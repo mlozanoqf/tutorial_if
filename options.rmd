@@ -160,7 +160,7 @@ c <- c.bs(50, 50, 0.05, 1, 0.3)
 p <- p.bs(50, 50, 0.05, 1, 0.3)
 option.prices <- data.frame("call" = c, "put" = p)
 row.names(option.prices) <- c("Black-Scholes option prices")
-kable(option.prices, caption = "Theoretical option prices.") %>%
+kable(option.prices, caption = "Theoretical option prices.") |>
 kable_styling(latex_options = "HOLD_position")
 ```
 
@@ -584,7 +584,7 @@ bin.bs <- rbind("Binomial (1 step)" = b1t, "Binomial (4 steps)" = b4t,
                 "Binomial (200 steps)" = b200t, 
                 "Binomial (500 steps)" = b500t, 
                 "Black-Scholes" = Black.Scholes)
-kable(bin.bs, caption = "Binomial and Black-Scholes comparison.") %>%
+kable(bin.bs, caption = "Binomial and Black-Scholes comparison.") |>
 kable_styling(latex_options = "HOLD_position")
 ```
 
@@ -649,7 +649,7 @@ Spaths <- S.paths(50, 0.3, 1, 10)
 # A table.
 colnames(Spaths) <- c(0, cumsum(rep(1/10, 10)))
 kable(Spaths, caption = "Stock price paths given to the binomial model.",
-      digits = 2) %>%
+      digits = 2) |>
 kable_styling(latex_options = "HOLD_position")
 ```
 
@@ -678,7 +678,7 @@ Spaths <- S.paths(50, 0.3, 1, 10)
 # A table.
 colnames(Spaths) <- round(c(0, cumsum(rep(1/10, 10))), 2)
 kable(Spaths, caption = "Stock price paths given to the binomial model.",
-      digits = 2) %>%
+      digits = 2) |>
 kable_styling(latex_options = "HOLD_position")
 ```
 
@@ -692,7 +692,7 @@ b2 <- mapply(bin, 50, 52, 0.3, 2, 0.05, 2)
 b2
 ```
 
-```{r}
+```{r eval=FALSE, include=FALSE}
 # E2 Q1
 # the value of being American; or the cost of being European.
 S.seq <- seq(30, 70, 0.5)
@@ -855,16 +855,16 @@ d = 0.34
 n = 30
 set.seed(2, sample.kind="Rounding")
 a.30x10k <- replicate(10000, 
-                      cumprod(sample(c(1+u, 1-d), n, replace = TRUE))) %>%
-  as.data.frame() %>%
-  mutate(year = c(1:30)) %>%
+                      cumprod(sample(c(1+u, 1-d), n, replace = TRUE))) |>
+  as.data.frame() |>
+  mutate(year = c(1:30)) |>
   gather(V1:V10000, key = name, value = c.ret)
 ```
 
 See the results.
 
 ```{r}
-a.30x10k %>%
+a.30x10k |>
 ggplot(aes(x = year, y = c.ret, color = name)) +
   geom_line(size = 1) +
   theme(legend.position = "none", legend.title = element_blank()) +
@@ -980,8 +980,8 @@ abc
 ```
 
 ```{r}
-abc %>%
-  gather(a:c, key = name, value = c.ret) %>%
+abc |>
+  gather(a:c, key = name, value = c.ret) |>
   ggplot(aes(x = year, y = c.ret, color = name)) +
   geom_line(size = 1)
 ```
@@ -998,8 +998,8 @@ bx <-(replicate(10000, binomial_tree(u = 0.46, d = 0.34, 30)))
 abcx <- as.data.frame(cbind(
   year = c(1:30), a = ax, b = bx, c = cx))
 
-abcx %>%
-  gather(a:c, key = name, value = c.ret) %>%
+abcx |>
+  gather(a:c, key = name, value = c.ret) |>
   ggplot(aes(x = name, y = log(c.ret), color = name)) +
   geom_boxplot() +
   theme(legend.position = "none")
@@ -1264,7 +1264,7 @@ epsilon <- c(epsilon, NA)
 delta_S <- c(delta_S, NA)
 results <- data.frame(S, epsilon, delta_S)
 kable(results, caption = "Simulation of stock price (Table 14.1 in Hull).", 
-      digits = 4) %>%
+      digits = 4) |>
 kable_styling(latex_options = "HOLD_position")
 ```
 
@@ -1476,7 +1476,7 @@ ANikkei <- Nikkei / YENUSD
 Table22.2 <- data.frame(DJIA, AFTSE100, ACAC40, ANikkei)
 kable(head(Table22.2), caption = "US dollar equivalent of stock indices for
       historical simulation (first values).", digits = 4, 
-      row.names = TRUE) %>%
+      row.names = TRUE) |>
 kable_styling(latex_options = "HOLD_position")
 ```
 
@@ -1484,7 +1484,7 @@ Now the last part of Table 22.2.
 
 ```{r}
 kable(tail(Table22.2), caption = "US dollar equivalent of stock indices for
-      historical simulation (last values).", digits = 4) %>%
+      historical simulation (last values).", digits = 4) |>
 kable_styling(latex_options = "HOLD_position")
 ```
 
@@ -1497,7 +1497,7 @@ ANikkei.hoy <- Nikkei.hoy / YENUSD.hoy
 # Table.
 Table22.2hoy <- data.frame(DJIA.hoy, AFTSE100.hoy, ACAC40.hoy, ANikkei.hoy)
 kable(tail(Table22.2hoy), caption = "Here we show 501 and 502 values.", 
-      digits = 4) %>%
+      digits = 4) |>
 kable_styling(latex_options = "HOLD_position")
 ```
 
@@ -1533,7 +1533,7 @@ Replicate Table 21.3 in Hull.
 # Verify this is the same as Table 21.3 in Hull.
 Table21.3 <- data.frame(SDJIA, SFTSE100, SCAC40, SNikkei, p, l)
 kable(head(Table21.3), caption = "Scenarios generated for September 26, 
-      2008 (first values).", digits = 4, row.names = TRUE) %>%
+      2008 (first values).", digits = 4, row.names = TRUE) |>
 kable_styling(latex_options = "HOLD_position")
 ```
 
@@ -1541,7 +1541,7 @@ The last values of Table 21.3.
 
 ```{r}
 kable(tail(Table21.3), caption = "Scenarios generated for September 26, 
-      2008 (last values).", digits = 4) %>%
+      2008 (last values).", digits = 4) |>
 kable_styling(latex_options = "HOLD_position")
 ```
 
@@ -1553,7 +1553,7 @@ See what really happened.
 Table21.3hoy <- data.frame(SDJIA.hoy, SFTSE100.hoy, SCAC40.hoy, SNikkei.hoy,
                            p.hoy,l.hoy)
 kable(head(Table21.3hoy), caption = "What really happened.", digits = 4, 
-      row.names = TRUE) %>%
+      row.names = TRUE) |>
 kable_styling(latex_options = "HOLD_position")
 ```
 
@@ -1612,7 +1612,7 @@ A table for the losses ranked.
 Table22.4 <- data.frame(scenario.number = order(l, decreasing = TRUE),
                         `loss in positive values` = l[order(l, decreasing = TRUE)])
 kable(head(Table22.4), caption = "Losses ranked from highest to lowest for 
-      500 scenarios (first values).", digits = 4, row.names = TRUE) %>%
+      500 scenarios (first values).", digits = 4, row.names = TRUE) |>
 kable_styling(latex_options = "HOLD_position")
 ```
 
@@ -1620,7 +1620,7 @@ And the last values (not shown in Hull).
 
 ```{r}
 kable(tail(Table22.4), caption = "Losses ranked from highest to lowest for 
-      500 scenarios (last values).", digits = 4) %>%
+      500 scenarios (last values).", digits = 4) |>
 kable_styling(latex_options = "HOLD_position")
 ```
 
@@ -1656,7 +1656,7 @@ barplot(quantile(l), ylim = c(min(l), max(l)),
 ```{r}
 # Results
 VaR.hist.quantile <- quantile(l, 0.99)
-kable(VaR.hist.quantile, caption = "Quantile.", digits = 4) %>%
+kable(VaR.hist.quantile, caption = "Quantile.", digits = 4) |>
 kable_styling(latex_options = "HOLD_position")
 ```
 
@@ -1677,7 +1677,7 @@ Summary of results.
 ```{r}
 Results <- data.frame(VaR.method = c("VaR.hist","VaR.hist.quantile"), 
                      value = c(VaR.hist,VaR.hist.quantile))
-kable(Results, caption = "Results.", digits = 4) %>%
+kable(Results, caption = "Results.", digits = 4) |>
 kable_styling(latex_options = "HOLD_position")
 ```
 
@@ -1711,7 +1711,7 @@ Rcor <- cor(R)
 Table23.5 <- Rcor
 kable(Table23.5, caption = "Correlation matrix on September 25, 2008, 
       calculated by giving equal weight to the last 500 daily returns.", 
-      digits = 4) %>%
+      digits = 4) |>
 kable_styling(latex_options = "HOLD_position")
 ```
 
@@ -1723,7 +1723,7 @@ Rcov <- cov(R)
 Table23.6 <- Rcov
 kable(Table23.6, caption = "Covariance matrix on September 25, 2008, 
       calculated by giving equal weight to the last 500 daily returns.", 
-      digits = 8) %>%
+      digits = 8) |>
 kable_styling(latex_options = "HOLD_position")
 ```
 
@@ -1758,7 +1758,7 @@ In Hull, this value is 217,757, which compares with 253,385, calculated using th
 Results <- data.frame(VaR.method = c("VaR.hist", "VaR.hist.quantile", 
                                      "VaR.ew"), 
                       value = c(VaR.hist, VaR.hist.quantile, VaR.ew))
-kable(Results, caption = "Summary of results.", digits = 4) %>%
+kable(Results, caption = "Summary of results.", digits = 4) |>
 kable_styling(latex_options = "HOLD_position")
 ```
 
@@ -1805,7 +1805,7 @@ Rdf <- as.data.frame(R)
 C <- covEWMA(Rdf, lambda = 0.94)[500,,] # Table 23.7
 Table23.7 <- C
 kable(Table23.7, caption = "Covariance matrix on September 25, 2008, 
-      calculated using the EWMA (other author's approach).", digits = 8) %>%
+      calculated using the EWMA (other author's approach).", digits = 8) |>
 kable_styling(latex_options = "HOLD_position")
 ```
 
@@ -1833,7 +1833,7 @@ In Hull, this value is 471,025, over twice as high as the value given when retur
 Results  <-  data.frame(VaR.method=c("VaR.hist", "VaR.hist.quantile", 
                                      "VaR.ew","VaR.ewma"), 
                     value = c(VaR.hist, VaR.hist.quantile, VaR.ew,VaR.ewma))
-kable(Results, caption = "Summary of results.", digits = 4) %>%
+kable(Results, caption = "Summary of results.", digits = 4) |>
 kable_styling(latex_options = "HOLD_position")
 ```
 
@@ -1845,7 +1845,7 @@ Table23.8 <- data.frame(Rsd * 100, diag(C)^0.5 * 100)
 colnames(Table23.8) <- c("Equal weighting", "EWMA")
 rownames(Table23.8) <- c("DJIA", "FTSE 100", "CAC 40", "Nikkei 225")
 kable(t(Table23.8), caption = "Volatilities % per day using equal 
-      weighting and EWMA (other author approach).", digits = 4) %>%
+      weighting and EWMA (other author approach).", digits = 4) |>
 kable_styling(latex_options = "HOLD_position")
 ```
 
@@ -1945,7 +1945,7 @@ Results <- data.frame(VaR.method=
                              VaR.ew,
                              VaR.ewma,
                              VaR.ewma.martin))
-kable(Results, caption = "Summary of results.", digits = 4) %>%
+kable(Results, caption = "Summary of results.", digits = 4) |>
 kable_styling(latex_options = "HOLD_position")
 ```
 
@@ -1957,7 +1957,7 @@ Table23.8 <- data.frame(Rsd * 100, diag(C)^0.5 * 100, diag(VCV)^0.5 * 100)
 colnames(Table23.8) <- c("Equal weighting", "EWMA", "EWMA Martín")
 rownames(Table23.8) <- c("DJIA", "FTSE 100", "CAC 40", "Nikkei 225")
 kable(t(Table23.8), caption = "Volatilities % per day using equal 
-      weighting and EWMA (other author approach).", digits = 4) %>%
+      weighting and EWMA (other author approach).", digits = 4) |>
 kable_styling(latex_options = "HOLD_position")
 ```
 
@@ -1972,7 +1972,7 @@ W_hull <- alpha / 10000
 W_hullt <- data.frame(W_hull)
 rownames(W_hullt) <- c("DJIA", "FTSE 100", "CAC 40", "Nikkei 225")
 kable(t(W_hullt), caption = "Original (and presumible sub-optimal) Hull's 
-      portfolio weights.", digits = 4) %>%
+      portfolio weights.", digits = 4) |>
 kable_styling(latex_options = "HOLD_position")
 ```
 
@@ -2021,7 +2021,7 @@ W <- data.frame(W_hull, W_min, W.cac40, c(0.25,0.25,0.25,0.25))
 rownames(W) <- c("DJIA", "FTSE 100", "CAC 40", "Nikkei 225")
 colnames(W) <- c("Hull (original weights)", "minimum variance (Martín)", "CAC 40 target return", "naive (1/N)")
 kable(t(W), caption = "Four different weights alternatives.", 
-      digits = 4) %>%
+      digits = 4) |>
 kable_styling(latex_options = "HOLD_position")
 ```
 
@@ -2187,7 +2187,7 @@ Results <- data.frame(VaR.method=c("VaR.hist",
                              VaR.ew.optimal.cac,
                              VaR.ewma,
                              VaR.ewma.martin))
-kable(Results, caption = "Summary of results.", digits = 4) %>%
+kable(Results, caption = "Summary of results.", digits = 4) |>
 kable_styling(latex_options = "HOLD_position")
 ```
 
@@ -2223,7 +2223,7 @@ Results <- data.frame(VaR.method=c("VaR.hist",
                              VaR.ewma.optimal,
                              VaR.ewma.optimal.cac,
                              VaR.ewma.martin))
-kable(Results, caption = "Summary of results.", digits = 4) %>%
+kable(Results, caption = "Summary of results.", digits = 4) |>
 kable_styling(latex_options = "HOLD_position")
 ```
 
@@ -2262,7 +2262,7 @@ Results <- data.frame(VaR.method=c("VaR.hist",
                              VaR.ewma.martin,
                              VaR.ewma.martin.optimal,
                              VaR.ewma.martin.optimal.cac))
-kable(Results, caption = "Summary of results.", digits = 4) %>%
+kable(Results, caption = "Summary of results.", digits = 4) |>
 kable_styling(latex_options = "HOLD_position")
 ```
 

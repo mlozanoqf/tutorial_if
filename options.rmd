@@ -24,6 +24,7 @@ header-includes:
 - \onehalfspacing
 - \counterwithin{figure}{subsection}
 - \counterwithin{table}{subsection}
+- \usepackage[nottoc]{tocbibind}
 - \usepackage{fontawesome5}
 #toc: yes
 bibliography: references.bib

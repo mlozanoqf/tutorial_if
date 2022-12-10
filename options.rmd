@@ -1,38 +1,10 @@
 ---
-title: "**\\Huge Financial engineering. \\vspace{20 mm}   \n \\fontsize{100}{100}\\faCogs  \\vspace{20 mm}  \n\\Huge Dr. Martín Lozano.**"
-
-author:
-- \faEnvelope \hspace{1 mm} \texttt{<martin.lozano@udem.edu>}
-- \faAddressCard \hspace{1 mm} \texttt{https://sites.google.com/site/mlozanoqf/}
-- \faGithub \hspace{1 mm} \texttt{https://github.com/mlozanoqf/}
-date: "\\faClock \\hspace{1 mm} Last compiled on: `r format(Sys.time(), '%d/%m/%Y, %H:%M:%S.')`"
-output:
-  pdf_document:
-    fig_caption: yes
-    number_sections: yes
-    extra_dependencies: float
-    citation_package: natbib
-  word_document: default
+title: ''
+#output: bookdown::gitbook:
   html_document:
     df_print: paged
-fontsize: 12pt
-always_allow_html: true #borrar.
-header-includes:
-- \usepackage{placeins}
-- \usepackage{setspace}
-- \usepackage{chngcntr}
-- \onehalfspacing
-- \counterwithin{figure}{subsection}
-- \counterwithin{table}{subsection}
-- \usepackage[nottoc]{tocbibind}
-- \usepackage{fontawesome5}
-#toc: yes
-bibliography: references.bib
-abstract: This material relies on John C. Hull [@Hull]. Some mathematical background is skipped to emphasize the data analysis, model logic, discussion, graphical approach and R coding. As in the philosophy of Donald Knuth [@knuth1984literate], the objective of this document is to explain to human beings what we want a computer to do as literate programming. This is a work in progress and it is under revision.
 ---
-
 -----------------------
-
 ```{=tex}
 \newpage 
 \hypersetup{linkcolor=black}
@@ -42,16 +14,9 @@ abstract: This material relies on John C. Hull [@Hull]. Some mathematical backgr
 
 ```{r echo=FALSE}
 # This removes all items in environment. 
-# It is a good practice to start your code this way.
 rm(list=ls())
-library(tictoc)
-tic()
 ```
 
-```{r global_options, include=FALSE}
-knitr::opts_chunk$set(warning=FALSE, message=FALSE)
-knitr::opts_chunk$set(fig.pos = "H", out.extra = "")
-```
 \newpage
 
 # Options.
@@ -499,7 +464,7 @@ legend("bottomright", legend = c("Call option (short)", "Stock",
 
 There is an alternative to the Black-Scholes formula we indirectly review before. Next section introduces the binomial trees.
 
-```{r}
+```{r eval=FALSE, include=FALSE}
 ST.seq <- seq(from = 0, to = 60, length.out = 200)
 K = 30
 c = 3
@@ -707,15 +672,15 @@ b2 <- mapply(bin, 50, 52, 0.3, 2, 0.05, 2)
 b2
 ```
 
-```{r eval=FALSE, include=FALSE}
+```{r}
 # E2 Q1
 # the value of being American; or the cost of being European.
 S.seq <- seq(30, 70, 0.5)
 AEoptions <- mapply(bin, S.seq, 52, 0.3, 1, 0.05, 50)
-plot(K.seq, unlist(AEoptions[4,]) - unlist(AEoptions[2,]), type = "l", lwd = 2,
+plot(S.seq, unlist(AEoptions[4,]) - unlist(AEoptions[2,]), type = "l", lwd = 2,
      main = "The value of being American.",
      xlab = "S_0",
-     ylab = "Option premium for American options.")
+     ylab = "Option premium for American put options.")
 abline(v = 52, lty = 2)
 ```
 
@@ -790,7 +755,8 @@ r.seq <- seq(0.11, 0.17, 0.001)
 df <- mapply(option.df.fun, r.seq)
 par(pty = "s")
 plot(r.seq, df, type = "l", lwd = 2,
-     main = "Options are in general much risker compared with the underlying stock.",
+     main = "Options are in general much risker compared with the 
+     underlying stock.",
      xlab = "Expected return of the stock (the underlying)",
      ylab = "Expected return of the option")
 abline(v = 0.12, lty = 2, col = "blue")

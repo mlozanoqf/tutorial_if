@@ -1,0 +1,11 @@
+hacer el repositorio público en GitHub, requiere el password.
+copiar un index.rmd en mi fólder local.
+abrir el Rproject file en mi fólder local.
+abro el index.rmd que acabo de copiar.
+	le cambio el título, el abstract, los archivos child, comento el "after_body: analytics_arf.html"
+abro los child y cambio el YAML y todo lo del inicio usando como referencia otros child.
+regreso a index.rmd y le doy knit to html_document2, eso abre un html y crea el index.html
+si es necesario save with Encoding como UTF-8 para acentos.
+
+abro google analytics
+

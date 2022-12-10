@@ -7,5 +7,41 @@ abro los child y cambio el YAML y todo lo del inicio usando como referencia otro
 regreso a index.rmd y le doy knit to html_document2, eso abre un html y crea el index.html
 si es necesario save with Encoding como UTF-8 para acentos.
 
-abro google analytics
+selecciono los documentos creados y cambiados, selecciono el primero y con shift presionado selecciono el último para seleccionar todos.
+Commit.
+escribo un mensaje breve y Commit.
+close en el mensaje de confirmación.
+Push botón verde.
+Close en el mensaje de confirmación.
 
+Regreso a GitHhub.
+Settings.
+Pages.
+Deploy from a branch.
+main branch y save.
+Regresar al repositorio esperar un poco, reload.
+Cuando esté listo abajo dice github-pages "active"
+Click en active y ver en "view deployment".
+Ya debe aparecer online como https://mlozanoqf.github.io/tutorial_if/
+
+
+
+abro google analytics
+admin (abajo izquierda)
++create property.
+property name: tutorial_if (por ejemplo)
+cambio el time zone y next.
+create
+choose a platform: web
+pongo el url mlozanoqf.github.io/tutorial_if/
+pongo nombre tutorial_if
+create stream
+install manually
+Regreso a RStudio porque necesito copiar un documento html de otro repositorio como analytics_emf en el fólder local.
+Le cambio el nombre como analytics_if
+Lo abro en RStudio (open in editor)
+Ahora copio el contenido del html que sale en install manually de google analytics en el documento analytics_if y grabo.
+En el index.rmd dejo sin comentar y con el nuevo nombre: after_body: analytics_if.html
+
+
+Los child tienen marcador de tiempo y sección de referencias que ya no necesitamos porque está en el index.rmd, se borran.

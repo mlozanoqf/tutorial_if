@@ -2,7 +2,7 @@
 title: Options and VaR with R.
 subtitle: Dr. Martín Lozano.
 author:
-- name: Back to main [`r fontawesome::fa("home")`](https://mlozanoqf.github.io/)
+#- name: Back to main [`r fontawesome::fa("home")`](https://mlozanoqf.github.io/)
 #  affiliation: Academic website. [Web.](https://sites.google.com/site/mlozanoqf/)
 date: "\\faClock \\hspace{1 mm} Current commit: `r format(Sys.time(), '%d/%m/%Y, %H:%M:%S.')`"
 #  bookdown::gitbook: default
@@ -33,6 +33,7 @@ bibliography: references.bib
 # This removes all items in environment. 
 # It is a good practice to start your code this way.
 rm(list=ls())
+library(fontawesome)
 library(tictoc)
 tic()
 ```
@@ -53,9 +54,11 @@ htmltools::tagList(
 )
 ```
 
+# [`r fa("arrow-circle-left", fill = "black")`](https://mlozanoqf.github.io/) {-}
+
+---
+
 \newpage
-
-
 
 ```{r Logistic, child = 'options.Rmd'}
 ```

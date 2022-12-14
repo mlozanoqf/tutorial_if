@@ -5,12 +5,6 @@ title: ''
     df_print: paged
 ---
 -----------------------
-```{=tex}
-\newpage 
-\hypersetup{linkcolor=black}
-\renewcommand*\contentsname{Index.}
-\tableofcontents
-```
 
 ```{r echo=FALSE}
 # This removes all items in environment. 
@@ -34,35 +28,31 @@ ps <- pmin(ST.seq - K, 0) # short put payoff.
 
 Graphically:
 
-```{r}
+```{r fig.cap="Payoffs of option positions."}
 par(mfrow = c(2, 2), mai = c(0.7, 0.4, 0.4, 0.4))
 par(pty = "s")
 plot(ST.seq, cl, type = "l", ylim = c(0, 150), lwd = 2,
-     ylab = "Payoff",
-     xlab = "")
+     ylab = "Payoff", xlab = "")
 legend("topleft", legend = c("Long call"),
        lwd = 2, bg = "white", bty = "n")
 par(pty = "s")
 plot(ST.seq, pl, type = "l", ylim = c(0, 150), lwd = 2,
-     ylab = "",
-     xlab = "")
+     ylab = "", xlab = "")
 legend("topleft", legend = c("Long put"),
        lwd = 2, bg = "white", bty = "n")
 par(pty = "s")
 plot(ST.seq, cs, type = "l", ylim = c(-150, 0), lwd = 2,
-     ylab = "Payoff",
-     xlab = "Stock price at maturity")
+     ylab = "Payoff", xlab = expression(paste(S[T])))
 legend("bottomleft", legend = c("Short call"),
        lwd = 2, bg = "white", bty = "n")
 par(pty = "s")
 plot(ST.seq, ps, type = "l", ylim = c(-150, 0), lwd = 2,
-     ylab = "",
-     xlab = "Stock price at maturity")
+     ylab = "", xlab = expression(paste(S[T])))
 legend("bottomleft", legend = c("Short put"),
        lwd = 2, bg = "white", bty = "n")
 ```
 
-```{r}
+```{r fig.cap="Hull: Figure 12.1a, profit diagram."}
 # Here I assume the stock price is currently 65.
 S0 <- ST.seq - K + 10
 # I assume the option price is 5.
@@ -71,7 +61,7 @@ cs.p <- 5
 ans <- cs.p + cs + S0
 par(pty = "s")
 plot(ST.seq, ans, type ="l", ylim = c(-75, 75), lwd = 2, col = "red",
-     main = "Figure 12.1a", xlab = "Stock price at maturity", 
+     xlab = expression(paste(S[T])), 
      ylab = "Profit")
 lines(ST.seq, S0, lty = 2, lwd = 2, col = "orange")
 lines(ST.seq, cs + cs.p, lty = 2, lwd = 2, col = "blue")
@@ -87,13 +77,12 @@ legend("topleft", legend = c("Short call", "Long stock", "Short put"),
 
 Nice. Now see how it looks if we plot a payoff diagram instead.
 
-```{r}
+```{r fig.cap="Hull: Figure 12.1a, payoff diagram."}
 S0 <- ST.seq - K
 ans <- cs + S0
 par(pty = "s")
 plot(ST.seq, S0, type ="l", ylim = c(-75, 75), lwd = 4, col = "orange",
-     main = "Figure 12.1a", xlab = "Stock price at maturity", 
-     ylab = "Payoff", lty = 2)
+     xlab = expression(paste(S[T])), ylab = "Payoff", lty = 2)
 lines(ST.seq, ans, lwd = 4, col = "red")
 lines(ST.seq, cs, lty = 2, lwd = 4, col = "blue")
 abline(v = 0)
@@ -164,7 +153,7 @@ We produce as many \texttt{c.S0} as values for \texttt{S0.seq}. Then, we can plo
 
 ```{r fig.cap="Call price as a function of the stock price at time zero."}
 # See the results.
-plot(S0.seq, c.S0, type = "l", lwd = 2, xlab = "Stock price, S0", 
+plot(S0.seq, c.S0, type = "l", lwd = 2, xlab = expression(paste(S[0])), 
      ylab = "Call option price, c")
 ```
 
@@ -173,7 +162,7 @@ The call option price is an increasing function of $S_0$. This makes sense becau
 See the case of the put option.
 
 ```{r fig.cap="Put price as a function of the stock price at time zero."}
-plot(S0.seq, p.S0, type = "l", lwd = 2, xlab = "Stock price, S0", 
+plot(S0.seq, p.S0, type = "l", lwd = 2, xlab = expression(paste(S[0])), 
      ylab = "Put option price, p")
 ```
 
@@ -187,7 +176,7 @@ S0.star <- K * exp(-rf * TT)
 c.S0.star <- mapply(c.bs, S0.star, K, rf, TT, sigma)
 # Plot.
 plot(S0.seq, c.S0, type = "l", lwd = 3, col = "blue", ylim = c(4, 8), 
-     xlab = "Stock price, S0", ylab = "Option theoretical price", 
+     xlab = expression(paste(S[0])), ylab = "Option theoretical price", 
      xlim = c(40, 55))
 lines(S0.seq, p.S0, lwd = 3, col = "red")
 abline(v = S0.star, lty = 2)
@@ -220,7 +209,7 @@ line.star <- S0.star * 2
 # Plot.
 par(pty = "s")
 plot(S0.seq, c.S0, type = "l", lwd = 3, col = "blue", ylim = c(0, 100),
-     xlab = "Stock price, S0", ylab = "Call (blue), put (red)")
+     xlab = expression(paste(S[0])), ylab = "Call (blue), put (red)")
 lines(S0.seq, p.S0, lwd = 3, col = "red")
 abline(v = S0.star, lty = 2) 
 abline(v = 0, lty = 2)
@@ -239,7 +228,7 @@ Note that the stock price range of values is from zero to positive infinity. How
 ```{r fig.cap="Call and put option bounds: geometric inspection (or 'the puzzle')."}
 par(pty = "s")
 plot(S0.seq, lb.put, type = "l", lwd = 2, col = "red",  ylim = c(0, 100), 
-     xlab = "Stock price, S0", ylab = "Call (blue), put (red)")
+     xlab = expression(paste(S[0])), ylab = "Call (blue), put (red)")
 abline(v = S0.star, lty = 2) 
 abline(v = 0, lty = 2)
 abline(v = line.star, lty = 2)
@@ -269,7 +258,7 @@ c.S0.s1 <- mapply(c.bs, S0.seq, K, rf, TT, sigma)
 c.S0.s5 <- mapply(c.bs, S0.seq, K, rf, TT, sigma * 5)
 c.S0.s15 <- mapply(c.bs, S0.seq, K, rf, TT, sigma * 15)
 # Plot.
-plot(S0.seq, c.S0.s1, type= "l", lwd = 3,  xlab = "Stock price, S0",
+plot(S0.seq, c.S0.s1, type= "l", lwd = 3,  xlab = expression(paste(S[0])),
      ylab = "Call option price, c")
 lines(S0.seq, c.S0.s5, lwd = 3, col = "blue") # call with higher sigma
 lines(S0.seq, c.S0.s15, lwd = 3, col = "red") # call with even higher sigma
@@ -289,7 +278,7 @@ p.S0.s1 <- mapply(p.bs, S0.seq, K, rf, TT, sigma)
 p.S0.s5 <- mapply(p.bs, S0.seq, K, rf, TT, sigma * 5)
 p.S0.s15 <- mapply(p.bs, S0.seq, K, rf, TT, sigma * 15)
 # Plot.
-plot(S0.seq, p.S0.s1, type= "l", lwd = 3,  xlab = "Stock price, S0",
+plot(S0.seq, p.S0.s1, type= "l", lwd = 3,  xlab = expression(paste(S[0])),
      ylab = "Pall option price, p")
 lines(S0.seq, p.S0.s5, lwd = 3, col = "blue") # put with higher sigma
 lines(S0.seq, p.S0.s15, lwd = 3, col = "red") # put with even higher sigma
@@ -315,7 +304,7 @@ for(i in 1:50){ # Is there an easier way to do this?
   for(j in 1:50){
     c.S0.s[i, j] <- c.bs(S0.seq[i], K.seq[j], rf, TT, sigma) } }
 # Plot.
-c.S0.s.plot <- persp(S0.seq, K.seq, c.S0.s, zlab = "Call", xlab = "S0", 
+c.S0.s.plot <- persp(S0.seq, K.seq, c.S0.s, zlab = "Call", xlab = "S_0", 
       ylab = "K", theta = -60, phi = 10, expand =  0.5, col = "orange", 
       shade = 0.2, ticktype = "detailed") 
 points(trans3d(S0, K, c, c.S0.s.plot), cex = 2, pch = 19, col = "blue")
@@ -324,7 +313,7 @@ points(trans3d(S0, K, c, c.S0.s.plot), cex = 2, pch = 19, col = "blue")
 An alternative view is by showing a contour plot. A contour plot is a graphical technique for representing a 3-dimensional surface by plotting constant $z$ slices (option prices), called contours, on a 2-dimensional format. That is, given a value for $z$, lines are drawn for connecting the $(x, y)$ coordinates ($S_0$, $K$) where that $z$ value occurs.
 
 ```{r fig.cap="Call value as the stock price at time zero and the strike price change: a contour view."}
-contour(S0.seq, K.seq, c.S0.s, xlab = "S0", ylab = "K", lwd = 2, 
+contour(S0.seq, K.seq, c.S0.s, xlab = expression(paste(S[0])), ylab = "K", lwd = 2, 
         nlevels = 20)
 points(S0, K, pch = 19, col = "blue", cex = 2)
 ```
@@ -358,7 +347,7 @@ points(trans3d(S0, TT, p, p.S0.T.plot), cex = 2, pch = 19, col = "blue")
 That is not quite clear. So, here is the contour view.
 
 ```{r fig.cap="Put value as the stock price at time zero and time to maturity change: a contour view, or the hypnotic plot."}
-contour(S0.seq, TT.seq, p.S0.T, xlab = "S0", ylab = "T", lwd = 2, 
+contour(S0.seq, TT.seq, p.S0.T, xlab = expression(paste(S[0])), ylab = "T", lwd = 2, 
         nlevels = 40, drawlabels = TRUE)
 points(S0, TT, pch = 19, col = "blue", cex = 2)
 ```
@@ -392,7 +381,7 @@ par(pty = "s")
 par(mfrow = c(1, 2), oma = c(0, 0, 2, 0))
 par(pty = "s")
 # Portfolio A.
-plot(ST.seq, cT, type = "l", ylab = "Payoff", xlab = "ST", lwd = 2, 
+plot(ST.seq, cT, type = "l", ylab = "Payoff", xlab = expression(paste(S[T])), lwd = 2, 
      lty = 2, col = "blue", ylim = c(0, 150))
 lines(ST.seq, BT, lwd = 2, lty = 2, col = "red")
 lines(ST.seq, (cT + BT), lwd = 2)
@@ -402,7 +391,7 @@ legend("topleft", legend = c("Call option", "Zero coupon bond",
        bg = "white", cex = 0.7)
 par(pty = "s")
 # Portfolio C.
-plot(ST.seq, ST.seq, type = "l", ylab = "Payoff", xlab = "ST",
+plot(ST.seq, ST.seq, type = "l", ylab = "Payoff", xlab = expression(paste(S[T])),
      lwd = 2, lty = 2, col = "orange", ylim = c(0, 150))
 lines(ST.seq, pT, lwd = 2, lty = 2, col = "purple")
 lines(ST.seq, (pT + ST.seq), lwd = 2)
@@ -417,7 +406,7 @@ In sum, this is the payoff of portfolios A and C: $max(S_T, K)$.
 
 ```{r fig.cap="Portfolio A and C payoffs: max(ST,K)."}
 par(pty = "s")
-plot(ST.seq, pc, type = "l", ylab = "Payoff", xlab = "ST", lwd = 3, 
+plot(ST.seq, pc, type = "l", ylab = "Payoff", xlab = expression(paste(S[T])), lwd = 3, 
      ylim = c(0, 150))
 ```
 
@@ -429,7 +418,7 @@ Graphically:
 
 ```{r fig.cap="A synthetic stock."}
 par(pty = "s")
-plot(ST.seq, (cT + BT - pT), type = "l", ylab = "Payoff", xlab = "ST", 
+plot(ST.seq, (cT + BT - pT), type = "l", ylab = "Payoff", xlab = expression(paste(S[T])), 
      lwd = 3, ylim = c(-50, 150), xlim = c(0, 200), col = "orange")
 lines(ST.seq, cT, lwd = 2, lty = 2, col = "blue") # positive call.
 lines(ST.seq, BT, lwd = 2, lty = 2, col = "red") # positive bond.
@@ -450,7 +439,7 @@ Graphically:
 
 ```{r fig.cap="A synthetic bond."}
 par(pty = "s")
-plot(ST.seq, (-cT + ST.seq + pT), type = "l", ylab = "Payoff", xlab = "ST", 
+plot(ST.seq, (-cT + ST.seq + pT), type = "l", ylab = "Payoff", xlab = expression(paste(S[T])), 
      lwd = 3, ylim = c(-50, 150), xlim = c(0, 200), col = "orange",
      main = "A synthetic bond.")
 lines(ST.seq, -cT, lwd = 2, lty = 2, col = "blue") 
@@ -581,7 +570,7 @@ b20 <- mapply(bin, S0.seq, K, sigma, TT, rf, 20)
 Here we compare the value of the binomial method and the Black-Scholes as a function of $S_0$.
 
 ```{r fig.cap="Binomial and Black-Scholes comparison."}
-plot(S0.seq, b1[1, ], type = "l", col = "red", lwd = 2, xlab = "S0", 
+plot(S0.seq, b1[1, ], type = "l", col = "red", lwd = 2, xlab = expression(paste(S[0])), 
      ylab = "Call")
 lines(S0.seq, c.S0.s1, col = "black", lwd = 2)
 legend("topleft", legend = c("1 step binomial", "Black-Scholes"),
@@ -592,7 +581,7 @@ There are some differences between the binomial and the Black-Scholes. Let's zoo
 
 ```{r fig.cap="Binomial and Black-Scholes convergence: a zoom view."}
 plot(S0.seq, b1[1,], type="l", ylim = c(0, 4), xlim = c(30, 45), 
-     col = "green", lwd = 2, xlab = "S0", ylab = "Call")
+     col = "green", lwd = 2, xlab = expression(paste(S[0])), ylab = "Call")
 lines(S0.seq, b2[1,], col = "purple", lwd = 2)
 lines(S0.seq, b3[1,], col = "orange", lwd = 2)
 lines(S0.seq, b4[1,], col = "red", lwd = 2)
@@ -679,7 +668,7 @@ S.seq <- seq(30, 70, 0.5)
 AEoptions <- mapply(bin, S.seq, 52, 0.3, 1, 0.05, 50)
 plot(S.seq, unlist(AEoptions[4,]) - unlist(AEoptions[2,]), type = "l", lwd = 2,
      main = "The value of being American.",
-     xlab = "S_0",
+     xlab = expression(paste(S[0])),
      ylab = "Option premium for American put options.")
 abline(v = 52, lty = 2)
 ```
@@ -872,7 +861,7 @@ ggplot(aes(x = year, y = c.ret, color = name)) +
 Here it is easier to see that the paths actually follow a binomial structure. Now, let's see the summary statistics for the 10,000 possible investment value at year 30.
 
 ```{r}
-set.seed(2, sample.kind="Rounding")
+set.seed(2, sample.kind = "Rounding")
 summary(replicate(10000, binomial_tree(u = 0.46, d = 0.34, 30)))
 ```
 
@@ -919,14 +908,14 @@ binomial_tree(u = (-0.001), d = (0.001), 30)
 It works, a $\$1$ dollar invested at $t=0$ would lead to $\$0.99501$ at $T=5$. And now we know that a $\$1$ dollar invested at $t=0$ would lead to $\$0.970431$ at $T=30$. These results represent one single path, but we do not need more as there is no risk. Let's confirm:
 
 ```{r}
-set.seed(2, sample.kind="Rounding")
+set.seed(2, sample.kind = "Rounding")
 median(replicate(10000, binomial_tree(u = -0.001, d = 0.001, 30)))
 ```
 
 The result is the same. Asset B is a loosing investment as well. But, what if we combine both assets A and B in an equally weighted portfolio C?
 
 ```{r}
-set.seed(2, sample.kind="Rounding")
+set.seed(2, sample.kind = "Rounding")
 median(replicate(1, binomial_tree(u = (0.46-0.001)/2, 
                                       d = (0.34+0.001)/2, 30)))
 ```
@@ -940,7 +929,7 @@ Let's visualize how these assets behave. I have to set the seed to have nice res
 ```{r}
 u = 0.46
 d = 0.34
-xx=8
+xx = 8
 set.seed(xx, sample.kind="Rounding")
 a30 <- sample(c(1+u, 1-d), 30, replace = TRUE)
 u = - 0.001
@@ -948,7 +937,7 @@ d = 0.001
 b30 <- sample(c(1+u, 1-d), 30, replace = TRUE)
 u = (0.46 - 0.001)/2
 d = (0.34 + 0.001)/2
-set.seed(xx, sample.kind="Rounding")
+set.seed(xx, sample.kind = "Rounding")
 c30 <- sample(c(1+u, 1-d), 30, replace = TRUE)
 ```
 
@@ -968,12 +957,12 @@ abc |>
 ```
 
 ```{r}
-set.seed(2, sample.kind="Rounding")
+set.seed(2, sample.kind = "Rounding")
 ax <- (replicate(10000, binomial_tree(u = -0.001, d = 0.001, 30)))
-set.seed(2, sample.kind="Rounding")
+set.seed(2, sample.kind = "Rounding")
 cx <- (replicate(10000, binomial_tree(u = (0.46-0.001)/2, 
                                       d = (0.34+0.001)/2, 30)))
-set.seed(2, sample.kind="Rounding")
+set.seed(2, sample.kind = "Rounding")
 bx <-(replicate(10000, binomial_tree(u = 0.46, d = 0.34, 30)))
 
 abcx <- as.data.frame(cbind(
@@ -2013,7 +2002,7 @@ W_hull <- alpha / 10000
 R_hull <- c(t(W_hull) %*% E)
 S_hull <- c(t(W_hull) %*% sigma %*% W_hull)^0.5
 
-plot(S, ER, type ="l", lwd = 2, xlim = c(0.7, 1.6), ylim = c(-0.022, 0.005),
+plot(S, ER, type = "l", lwd = 2, xlim = c(0.7, 1.6), ylim = c(-0.022, 0.005),
      ylab = "Expected return", xlab = "Standard deviation")
 points(diag(sigma)^0.5, E)
 abline(0, R_hull / S_hull, lty = 3, col = "blue")
@@ -2046,7 +2035,7 @@ W_1N <- c(0.25,0.25,0.25,0.25)
 R_1N <- c(t(W_1N) %*% E)
 S_1N <- c(t(W_1N) %*% sigma %*% W_1N)^0.5
 
-plot(S, ER, type ="l", lwd = 2, xlim = c(0.7, 1.6), ylim = c(-0.022, 0.005),
+plot(S, ER, type = "l", lwd = 2, xlim = c(0.7, 1.6), ylim = c(-0.022, 0.005),
      ylab = "Expected return", xlab = "Standard deviation")
 points(diag(sigma)^0.5, E)
 abline(0, R_hull / S_hull, lty = 3, col = "blue")

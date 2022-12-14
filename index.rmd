@@ -1,5 +1,6 @@
 ---
-title: Options and VaR with R.
+title: Options and VaR with `r fontawesome::fa("r-project")` <span style="color:white">R</span>
+
 subtitle: Dr. Martín Lozano.
 author:
 #- name: Back to main [`r fontawesome::fa("home")`](https://mlozanoqf.github.io/)

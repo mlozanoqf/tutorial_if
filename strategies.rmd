@@ -1,0 +1,213 @@
+---
+title: ''
+#output: bookdown::gitbook:
+  html_document:
+    df_print: paged
+---
+
+```{r echo=FALSE}
+# This removes all items in environment. 
+rm(list=ls())
+```
+
+\newpage
+
+# Payoff functions.
+
+## European options.
+
+The payoff functions for European options are the following.
+
+* Payoff from a long position in a European call option: $\mathrm{max}(S_T-K, 0)$. Or equivalently: $-\mathrm{min}(K-S_T, 0)$.
+* Payoff from to the holder of a long position in a European put option: $\mathrm{max}(K-S_T, 0)$. Or equivalently: $-\mathrm{min}(S_T-K, 0)$.
+* Payoff to the holder of a short position in the European call option: $\mathrm{min}(K-S_T, 0)$. Or equivalently: $-\mathrm{max}(S_T-K, 0)$.
+* Payoff from a short position in a European put option: $\mathrm{min}(S_T-K, 0)$. Or equivalently: $-\mathrm{max}(K-S_T, 0)$.
+
+Options are zero sum games because the payoffs to the holder or a long position and to the holder of a short position offset each other. 
+
+In the case of a call option: 
+
+$\mathrm{max}(S_T-K, 0) + \mathrm{min}(K-S_T, 0)$,
+
+$\mathrm{max}(S_T-K, 0) - \mathrm{max}(S_T-K, 0) = 0$.
+
+In the case of a put option: 
+
+$\mathrm{max}(K-S_T, 0) + \mathrm{min}(S_T-K, 0)$,
+
+$\mathrm{max}(K-S_T, 0) - \mathrm{max}(K-S_T, 0) = 0$.
+
+
+```{r}
+ST.seq <- seq(from = 0, to = 150, length.out = 150)
+K = 75
+cl <- pmax(ST.seq - K, 0) # long call payoff.
+pl <- pmax(K - ST.seq, 0) # long put payoff.
+cs <- pmin(K - ST.seq, 0) # short call payoff.
+ps <- pmin(ST.seq - K, 0) # short put payoff.
+```
+
+Graphically (assuming $K=75$):
+
+```{r fig.cap="Payoffs of European option positions."}
+par(mfrow = c(2, 2), mai = c(0.7, 0.4, 0.4, 0.4))
+par(pty = "s")
+plot(ST.seq, cl, type = "l", ylim = c(0, 150), lwd = 4,
+     ylab = "Payoff", xlab = "")
+legend("topleft", legend = c("Long call"),
+       bg = "white", bty = "n")
+par(pty = "s")
+plot(ST.seq, pl, type = "l", ylim = c(0, 150), lwd = 4,
+     ylab = "", xlab = "")
+legend("topleft", legend = c("Long put"),
+       bg = "white", bty = "n")
+par(pty = "s")
+plot(ST.seq, cs, type = "l", ylim = c(-150, 0), lwd = 4,
+     ylab = "Payoff", xlab = expression(paste(S[T])))
+legend("bottomleft", legend = c("Short call"),
+       bg = "white", bty = "n")
+par(pty = "s")
+plot(ST.seq, ps, type = "l", ylim = c(-150, 0), lwd = 4,
+     ylab = "", xlab = expression(paste(S[T])))
+legend("bottomleft", legend = c("Short put"),
+       bg = "white", bty = "n")
+```
+## Stocks.
+
+The payoff functions for stocks are the following.
+
+* Long position in a stock: $S_T-S_0$.
+
+* Short position in a stock: $S_0-S_T$.
+
+Graphically:
+
+```{r fig.cap="Long and short stock payoffs."}
+S0 = 75
+par(pty = "s")
+par(mfrow = c(1, 2), oma = c(0, 0, 2, 0))
+par(pty = "s")
+# Long position
+plot(ST.seq, ST.seq-S0, type = "l", ylab = "Payoff", main = "Long stock",
+     xlab = expression(paste(S[T])), lwd = 4, col = "blue", 
+     ylim = c(-75, 75))
+abline(h = 0, lty = 2)
+abline(v = 0, lty = 2)
+par(pty = "s")
+# Short position
+plot(ST.seq, S0-ST.seq, type = "l", ylab = "", main = "Short stock",
+     xlab = expression(paste(S[T])), lwd = 4, col = "red", 
+     ylim = c(-75, 75))
+abline(h = 0, lty = 2)
+abline(v = 0, lty = 2)
+```
+
+## Bonds.
+
+
+The payoff functions for zero coupon bonds are the following.
+
+* Long position in a bond: $K$.
+
+* Short position in a bond: $-K$.
+
+Graphically (assuming $K=75$):
+
+```{r fig.cap="Long and short zero coupon bond payoffs."}
+K = 75
+par(pty = "s")
+par(mfrow = c(1, 2), oma = c(0, 0, 2, 0))
+par(pty = "s")
+# Long position
+plot(ST.seq, rep(K, 150), type = "l", ylab = "Payoff", main = "Long bond",
+     xlab = expression(paste(S[T])), lwd = 4, col = "blue", 
+     ylim = c(0, 150))
+abline(h = 0, lty = 2)
+abline(v = 0, lty = 2)
+par(pty = "s")
+# Short position
+plot(ST.seq, rep(-K, 150), type = "l", ylab = "", main = "Short bond",
+     xlab = expression(paste(S[T])), lwd = 4, col = "red", 
+     ylim = c(-150, 0))
+abline(h = 0, lty = 2)
+abline(v = 0, lty = 2)
+```
+
+## Options, stocks and bonds.
+
+```{r fig.cap="Hull: Figure 12.1a, profit diagram."}
+S0 = 65
+# Here I assume the stock price is currently 65.
+Sl <- ST.seq - S0
+# I assume the option price is 5.
+cs.pr <- pmin(K - ST.seq, 0) + 5
+# A short put profit is replicated by taking a short call and a long stock.
+ans <- cs.pr + Sl
+par(pty = "s")
+plot(ST.seq, ans, type = "l", ylim = c(-75, 75), lwd = 2, col = "red",
+     xlab = expression(paste(S[T])), 
+     ylab = "Profit")
+lines(ST.seq, Sl, lty = 2, lwd = 2, col = "orange")
+lines(ST.seq, cs.pr, lty = 2, lwd = 2, col = "blue")
+abline(v = 0)
+abline(h = 0)
+abline(v = 65, lty = 2, col = "grey")
+abline(v = 75, lty = 2, col = "grey")
+abline(v = 80, lty = 2, col = "grey")
+legend("topleft", legend = c("Short call", "Long stock", "Short put"),
+       col = c("blue", "orange", "red"), lty = c(2, 2, 1), 
+       lwd = 2, bg = NULL)
+```
+
+```{r fig.cap="Hull: Figure 12.1a, profit diagram (zoom)."}
+S0 = 65
+c_price = 5
+# Here I assume the stock price is currently 65.
+Sl <- ST.seq - S0
+# I assume the option price is 5.
+cs.pr <- pmin(K - ST.seq, 0) + c_price
+# A short put profit is replicated by taking a short call and a long stock.
+ans <- cs.pr + Sl
+par(pty = "s")
+plot(ST.seq, ans, type = "l", ylim = c(-5, 15), xlim = c(60, 80),
+     lwd = 4, col = "red",
+     xlab = expression(paste(S[T])), 
+     ylab = "Profit")
+lines(ST.seq, Sl, lwd = 4, col = "orange")
+lines(ST.seq, cs.pr, lwd = 4, col = "blue")
+abline(v = 0)
+abline(h = 0)
+abline(v = 65, lty = 2, col = "grey")
+abline(v = 75, lty = 2, col = "grey")
+abline(v = 80, lty = 2, col = "grey")
+points(S0 - c_price, 0, cex = 3, col = "red", lwd = 3)
+points(K, K - S0 + c_price, cex = 3, col = "red", lwd = 3, pch = 0)
+points(K + c_price, 0, cex = 3, col = "blue", lwd = 3)
+points(K, c_price, cex = 3, col = "blue", lwd = 3, pch = 0)
+points(S0, 0, cex = 3, col = "orange", lwd = 3)
+points(K, K - S0, cex = 3, col = "orange", lwd = 3, pch = 0)
+points(K, 0, cex = 3, lwd = 3)
+```
+
+We can identify at least three isosceles right triangles, they have two sides of equal measure. Now see how it looks if we plot a payoff diagram instead.
+
+```{r fig.cap="Hull: Figure 12.1a, payoff diagram."}
+S0 = K
+Sl <- ST.seq - S0
+cs.pr <- pmin(K - ST.seq, 0)
+# A short put profit is replicated by taking a short call and a long stock.
+ans <- cs.pr + Sl
+par(pty = "s")
+plot(ST.seq, ans, type = "l", ylim = c(-75, 75), lwd = 5, col = "red",
+     xlab = expression(paste(S[T])), 
+     ylab = "Payoff")
+lines(ST.seq, Sl, lty = 2, lwd = 2, col = "orange")
+lines(ST.seq, cs.pr, lty = 2, lwd = 2, col = "blue")
+abline(v = 0, lty = 2)
+abline(h = 0, lty = 2)
+legend("topleft", legend = c("Short call", "Long stock", "Short put"),
+       col = c("blue", "orange", "red"), lty = c(2, 2, 1), 
+       lwd = 2, bg = "white")
+```
+
+

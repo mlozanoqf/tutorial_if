@@ -1,0 +1,972 @@
+---
+title: ''
+#output: bookdown::gitbook:
+  html_document:
+    df_print: paged
+---
+
+```{r echo=FALSE}
+# This removes all items in environment. 
+rm(list=ls())
+```
+
+\newpage
+
+# VaR.
+
+Here we develop and extend the example called "Investment in Four Stock Indices".
+
+## Prepare the data.
+
+Load the data and prepare the database.
+
+```{r}
+rm(list=ls())
+df <- read.table("dataR.txt", sep = "", header = TRUE) 
+df.hoy <- read.table("hoy.txt", sep = "", header = TRUE) 
+library(zoo)
+# Easy to remember names:
+DJIA <- df[1]
+FTSE100 <- df[2]
+USDGBP <- df[3]
+CAC40 <- df[4]
+EURUSD <- df[5]
+Nikkei <- df[6]
+YENUSD <- df[7]
+# Easy to remember names:
+DJIA.hoy <- df.hoy[1]
+FTSE100.hoy <- df.hoy[2]
+USDGBP.hoy <- df.hoy[3]
+CAC40.hoy <- df.hoy[4]
+EURUSD.hoy <- df.hoy[5]
+Nikkei.hoy <- df.hoy[6]
+YENUSD.hoy <- df.hoy[7]
+```
+
+Replicate Table 22.2 in Hull.
+
+```{r}
+# Adjustments for exchange rate risk. See Hull for details.
+# Now the variables starting with "A" stands for "adjusted".
+# We do not need to adjust DJIA since we are supposed to be in the US.
+AFTSE100 <- FTSE100 * USDGBP
+ACAC40 <- CAC40 / EURUSD
+ANikkei <- Nikkei / YENUSD
+# Inspection of the original data.
+# Verify this is the same as Table 22.2 in Hull.
+Table22.2 <- data.frame(DJIA, AFTSE100, ACAC40, ANikkei)
+kable(head(Table22.2), caption = "US dollar equivalent of stock indices for
+      historical simulation (first values).", digits = 4, 
+      row.names = TRUE) |>
+kable_styling(latex_options = "HOLD_position")
+```
+
+Now the last part of Table 22.2.
+
+```{r}
+kable(tail(Table22.2), caption = "US dollar equivalent of stock indices for
+      historical simulation (last values).", digits = 4) |>
+kable_styling(latex_options = "HOLD_position")
+```
+
+We are interested to evaluate what happened on September 26, 2008. This is why we need the real values.
+
+```{r}
+AFTSE100.hoy <- FTSE100.hoy * USDGBP.hoy
+ACAC40.hoy <- CAC40.hoy / EURUSD.hoy
+ANikkei.hoy <- Nikkei.hoy / YENUSD.hoy
+# Table.
+Table22.2hoy <- data.frame(DJIA.hoy, AFTSE100.hoy, ACAC40.hoy, ANikkei.hoy)
+kable(tail(Table22.2hoy), caption = "Here we show 501 and 502 values.", 
+      digits = 4) |>
+kable_styling(latex_options = "HOLD_position")
+```
+
+```{r}
+# S stands for scenarios for September 26th 2008:
+SDJIA <- DJIA[501, ] * DJIA[2:501, ] / DJIA[1:500, ]
+SFTSE100 <- AFTSE100[501, ] * AFTSE100[2:501, ] / AFTSE100[1:500, ]
+SCAC40 <- ACAC40[501, ] * ACAC40[2:501, ] / ACAC40[1:500, ]
+SNikkei <- ANikkei[501, ] * ANikkei[2:501, ] / ANikkei[1:500, ]
+# Real values for September 26th 2008:
+SDJIA.hoy <- DJIA.hoy[2, ] * DJIA.hoy[2, ] / DJIA.hoy[1, ]
+SFTSE100.hoy <- AFTSE100.hoy[2, ] * AFTSE100.hoy[2, ] / AFTSE100.hoy[1, ]
+SCAC40.hoy <- ACAC40.hoy[2, ] * ACAC40.hoy[2, ] / ACAC40.hoy[1, ]
+SNikkei.hoy <- ANikkei.hoy[2, ] * ANikkei.hoy[2, ] / ANikkei.hoy[1, ]
+# Investment portfolio value
+p <- (4000 * DJIA[2:501, ] / DJIA[1:500, ]) +
+  (3000 * AFTSE100[2:501, ] / AFTSE100[1:500, ]) +
+  (1000 * ACAC40[2:501, ] / ACAC40[1:500, ]) + 
+  (2000 * ANikkei[2:501,] / ANikkei[1:500, ])
+# Evaluated according to the real values.
+p.hoy <- (4000 * DJIA.hoy[2, ] / DJIA.hoy[1, ]) +
+  (3000 * AFTSE100.hoy[2, ] / AFTSE100.hoy[1, ]) +
+  (1000 * ACAC40.hoy[2, ] / ACAC40.hoy[1, ]) + 
+  (2000 * ANikkei.hoy[2, ] / ANikkei.hoy[1, ])
+# Losses l
+l <- 10000 - p
+l.hoy <- 10000 - p.hoy
+```
+
+Replicate Table 21.3 in Hull.
+
+```{r}
+# Verify this is the same as Table 21.3 in Hull.
+Table21.3 <- data.frame(SDJIA, SFTSE100, SCAC40, SNikkei, p, l)
+kable(head(Table21.3), caption = "Scenarios generated for September 26, 
+      2008 (first values).", digits = 4, row.names = TRUE) |>
+kable_styling(latex_options = "HOLD_position")
+```
+
+The last values of Table 21.3.
+
+```{r}
+kable(tail(Table21.3), caption = "Scenarios generated for September 26, 
+      2008 (last values).", digits = 4) |>
+kable_styling(latex_options = "HOLD_position")
+```
+
+Nice. Values are exactly the same as in Hull.
+
+See what really happened.
+
+```{r}
+Table21.3hoy <- data.frame(SDJIA.hoy, SFTSE100.hoy, SCAC40.hoy, SNikkei.hoy,
+                           p.hoy,l.hoy)
+kable(head(Table21.3hoy), caption = "What really happened.", digits = 4, 
+      row.names = TRUE) |>
+kable_styling(latex_options = "HOLD_position")
+```
+
+Visually.
+
+```{r fig.cap="Today is September 25, 2008. What is the worst that can happen to my portfolio tomorrow?"}
+plot(l, type = "h", lwd = 2, 
+     xlab = "500 scenarios (sorted by historical date)",
+     ylab = "Gains (-) and losses (+)", col = ifelse(l < 0, "blue", "red"))
+points(501, l.hoy, pch = 19, cex = 2)
+abline(0, 0)
+abline(v = 0)
+lines(seq(0, max(l), length.out = 500), lty = 2)
+lines(seq(0, min(l), length.out = 500), lty = 2)
+abline(h = 253.385, lwd = 2, col = "green")
+legend("bottomleft", legend = c("Gains", "Losses", "Historic VaR (253.385)"),
+       col = c("blue", "red", "green"), lty = 1, bg = "white", lwd = 2)
+```
+
+Now, a histogram of losses.
+
+```{r fig.cap="Histogram of losses for the scenarios considered between September 25 and 26, 2008: a histogram."}
+hist(l, 15, xlab = "Losses (+) and gains (-)", main = NULL)
+points(l.hoy, 1, pch = 19, cex = 2)
+abline(v = 253.385, col = "red", lwd = 2)
+legend("topleft", legend = c("Historic VaR (253.385)"), col = "red", 
+       bg = "white", lwd = 2)
+```
+
+The point refers to what really happened, and the red line is the VaR following a historic approach. Now, the same information but now using a density plot.
+
+```{r fig.cap="Histogram of losses for the scenarios considered between September 25 and 26, 2008: a density plot."}
+densi <- density(l)
+plot(densi, main = "", xlab = "Losses (+) and gains (-)")
+polygon(densi, col = "grey", border = "black")
+points(l.hoy, 0, pch = 19, cex = 2)
+abline(v = 253.385, col = "red", lwd = 2)
+legend("topleft", legend = c("Historic VaR (253.385)"), col = "red", 
+       bg = "white", lwd = 2)
+```
+
+Looks nice.
+
+Here is a histogram that looks like the one in Hull.
+
+```{r fig.cap="Figure 21.3. Histogram of losses for the scenarios considered between September 25 and 26, 2008."}
+hist(l, 15, axes = F, lty = "blank", col = "grey", main = "",
+     xlab = "Losses (+) and gains (-)")
+axis(1, pos = 0)
+axis(2, pos = 0, las = 1)
+```
+
+A table for the losses ranked.
+
+```{r}
+Table22.4 <- data.frame(scenario.number = order(l, decreasing = TRUE),
+                        `loss in positive values` = l[order(l, decreasing = TRUE)])
+kable(head(Table22.4), caption = "Losses ranked from highest to lowest for 
+      500 scenarios (first values).", digits = 4, row.names = TRUE) |>
+kable_styling(latex_options = "HOLD_position")
+```
+
+And the last values (not shown in Hull).
+
+```{r}
+kable(tail(Table22.4), caption = "Losses ranked from highest to lowest for 
+      500 scenarios (last values).", digits = 4) |>
+kable_styling(latex_options = "HOLD_position")
+```
+
+Note that one of the highest gains happen in scenario 497, almost at the end.
+
+```{r}
+# Results
+(VaR.hist <- Table22.4[5, 2])
+```
+
+The VaR according to the historic approach is the highest 5th loss because the top 1% of 500 scenarios is the 5th scenario. We can view this in a barplot.
+
+```{r fig.cap="Extract of table 22.4 in a graph VaR historical approach 1 percent 253.385 What really happen in green."}
+barplot(l[order(l, decreasing = TRUE)], 
+        names.arg = order(l, decreasing = TRUE), ylim = c(0, 500), 
+        xlim = c(0, 20), las = 2, cex.names = 1, ylab = "Loss ($000s)",
+        col = "red", xlab = "Scenario number (ranked)")
+abline(h = 253.385, lwd = 3)
+abline(h = l.hoy, lwd = 3, col = "green")
+legend("topright", legend = c("Historic VaR (253.385)", 
+       "What really happened"), col = c("black", "green"), 
+       bg = "white", lwd = 2)
+```
+
+```{r fig.cap="Ilustration of portfolio losses in quantiles."}
+quantile(l, 0.99)
+barplot(quantile(l), ylim = c(min(l), max(l)),
+        col = ifelse(quantile(l) < 0, "blue", "red"),
+        xlab = "Quantiles", ylab = "Gains (-) and losses (+)")
+# quantile(l,seq(from=0.8,to=0.99,by=0.001))
+```
+
+```{r}
+# Results
+VaR.hist.quantile <- quantile(l, 0.99)
+kable(VaR.hist.quantile, caption = "Quantile.", digits = 4) |>
+kable_styling(latex_options = "HOLD_position")
+```
+
+```{r fig.cap="If we use a quantile approach."}
+plot(seq(from = 0.902, to = 1, by = 0.002), 
+     quantile(l, seq(from = 0.902, to = 1, by = 0.002)), cex = 1.5,
+     xlab = "Confidence level (vertical line at 99%)", ylab = "VaR")
+abline(v = 0.99, lty = 2, lwd = 2)
+abline(h = quantile(l, 0.99), col = "blue", lty = 2, lwd = 2)
+abline(h = Table22.4[5, 2], col = "red", lty = 2, lwd = 2)
+legend("topleft", legend = c("99% level", "Historic VaR (253.385)", 
+                             "99% quantile VaR (218.3281)"),
+       col = c("black", "red", "blue"), lty = 2, bg = "white", lwd = 2)
+```
+
+Summary of results.
+
+```{r}
+Results <- data.frame(VaR.method = c("VaR.hist","VaR.hist.quantile"), 
+                     value = c(VaR.hist,VaR.hist.quantile))
+kable(Results, caption = "Results.", digits = 4) |>
+kable_styling(latex_options = "HOLD_position")
+```
+
+## Model building approach.
+
+Let's calculate more VaR with different methods.
+
+```{r}
+# Model building example -- equally weighted
+# Compute returns (this code should be simplified)
+RDJIA <- (DJIA[2:501, ] - DJIA[1:500, ]) / DJIA[1:500, ]
+RAFTSE100 <- (AFTSE100[2:501, ] - AFTSE100[1:500, ]) / AFTSE100[1:500, ]
+RACAC40 <- (ACAC40[2:501, ] - ACAC40[1:500, ]) / ACAC40[1:500, ]
+RANikkei <- (ANikkei[2:501, ] - ANikkei[1:500, ]) / ANikkei[1:500, ]
+# Gather returns.
+R <- merge.zoo(RDJIA, RAFTSE100, RACAC40, RANikkei)
+# Compute returns for "today".
+RDJIA.hoy <- (DJIA.hoy[2, ] - DJIA.hoy[1, ]) / DJIA.hoy[1, ]
+RAFTSE100.hoy <- (AFTSE100.hoy[2, ] - AFTSE100.hoy[1, ]) / AFTSE100.hoy[1, ]
+RACAC40.hoy <- (ACAC40.hoy[2, ] - ACAC40.hoy[1, ]) / ACAC40.hoy[1, ]
+RANikkei.hoy <- (ANikkei.hoy[2, ] - ANikkei.hoy[1, ]) / ANikkei.hoy[1, ]
+# Gather returns.
+R.hoy <- merge.zoo(RDJIA.hoy, RAFTSE100.hoy, RACAC40.hoy, RANikkei.hoy)
+```
+
+Replicate Hull's table 23.5.
+
+```{r}
+# correlation
+Rcor <- cor(R)
+Table23.5 <- Rcor
+kable(Table23.5, caption = "Correlation matrix on September 25, 2008, 
+      calculated by giving equal weight to the last 500 daily returns.", 
+      digits = 4) |>
+kable_styling(latex_options = "HOLD_position")
+```
+
+Replicate Hull's table 23.6.
+
+```{r}
+# covariance
+Rcov <- cov(R)
+Table23.6 <- Rcov
+kable(Table23.6, caption = "Covariance matrix on September 25, 2008, 
+      calculated by giving equal weight to the last 500 daily returns.", 
+      digits = 8) |>
+kable_styling(latex_options = "HOLD_position")
+```
+
+This covariance matrix is quite similar to the one in Hull. We are not taking round values this explains minor differences.
+
+This covariance matrix gives the variance of the portfolio losses (\$000s) as
+
+```{r}
+# standard deviation
+Rsd <- apply(R, 2, sd)
+# allocation of the 10,000 usd
+alpha <- c(4000, 3000, 1000, 2000)
+# Answers can be compared in page 538 (Chapter 23)
+(Pvar <- t(alpha) %*% Rcov %*% alpha) # equation in page 506 (chapter 22)
+```
+
+This is slightly different as in Hull: 8,761.833. The standard deviation is the square root of this
+
+```{r}
+(Psd <- Pvar^0.5)
+```
+
+As expected, this is a bit different as in Hull (93.60). The one-day 99% VaR in is therefore
+
+```{r}
+(VaR.ew <- qnorm(0.99, 0, 1) * Psd) # I did not use the simplification 2.33
+```
+
+In Hull, this value is 217,757, which compares with 253,385, calculated using the historical simulation approach in Section 22.2.
+
+```{r}
+Results <- data.frame(VaR.method = c("VaR.hist", "VaR.hist.quantile", 
+                                     "VaR.ew"), 
+                      value = c(VaR.hist, VaR.hist.quantile, VaR.ew))
+kable(Results, caption = "Summary of results.", digits = 4) |>
+kable_styling(latex_options = "HOLD_position")
+```
+
+We are interested to compare the equally weighted approach with the EWMA (exponentially weighted moving average method). In fact, there are two EWMA versions here, one was taken from a different author, and the other is mine (Martín).
+
+First the other author's approach to calculate an EWMA covariance considering $\lambda=0.94$.
+
+```{r}
+# Model building example -- EWMA
+covEWMA <-
+  function(factors, lambda = 0.96, return.cor = FALSE) {  
+    factor.names  = colnames(factors)
+    t.factor      = nrow(factors)
+    k.factor      = ncol(factors)
+    factors       = as.matrix(factors)
+    t.names       = rownames(factors)
+    
+    cov.f.ewma = array(,c(t.factor, k.factor, k.factor))
+    cov.f = var(factors)  # unconditional variance as EWMA at time = 0 
+    FF = (factors[1, ] - mean(factors)) %*% t(factors[1,] - mean(factors))
+    cov.f.ewma[1,,] = (1 - lambda) * FF  + lambda * cov.f
+    for (i in 2:t.factor) {
+    FF = (factors[i, ] - mean(factors)) %*% t(factors[i, ] - mean(factors))
+    cov.f.ewma[i,,] = (1 - lambda) * FF  + lambda * cov.f.ewma[(i-1),,]
+    }
+    dimnames(cov.f.ewma) = list(t.names, factor.names, factor.names)
+    
+    if(return.cor) {
+      cor.f.ewma = cov.f.ewma
+      for (i in 1:dim(cor.f.ewma)[1]) {
+        cor.f.ewma[i, , ] = cov2cor(cov.f.ewma[i, ,])
+      }
+      return(cor.f.ewma)
+    } else {
+      return(cov.f.ewma)  
+    }
+  }
+```
+
+Let's implement this approach to our problem.
+
+```{r}
+Rdf <- as.data.frame(R)
+C <- covEWMA(Rdf, lambda = 0.94)[500,,] # Table 23.7
+Table23.7 <- C
+kable(Table23.7, caption = "Covariance matrix on September 25, 2008, 
+      calculated using the EWMA (other author's approach).", digits = 8) |>
+kable_styling(latex_options = "HOLD_position")
+```
+
+The variance of portfolio losses is:
+
+```{r}
+(Pvar_EWMA <- t(alpha) %*% C %*% alpha)
+```
+
+In Hull, this value is 40,995.765. The standard deviation is the square root of this, or:
+
+```{r}
+(Psd_EWMA <- Pvar_EWMA^0.5)
+```
+
+In Hull, this value is 202.474. The one-day 99% VaR is therefore:
+
+```{r}
+(VaR.ewma <- qnorm(0.99, 0, 1) * Psd_EWMA)
+```
+
+In Hull, this value is 471,025, over twice as high as the value given when returns are equally weighted.
+
+```{r}
+Results  <-  data.frame(VaR.method=c("VaR.hist", "VaR.hist.quantile", 
+                                     "VaR.ew","VaR.ewma"), 
+                    value = c(VaR.hist, VaR.hist.quantile, VaR.ew,VaR.ewma))
+kable(Results, caption = "Summary of results.", digits = 4) |>
+kable_styling(latex_options = "HOLD_position")
+```
+
+Let's replicate Table 23.8.
+
+```{r}
+#Table 23.8
+Table23.8 <- data.frame(Rsd * 100, diag(C)^0.5 * 100)
+colnames(Table23.8) <- c("Equal weighting", "EWMA")
+rownames(Table23.8) <- c("DJIA", "FTSE 100", "CAC 40", "Nikkei 225")
+kable(t(Table23.8), caption = "Volatilities % per day using equal 
+      weighting and EWMA (other author approach).", digits = 4) |>
+kable_styling(latex_options = "HOLD_position")
+```
+
+The estimated daily standard deviations are much higher when EWMA is used than when data are equally weighted. This is because volatilities were much higher during the period immediately preceding September 25, 2008, than during the rest of the 500 days covered by the data.
+
+Now EWMA with my own approach.
+
+```{r}
+# Model building example -- EWMA -- INEFFICIENT BUT ACCURATE.
+# My approach based on Hull.
+lambda = 0.94
+Var.R.EWMA <- matrix(0, 501, 4)
+for(i in 1:501) {
+  if(i==1) {
+    Var.R.EWMA[, (1:4)] <- Rsd^2
+    } else if (i > 1) {
+      Var.R.EWMA[i,] <- (Var.R.EWMA[(i - 1), (1:4)] * lambda) + 
+        (R[(i - 1), (1:4)]^2 * (1 - lambda))}
+    }
+
+Cov.DF.EWMA <- NULL
+Cov.DC.EWMA <- NULL
+Cov.DN.EWMA <- NULL
+Cov.FC.EWMA <- NULL
+Cov.FN.EWMA <- NULL
+Cov.CN.EWMA <- NULL
+
+for(i in 1:501){
+if(i==1){
+  Cov.DF.EWMA[i] <- cov(RDJIA, RAFTSE100)
+  Cov.DC.EWMA[i] <- cov(RDJIA, RACAC40)
+  Cov.DN.EWMA[i] <- cov(RDJIA, RANikkei)
+  Cov.FC.EWMA[i] <- cov(RAFTSE100, RACAC40)
+  Cov.FN.EWMA[i] <- cov(RAFTSE100, RANikkei)
+  Cov.CN.EWMA[i] <- cov(RACAC40, RANikkei)
+  } else if (i > 1) {
+    Cov.DF.EWMA[i] <- (Cov.DF.EWMA[i - 1] * lambda) + 
+      (RAFTSE100[i - 1] * RDJIA[i - 1] * (1 - lambda))
+    Cov.DC.EWMA[i] <- (Cov.DC.EWMA[i - 1] * lambda) +
+      (RACAC40[i - 1] * RDJIA[i - 1] * (1 - lambda))
+    Cov.DN.EWMA[i] <- (Cov.DN.EWMA[i - 1] * lambda) +
+      (RANikkei[i - 1] * RDJIA[i - 1] * (1 - lambda))
+    Cov.FC.EWMA[i] <- (Cov.FC.EWMA[i - 1] * lambda) +
+      (RACAC40[i - 1] * RAFTSE100[i - 1] * (1 - lambda))
+    Cov.FN.EWMA[i] <- (Cov.FN.EWMA[i - 1] * lambda) +
+      (RANikkei[i-1] * RAFTSE100[i-1] * (1 - lambda))
+    Cov.CN.EWMA[i] <- (Cov.CN.EWMA[i - 1] * lambda) +
+      (RANikkei[i - 1] * RACAC40[i - 1] * (1 - lambda))
+  }
+  }
+
+C11 <- c(Var.R.EWMA[501, 1])
+C22 <- c(Var.R.EWMA[501, 2])
+C33 <- c(Var.R.EWMA[501, 3])
+C44 <- c(Var.R.EWMA[501, 4])
+C12 <- c(Cov.DF.EWMA[501])
+C13 <- c(Cov.DC.EWMA[501])
+C14 <- c(Cov.DN.EWMA[501])
+C23 <- c(Cov.FC.EWMA[501])
+C24 <- c(Cov.FN.EWMA[501])
+C34 <- c(Cov.CN.EWMA[501])
+VCV <- c(C11 ,C12, C13, C14, C12, C22, C23, C24,C13, C23, 
+         C33, C34, C14, C24, C34, C44)
+VCV <- matrix(VCV, 4, 4)
+```
+
+The variance of portfolio losses is now:
+
+```{r}
+(Pvar_EWMA1 <- t(alpha) %*% VCV %*% alpha)
+```
+
+Which is basically the same as in Hull: 40,995.765. The standard deviation is the square root of this, or:
+
+```{r}
+(Psd_EWMA1 <- Pvar_EWMA1^0.5)
+```
+
+The same as in Hull: 202.474. The one-day 99% VaR is therefore:
+
+```{r}
+# My approach is longer but more accurate
+(VaR.ewma.martin <- qnorm(0.99, 0, 1) * Psd_EWMA1) 
+```
+
+The same as in Hull: 471.0252. Let's report all results so far.
+
+```{r}
+Results <- data.frame(VaR.method=
+                       c("VaR.hist",
+                         "VaR.hist.quantile",
+                         "VaR.ew",
+                         "VaR.ewma",
+                         "VaR.ewma.martin"), 
+                     value=c(VaR.hist,
+                             VaR.hist.quantile,
+                             VaR.ew,
+                             VaR.ewma,
+                             VaR.ewma.martin))
+kable(Results, caption = "Summary of results.", digits = 4) |>
+kable_styling(latex_options = "HOLD_position")
+```
+
+Let's replicate an extended Table 23.8.
+
+```{r}
+#Table 23.8
+Table23.8 <- data.frame(Rsd * 100, diag(C)^0.5 * 100, diag(VCV)^0.5 * 100)
+colnames(Table23.8) <- c("Equal weighting", "EWMA", "EWMA Martín")
+rownames(Table23.8) <- c("DJIA", "FTSE 100", "CAC 40", "Nikkei 225")
+kable(t(Table23.8), caption = "Volatilities % per day using equal 
+      weighting and EWMA (other author approach).", digits = 4) |>
+kable_styling(latex_options = "HOLD_position")
+```
+
+Again: The estimated daily standard deviations are much higher when EWMA is used than when data are equally weighted. This is because volatilities were much higher during the period immediately preceding September 25, 2008, than during the rest of the 500 days covered by the data.
+
+## Optimal allocation of resources and VaR.
+
+The current portfolio weights are:
+
+```{r}
+W_hull <- alpha / 10000
+W_hullt <- data.frame(W_hull)
+rownames(W_hullt) <- c("DJIA", "FTSE 100", "CAC 40", "Nikkei 225")
+kable(t(W_hullt), caption = "Original (and presumible sub-optimal) Hull's 
+      portfolio weights.", digits = 4) |>
+kable_styling(latex_options = "HOLD_position")
+```
+
+Let's calculate optimal weights.
+
+```{r}
+# Further extension: propose an optimal allocation of resources
+R <- R * 100
+R.hoy <- R.hoy * 100
+stocks<- c("DJIA", "FTSE100", "CAC40", "Nikkei")
+sigma <- var(R)
+sd <- diag(sigma)^0.5
+E <- colMeans(R)
+E.hoy <- colMeans(R.hoy)
+ones <- abs(E / E)
+a <- c(t(ones) %*% solve(sigma) %*% ones)
+b <- c(t(ones) %*% solve(sigma) %*% E)
+c <- c(t(E) %*% solve(sigma) %*% E)
+d <- c(a * c - (b^2))
+g <- c(solve(sigma) %*% (c * ones - b * E) / d)
+h <- c(solve(sigma) %*% (a * E - b * ones) / d)
+ER <- seq(from = -0.3, to = 0.3, by = 0.0001)
+S <- ER
+W <- matrix(0, nrow = length(ER), ncol = length(stocks))
+for(i in 1:length(ER)){
+W[i,] <- g + h * ER[i]
+ER[i] <- W[i,] %*% E
+S[i] <- (t(W[i,]) %*% sigma %*% W[i, ])^0.5
+}
+W_min <- (solve(sigma) %*% ones) / a
+R_min <- c(t(W_min) %*% E)
+R_min.realized <- c(t(W_min) %*% E.hoy)
+S_min <- c(t(W_min) %*% sigma %*% W_min)^0.5
+# Allocation to mimic the return of the CAC40 but with lower risk
+W.cac40 <- g + h * E[3]
+R_cac40 <- c(t(W.cac40) %*% E)
+R_cac40.realized <- c(t(W.cac40) %*% E.hoy)
+S_cac40 <- c(t(W.cac40) %*% sigma %*% W.cac40)^0.5
+R_hull.realized = c(t(W_hull) %*% E.hoy)
+```
+
+Now we have four different portfolio weights alternatives. Two of them are optimal. Can we reduce the VaR by using optimal weights?
+
+```{r}
+W <- data.frame(W_hull, W_min, W.cac40, c(0.25,0.25,0.25,0.25))
+rownames(W) <- c("DJIA", "FTSE 100", "CAC 40", "Nikkei 225")
+colnames(W) <- c("Hull (original weights)", "minimum variance (Martín)", "CAC 40 target return", "naive (1/N)")
+kable(t(W), caption = "Four different weights alternatives.", 
+      digits = 4) |>
+kable_styling(latex_options = "HOLD_position")
+```
+
+See the results graphically.
+
+```{r fig.cap="Hull's allocation is sub-optimal, the red one is a better alternative, although with negative expected return."}
+W_hull <- alpha / 10000
+R_hull <- c(t(W_hull) %*% E)
+S_hull <- c(t(W_hull) %*% sigma %*% W_hull)^0.5
+
+plot(S, ER, type = "l", lwd = 2, xlim = c(0.7, 1.6), ylim = c(-0.022, 0.005),
+     ylab = "Expected return", xlab = "Standard deviation")
+points(diag(sigma)^0.5, E)
+abline(0, R_hull / S_hull, lty = 3, col = "blue")
+abline(0, R_min / S_min, lty = 3, col = "red")
+points(S_min, R_min, col = "red", pch = 19, cex = 2)
+abline(0, 0, lty = 3)
+text(S_min, R_min, "Martin's
+     alpha", pos = 2, cex = 0.8)
+text(sd, E, stocks, adj = -0.5, cex = 0.8)
+points(S_hull, R_hull, col = "blue", pch = 19, cex = 2)
+text(S_hull, R_hull, "Hull's alpha", adj = -0.3, cex = 0.8, pos = 1)
+legend("bottomleft", legend = c("DJ=0.4, FTSE=0.3, CAC=0.1, Nikkei=0.2", 
+                            "DJ=0.56, FTSE=0.038, CAC=0.022, Nikkei=0.38"),
+       col = c("blue","red"), pch = 19, bg = "white", cex = 0.8)
+```
+
+The figure suggest that the minimum variance alternative reduce the original portfolio risk. In fact, the minimum variance portfolio has a higher return and lower risk. This representation is an estimate of the future. We can evaluate what really happened by using the real returns.
+
+```{r}
+(R_min.realized <- c(t(W_min) %*% E.hoy))
+(R_hull.realized = c(t(W_hull) %*% E.hoy))
+```
+
+```{r fig.cap="Hull's allocation is sub-optimal, the red one is a better alternative, although with negative expected return."}
+W_hull <- alpha / 10000
+R_hull <- c(t(W_hull) %*% E)
+S_hull <- c(t(W_hull) %*% sigma %*% W_hull)^0.5
+
+W_1N <- c(0.25,0.25,0.25,0.25)
+R_1N <- c(t(W_1N) %*% E)
+S_1N <- c(t(W_1N) %*% sigma %*% W_1N)^0.5
+
+plot(S, ER, type = "l", lwd = 2, xlim = c(0.7, 1.6), ylim = c(-0.022, 0.005),
+     ylab = "Expected return", xlab = "Standard deviation")
+points(diag(sigma)^0.5, E)
+abline(0, R_hull / S_hull, lty = 3, col = "blue")
+abline(0, R_min / S_min, lty = 3, col = "red")
+abline(0, R_1N / S_1N, lty = 3, col = "purple")
+points(S_min, R_min, col = "red", pch = 19, cex = 2)
+points(S_1N, R_1N, col = "purple", pch = 19, cex = 2)
+abline(0, 0, lty = 3)
+text(S_min, R_min, "Martin's
+     alpha", pos = 2, cex = 0.8)
+text(sd, E, stocks, adj = -0.5, cex = 0.8)
+points(S_hull, R_hull, col = "blue", pch = 19, cex = 2)
+text(S_hull, R_hull, "Hull's alpha", adj = -0.3, cex = 0.8, pos = 1)
+text(S_1N, R_1N, "1/N alpha", adj = -0.3, cex = 0.8, pos = 3)
+legend("bottomleft", 
+       legend = c("Hull: DJ=0.4, FTSE=0.3, CAC=0.1, Nikkei=0.2", 
+"Martin: DJ=0.56, FTSE=0.038, CAC=0.022, Nikkei=0.38",
+"1/N: DJ=0.25, FTSE=0.25, CAC=0.25, Nikkei=0.25"),
+       col = c("blue","red", "purple"), pch = 19, bg = "white", cex = 0.8)
+```
+
+Hull's sub-optimal portfolio allocation turns out to be problematic. His recommendation would lead to a loss and the optimal minimum variance would lead to a positive return. Nice.
+
+```{r fig.cap="Martin recommendation and realized outcome in blue."}
+set.seed <- 1
+M <- rnorm(10000, R_min, S_min)
+hist(M, 100, xlim = c(-4, 4), ylim = c(0, 450), main = "")
+abline(v = R_min.realized, col = "blue", lwd = 3)
+abline(v = quantile(M, 0.025), lty = 2)
+abline(v = quantile(M, 0.975), lty = 2)
+```
+
+```{r fig.cap="Hull recommendation and realized outcome."}
+set.seed = 1
+H = rnorm(10000, R_hull, S_hull)
+hist(H,100, xlim = c(-4, 4), ylim = c(0, 450), main = "")
+abline(v = R_hull.realized, col = "blue", lwd = 3)
+abline(v = quantile(H, 0.025), lty = 2)
+abline(v = quantile(H, 0.975), lty = 2)
+```
+
+```{r fig.cap="CAC40 recommendation and realized outcome."}
+set.seed <- 1
+Ca <- rnorm(10000, R_cac40, S_cac40)
+hist(Ca, 100, xlim = c(-4, 4), ylim = c(0, 450), main = "")
+abline(v = R_cac40.realized, col = "blue", lwd = 3)
+abline(v = quantile(C, 0.025), lty = 2)
+abline(v = quantile(C, 0.975), lty = 2)
+```
+
+Let's compare a different portfolio. This is optimal and targets the CAC 40 expected return.
+
+```{r fig.cap="Estimation of a new optimal alpha: Replicate CAC40 ER."}
+plot(S, ER, type = "l", lwd = 2, xlim = c(0.7, 1.6), 
+     ylim = c(-0.022, 0.007), ylab = "Expected return", 
+     xlab = "Standard deviation")
+points(diag(sigma)^0.5, E)
+abline(0, 0, lty = 3)
+points(S_cac40, R_cac40, col = "red", pch = 19, cex = 2)
+points(0.68, R_cac40.realized, col = "red", pch = 15, cex = 2)
+text(S_cac40, R_cac40, "CAC40
+     expected return", pos = 2, cex = 0.8)
+text(sd,E,stocks,adj=-0.5,cex=0.8)
+W_hull = alpha / 10000
+R_hull = c(t(W_hull) %*% E)
+S_hull = c(t(W_hull) %*% sigma %*% W_hull)^0.5
+points(S_hull, R_hull, col = "blue", pch = 19, cex = 2)
+points(0.68, R_hull.realized, col = "blue", pch = 15, cex = 2)
+abline(0,R_hull / S_hull, lty = 3, col = "blue")
+abline(0,R_cac40 / S_cac40, lty = 3, col = "red")
+abline(0,E[3] / sd[3], lty = 3)
+abline(v = S_cac40, lty = 3)
+text(S_hull, R_hull, "Hull's alpha", adj = -0.3, cex = 0.8, pos = 1)
+legend("bottomleft", legend = c("DJ=0.4, FTSE=0.3, CAC=0.1, Nikkei=0.2", 
+                          "DJ=0.607, FTSE=-0.403, CAC=0.459, Nikkei=0.336"),
+       col = c("blue", "red"), pch = 19, bg = "white", cex = 0.8)
+```
+
+```{r}
+(R_min.realized)
+(R_hull.realized)
+(R_cac40.realized)
+```
+
+As stated before, Hull's sub-optimal portfolio allocation turns out to be problematic. His recommendation would lead to a loss (-0.558) and the optimal minimum variance would lead to a positive return (0.2629), and the optimal portfolio that targets the CAC 40 expected return leads to an even higher return (0.518). Nice.
+
+## Model building approach with optimal weights.
+
+Now that we have two additional optimal portfolios, we can compute the corresponding VaR for the model building approach. First, the equally weighted case.
+
+```{r}
+# Model building approach, equally weighted.
+alpha2 <- c(W_min * 10000)
+alpha3 <- c(W.cac40 * 10000)
+# This is the minimum variance optimal portfolio.
+Pvar2 <- t(alpha2) %*% Rcov %*% alpha2
+Psd2 <- Pvar2^0.5
+VaR.ew.optimal <- qnorm(0.99, 0, 1) * Psd2
+# This is optimal portfolio targeting the CAC 40 expected return.
+Pvar3 <- t(alpha3) %*% Rcov %*% alpha3
+Psd3 <- Pvar3^0.5
+VaR.ew.optimal.cac <- qnorm(0.99, 0, 1) * Psd3
+```
+
+Summary of results:
+
+```{r}
+Results <- data.frame(VaR.method=c("VaR.hist",
+                                  "VaR.hist.quantile",
+                                  "VaR.ew",
+                                  "VaR.ew.optimal",
+                                  "VaR.ew.optimal.cac",
+                                  "VaR.ewma",
+                                  "VaR.ewma.martin"), 
+                     value=c(VaR.hist,
+                             VaR.hist.quantile,
+                             VaR.ew,
+                             VaR.ew.optimal,
+                             VaR.ew.optimal.cac,
+                             VaR.ewma,
+                             VaR.ewma.martin))
+kable(Results, caption = "Summary of results.", digits = 4) |>
+kable_styling(latex_options = "HOLD_position")
+```
+
+Second, the EWMA case.
+
+```{r}
+Pvar2_EWMA <- t(alpha2) %*% C %*% alpha2
+Psd2_EWMA <- Pvar2_EWMA^0.5
+VaR.ewma.optimal <- qnorm(0.99, 0, 1) * Psd2_EWMA
+VaR.ewma.optimal
+Pvar3_EWMA <- t(alpha3) %*% C %*% alpha3
+Psd3_EWMA <- Pvar3_EWMA^0.5
+VaR.ewma.optimal.cac <- qnorm(0.99, 0, 1) * Psd3_EWMA
+VaR.ewma.optimal.cac
+```
+
+Summary of results.
+
+```{r}
+Results <- data.frame(VaR.method=c("VaR.hist",
+                                  "VaR.hist.quantile",
+                                  "VaR.ew",
+                                  "VaR.ew.optimal",
+                                  "VaR.ewma",
+                                  "VaR.ewma.optimal",
+                                  "VaR.ewma.optimal.cac",
+                                  "VaR.ewma.martin"), 
+                     value=c(VaR.hist,
+                             VaR.hist.quantile,
+                             VaR.ew,
+                             VaR.ew.optimal,
+                             VaR.ewma,
+                             VaR.ewma.optimal,
+                             VaR.ewma.optimal.cac,
+                             VaR.ewma.martin))
+kable(Results, caption = "Summary of results.", digits = 4) |>
+kable_styling(latex_options = "HOLD_position")
+```
+
+And third, my EWMA version.
+
+```{r}
+# My EWMA approach
+VaR.ewma.martin
+Pvar_EWMA12 <- t(alpha2) %*% VCV %*% alpha2
+Psd_EWMA12 <- Pvar_EWMA12^0.5
+VaR.ewma.martin.optimal <- qnorm(0.99, 0, 1) * Psd_EWMA12
+VaR.ewma.martin.optimal
+Pvar_EWMA13 <- t(alpha3) %*% VCV %*% alpha3
+Psd_EWMA13 <- Pvar_EWMA13^0.5
+VaR.ewma.martin.optimal.cac <- qnorm(0.99, 0, 1) * Psd_EWMA13
+VaR.ewma.martin.optimal.cac
+```
+
+Summary of results.
+
+```{r}
+Results <- data.frame(VaR.method=c("VaR.hist",
+                                  "VaR.hist.quantile",
+                                  "VaR.ew",
+                                  "VaR.ew.optimal",
+                                  "VaR.ewma",
+                                  "VaR.ewma.optimal",
+                                  "VaR.ewma.martin",
+                                  "VaR.ewma.martin.optimal",
+                                  "VaR.ewma.martin.optimal.cac"), 
+                     value=c(VaR.hist,
+                             VaR.hist.quantile,
+                             VaR.ew,VaR.ew.optimal,
+                             VaR.ewma,
+                             VaR.ewma.optimal,
+                             VaR.ewma.martin,
+                             VaR.ewma.martin.optimal,
+                             VaR.ewma.martin.optimal.cac))
+kable(Results, caption = "Summary of results.", digits = 4) |>
+kable_styling(latex_options = "HOLD_position")
+```
+
+## Historic approach with optimal weights.
+
+Let's go back to the historic approach. Now we can incorporate a comparison with the optimal weights.
+
+```{r}
+# Miniumu variance optimal weights.
+p2 <- (alpha2[1] * DJIA[2:501, ] / DJIA[1:500, ]) +
+  (alpha2[2] * AFTSE100[2:501, ] / AFTSE100[1:500, ]) +
+  (alpha2[3] * ACAC40[2:501, ] / ACAC40[1:500, ]) +
+  (alpha2[4] * ANikkei[2:501, ] / ANikkei[1:500, ])
+# Optimal portfolio targeting the CAC 40 expected return.
+p3 <- (alpha3[1] * DJIA[2:501, ] / DJIA[1:500, ]) +
+  (alpha3[2] * AFTSE100[2:501, ] / AFTSE100[1:500, ])+
+  (alpha3[3] * ACAC40[2:501, ] / ACAC40[1:500, ]) +
+  (alpha3[4] * ANikkei[2:501, ] / ANikkei[1:500, ])
+# Losses in both cases.
+l2 <- 10000 - p2
+l3 <- 10000 - p3
+```
+
+This is the Hull original case.
+
+```{r fig.cap="Losses with Hull's suboptimal alpha DJ=0.4, FTSE=0.3, CAC=0.1, Nikkei=0.2."}
+plot(l, type = "h", ylim = c(-600, 600), lwd = 2,
+     xlab = "500 scenarios (sorted by historical date)",
+ylab = "Gains (-) and losses (+)", col = ifelse(l < 0, "blue", "red"))
+abline(0, 0)
+abline(v = 0)
+abline(h = max(l), lty = 2)
+abline(h = min(l), lty = 2)
+```
+
+The one-day 99% value at risk can be estimated as the fifth-worst loss.
+
+```{r}
+sort(l)[496]
+```
+
+Now, let's see the minimum variance optimal portfolio.
+
+```{r fig.cap="Losses with optimal alpha DJ=0.56, FTSE=0.038, CAC=0.022, Nikkei=0.38."}
+plot(l2, type = "h", ylim = c(-600, 600), lwd = 2,
+     xlab = "500 scenarios (sorted by historical date)",
+     ylab = "Gains (-) and losses (+)", col = ifelse(l2 < 0, "blue", "red"))
+abline(0, 0)
+abline(v = 0)
+abline(h = max(l2), lty = 2)
+abline(h = min(l2), lty = 2)
+```
+
+The one-day 99% value at risk can be estimated as the fifth-worst loss.
+
+```{r}
+sort(l2)[496]
+```
+
+See how the range of losses and gains is now reduced.
+
+And this is the optimal portfolio targeting the CAC 40 expected return.
+
+```{r fig.cap="Losses with CAC40 optimal alpha DJ=0.607, FTSE=-0.403, CAC=0.459, Nikkei=0.336."}
+plot(l3, type = "h", ylim = c(-600, 600), lwd = 2,
+     xlab = "500 scenarios (sorted by historical date)",
+     ylab = "Gains (-) and losses (+)", col = ifelse(l3 < 0, "blue", "red"))
+abline(0, 0)
+abline(v = 0)
+abline(h = max(l3), lty = 2)
+abline(h = min(l3), lty = 2)
+```
+
+The one-day 99% value at risk can be estimated as the fifth-worst loss.
+
+```{r}
+sort(l3)[496]
+```
+
+Note that the range is reduced but allows for a higher gains. Let's see these three together.
+
+```{r fig.cap="Hull's suboptimal alpha (left); optimal alpha (center); optimal alpha CAC40 (right)."}
+par(mfrow=c(1, 3), oma = c(0, 0, 2, 0))
+par(pty = "s")
+plot(l, type = "h", ylim = c(-600, 600), lwd = 2, xlab = "",
+     main = "Hull original case.", ylab = "Gains (-) and losses (+)", 
+     col = ifelse(l < 0, "blue", "red"))
+abline(0, 0)
+abline(v = 0)
+abline(h = max(l), lty = 2)
+abline(h = min(l), lty = 2)
+plot(l2, type = "h", ylim = c(-600, 600), lwd = 2, 
+     main = "Minimum variance.", 
+     xlab = "500 scenarios sorted by historical date.", ylab = "", 
+     col = ifelse(l2 < 0, "blue", "red"))
+abline(0, 0)
+abline(v = 0)
+abline(h = max(l2), lty = 2)
+abline(h = min(l2), lty = 2)
+plot(l3, type = "h", ylim = c(-600, 600), lwd = 2, xlab = "", 
+     main = "Optimal targeting CAC 40.", ylab = "", 
+     col = ifelse(l3 < 0, "blue", "red"))
+abline(0, 0)
+abline(v = 0)
+abline(h = max(l3), lty = 2)
+abline(h = min(l3), lty = 2)
+```
+
+A quantile comparison.
+
+```{r}
+lq <- quantile(l, c(0.25, 0.5, 0.75))
+lq2 <- quantile(l2, c(0.25, 0.5, 0.75))
+lq3 <- quantile(l3, c(0.25, 0.5, 0.75))
+ll <- data.frame(lq, lq2, lq3)
+colours <- c("red", "orange", "blue")
+```
+
+```{r fig.cap="Quantile comparison of losses distribution."}
+barplot(as.matrix(t(ll)), beside = TRUE, col = colours, ylim = c(-60, 60), 
+        xlab = "Quantiles", ylab = "Gains (-) and Losses (+)")
+legend("topleft", c("Hull original","Optimal minvar",
+                    "Replicating CAC40 ER"), cex = 1.3, bty = "n", 
+       fill = colours)
+```
+

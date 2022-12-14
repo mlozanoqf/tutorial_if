@@ -60,9 +60,18 @@ htmltools::tagList(
 
 \newpage
 
-```{r Logistic, child = 'options.Rmd'}
+```{r strategies, child = 'strategies.Rmd'}
 ```
 
+\newpage
+
+```{r valuation, child = 'valuation.Rmd'}
+```
+
+\newpage
+
+```{r VaR, child = 'VaR.Rmd'}
+```
 
 ```{r include=FALSE}
 a <- toc()

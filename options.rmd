@@ -4,7 +4,6 @@ title: ''
   html_document:
     df_print: paged
 ---
------------------------
 
 ```{r echo=FALSE}
 # This removes all items in environment. 
@@ -190,23 +189,27 @@ points(K, K - S0, cex = 3, col = "orange", lwd = 3, pch = 0)
 points(K, 0, cex = 3, lwd = 3)
 ```
 
-Nice. Now see how it looks if we plot a payoff diagram instead.
+We can identify at least three isosceles right triangles, they have two sides of equal measure. Now see how it looks if we plot a payoff diagram instead.
 
 ```{r fig.cap="Hull: Figure 12.1a, payoff diagram."}
-S0 <- ST.seq - K
-ans <- cs + S0
+S0 = K
+Sl <- ST.seq - S0
+cs.pr <- pmin(K - ST.seq, 0)
+# A short put profit is replicated by taking a short call and a long stock.
+ans <- cs.pr + Sl
 par(pty = "s")
-plot(ST.seq, S0, type ="l", ylim = c(-75, 75), lwd = 4, col = "orange",
-     xlab = expression(paste(S[T])), ylab = "Payoff", lty = 2)
-lines(ST.seq, ans, lwd = 4, col = "red")
-lines(ST.seq, cs, lty = 2, lwd = 4, col = "blue")
-abline(v = 0)
-abline(h = 0)
-abline(v = 75, lty = 2, col = "grey")
+plot(ST.seq, ans, type = "l", ylim = c(-75, 75), lwd = 5, col = "red",
+     xlab = expression(paste(S[T])), 
+     ylab = "Payoff")
+lines(ST.seq, Sl, lty = 2, lwd = 2, col = "orange")
+lines(ST.seq, cs.pr, lty = 2, lwd = 2, col = "blue")
+abline(v = 0, lty = 2)
+abline(h = 0, lty = 2)
 legend("topleft", legend = c("Short call", "Long stock", "Short put"),
        col = c("blue", "orange", "red"), lty = c(2, 2, 1), 
        lwd = 2, bg = "white")
 ```
+
 
 # Options properties.
 

@@ -135,7 +135,9 @@ abline(v = 0, lty = 2)
 
 ## Options, stocks and bonds.
 
-```{r fig.cap="Hull: Figure 12.1a, profit diagram."}
+We look at what can be achieved when an option is traded in conjunction with other assets. In particular, we examine the properties of portfolios consisting of (a) an option and a zero-coupon bond, (b) an option and the asset underlying the option, and (c) two or more options on the same asset. This section is based in @Hull chapter 12.
+
+```{r fig.cap="Hull: Figure 12.1a, profit diagram. A synthetic short put."}
 S0 = 65
 # Here I assume the stock price is currently 65.
 Sl <- ST.seq - S0
@@ -159,7 +161,7 @@ legend("topleft", legend = c("Short call", "Long stock", "Short put"),
        lwd = 2, bg = NULL)
 ```
 
-```{r fig.cap="Hull: Figure 12.1a, profit diagram (zoom)."}
+```{r fig.cap="Hull: Figure 12.1a, profit diagram (zoom). A synthetic short put."}
 S0 = 65
 c_price = 5
 # Here I assume the stock price is currently 65.
@@ -189,7 +191,9 @@ points(K, K - S0, cex = 3, col = "orange", lwd = 3, pch = 0)
 points(K, 0, cex = 3, lwd = 3)
 ```
 
-We can identify at least three isosceles right triangles, they have two sides of equal measure. Now see how it looks if we plot a payoff diagram instead.
+We can identify at least three isosceles right triangles, they have two sides of equal measure. The short call profit is zero at $S_T = 80$, in the code above: <tt>`K + c_price`</tt>. The stock profit is zero at $S_T=65$, in the coded above: <tt>`S0`</tt>. Finally, the short put profit is zero at $S_T=60$, in the code above: <tt>`S0 - c_price`</tt>.
+
+Now see how it looks if we plot a payoff diagram instead.
 
 ```{r fig.cap="Hull: Figure 12.1a, payoff diagram."}
 S0 = K

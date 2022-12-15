@@ -191,7 +191,8 @@ A table for the losses ranked.
 
 ```{r}
 Table22.4 <- data.frame(scenario.number = order(l, decreasing = TRUE),
-                        `loss in positive values` = l[order(l, decreasing = TRUE)])
+                        `loss in positive values` = 
+                          l[order(l, decreasing = TRUE)])
 kable(head(Table22.4), caption = "Losses ranked from highest to lowest for 
       500 scenarios (first values).", digits = 4, row.names = TRUE) |>
 kable_styling(latex_options = "HOLD_position")
@@ -579,10 +580,10 @@ ER <- seq(from = -0.3, to = 0.3, by = 0.0001)
 S <- ER
 W <- matrix(0, nrow = length(ER), ncol = length(stocks))
 for(i in 1:length(ER)){
-W[i,] <- g + h * ER[i]
-ER[i] <- W[i,] %*% E
-S[i] <- (t(W[i,]) %*% sigma %*% W[i, ])^0.5
-}
+  W[i,] <- g + h * ER[i]
+  ER[i] <- W[i,] %*% E
+  S[i] <- (t(W[i,]) %*% sigma %*% W[i, ])^0.5
+  }
 W_min <- (solve(sigma) %*% ones) / a
 R_min <- c(t(W_min) %*% E)
 R_min.realized <- c(t(W_min) %*% E.hoy)

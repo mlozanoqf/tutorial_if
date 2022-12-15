@@ -68,7 +68,7 @@ c.S0 <- mapply(c.bs, S0.seq, K, rf, TT, sigma)
 p.S0 <- mapply(p.bs, S0.seq, K, rf, TT, sigma)
 ```
 
-We produce as many \texttt{c.S0} as values for \texttt{S0.seq}. Then, we can plot.
+We produce as many <tt>`c.S0`</tt> as values for <tt>`S0.seq`</tt>. Then, we can plot.
 
 ```{r fig.cap="Call price as a function of the stock price at time zero."}
 # See the results.
@@ -177,7 +177,7 @@ c.S0.s1 <- mapply(c.bs, S0.seq, K, rf, TT, sigma)
 c.S0.s5 <- mapply(c.bs, S0.seq, K, rf, TT, sigma * 5)
 c.S0.s15 <- mapply(c.bs, S0.seq, K, rf, TT, sigma * 15)
 # Plot.
-plot(S0.seq, c.S0.s1, type= "l", lwd = 3,  xlab = expression(paste(S[0])),
+plot(S0.seq, c.S0.s1, type = "l", lwd = 3,  xlab = expression(paste(S[0])),
      ylab = "Call option price, c")
 lines(S0.seq, c.S0.s5, lwd = 3, col = "blue") # call with higher sigma
 lines(S0.seq, c.S0.s15, lwd = 3, col = "red") # call with even higher sigma
@@ -197,7 +197,7 @@ p.S0.s1 <- mapply(p.bs, S0.seq, K, rf, TT, sigma)
 p.S0.s5 <- mapply(p.bs, S0.seq, K, rf, TT, sigma * 5)
 p.S0.s15 <- mapply(p.bs, S0.seq, K, rf, TT, sigma * 15)
 # Plot.
-plot(S0.seq, p.S0.s1, type= "l", lwd = 3,  xlab = expression(paste(S[0])),
+plot(S0.seq, p.S0.s1, type = "l", lwd = 3,  xlab = expression(paste(S[0])),
      ylab = "Pall option price, p")
 lines(S0.seq, p.S0.s5, lwd = 3, col = "blue") # put with higher sigma
 lines(S0.seq, p.S0.s15, lwd = 3, col = "red") # put with even higher sigma
@@ -232,8 +232,8 @@ points(trans3d(S0, K, c, c.S0.s.plot), cex = 2, pch = 19, col = "blue")
 An alternative view is by showing a contour plot. A contour plot is a graphical technique for representing a 3-dimensional surface by plotting constant $z$ slices (option prices), called contours, on a 2-dimensional format. That is, given a value for $z$, lines are drawn for connecting the $(x, y)$ coordinates ($S_0$, $K$) where that $z$ value occurs.
 
 ```{r fig.cap="Call value as the stock price at time zero and the strike price change: a contour view."}
-contour(S0.seq, K.seq, c.S0.s, xlab = expression(paste(S[0])), ylab = "K", lwd = 2, 
-        nlevels = 20)
+contour(S0.seq, K.seq, c.S0.s, xlab = expression(paste(S[0])), 
+        ylab = "K", lwd = 2, nlevels = 20)
 points(S0, K, pch = 19, col = "blue", cex = 2)
 ```
 
@@ -266,8 +266,8 @@ points(trans3d(S0, TT, p, p.S0.T.plot), cex = 2, pch = 19, col = "blue")
 That is not quite clear. So, here is the contour view.
 
 ```{r fig.cap="Put value as the stock price at time zero and time to maturity change: a contour view, or the hypnotic plot."}
-contour(S0.seq, TT.seq, p.S0.T, xlab = expression(paste(S[0])), ylab = "T", lwd = 2, 
-        nlevels = 40, drawlabels = TRUE)
+contour(S0.seq, TT.seq, p.S0.T, xlab = expression(paste(S[0])), 
+        ylab = "T", lwd = 2, nlevels = 40, drawlabels = TRUE)
 points(S0, TT, pch = 19, col = "blue", cex = 2)
 ```
 
@@ -325,8 +325,8 @@ In sum, this is the payoff of portfolios A and C: $max(S_T, K)$.
 
 ```{r fig.cap="Portfolio A and C payoffs: max(ST,K)."}
 par(pty = "s")
-plot(ST.seq, pc, type = "l", ylab = "Payoff", xlab = expression(paste(S[T])), lwd = 3, 
-     ylim = c(0, 150))
+plot(ST.seq, pc, type = "l", ylab = "Payoff", 
+     xlab = expression(paste(S[T])), lwd = 3, ylim = c(0, 150))
 ```
 
 Nice. We can manipulate the put-call parity to create a synthetic stock. This is:
@@ -389,12 +389,12 @@ plot(ST.seq, cl, type = "l", ylim = c(-10,40))
 abline(h = 0, lty = 2)
 abline(v = K, lty = 2)
 lines(ST.seq, ps)
-lines(ST.seq, -ST.seq + S0)
-lines(ST.seq, rep((S0+p-c)*exp(r*TT), 200))
+lines(ST.seq, - ST.seq + S0)
+lines(ST.seq, rep((S0 + p - c) * exp(r * TT), 200))
 
-cl+cs-(ST.seq + S0)+(S0+p-c)*exp(r*TT)
+cl + cs - (ST.seq + S0)+(S0 + p - c) * exp(r * TT)
 
-cl+ps-(ST.seq+S0)
+cl + ps - (ST.seq + S0)
 ```
 
 # Binomial trees.
@@ -489,8 +489,8 @@ b20 <- mapply(bin, S0.seq, K, sigma, TT, rf, 20)
 Here we compare the value of the binomial method and the Black-Scholes as a function of $S_0$.
 
 ```{r fig.cap="Binomial and Black-Scholes comparison."}
-plot(S0.seq, b1[1, ], type = "l", col = "red", lwd = 2, xlab = expression(paste(S[0])), 
-     ylab = "Call")
+plot(S0.seq, b1[1, ], type = "l", col = "red", lwd = 2, 
+     xlab = expression(paste(S[0])), ylab = "Call")
 lines(S0.seq, c.S0.s1, col = "black", lwd = 2)
 legend("topleft", legend = c("1 step binomial", "Black-Scholes"),
        col = c("red", "black"), lwd = 2, bg = "white")
@@ -499,7 +499,7 @@ legend("topleft", legend = c("1 step binomial", "Black-Scholes"),
 There are some differences between the binomial and the Black-Scholes. Let's zoom to see the differences clearer.
 
 ```{r fig.cap="Binomial and Black-Scholes convergence: a zoom view."}
-plot(S0.seq, b1[1,], type="l", ylim = c(0, 4), xlim = c(30, 45), 
+plot(S0.seq, b1[1,], type = "l", ylim = c(0, 4), xlim = c(30, 45), 
      col = "green", lwd = 2, xlab = expression(paste(S[0])), ylab = "Call")
 lines(S0.seq, b2[1,], col = "purple", lwd = 2)
 lines(S0.seq, b3[1,], col = "orange", lwd = 2)
@@ -585,8 +585,8 @@ b2
 # the value of being American; or the cost of being European.
 S.seq <- seq(30, 70, 0.5)
 AEoptions <- mapply(bin, S.seq, 52, 0.3, 1, 0.05, 50)
-plot(S.seq, unlist(AEoptions[4,]) - unlist(AEoptions[2,]), type = "l", lwd = 2,
-     main = "The value of being American.",
+plot(S.seq, unlist(AEoptions[4,]) - unlist(AEoptions[2,]), 
+     type = "l", lwd = 2, main = "The value of being American.",
      xlab = expression(paste(S[0])),
      ylab = "Option premium for American put options.")
 abline(v = 52, lty = 2)
@@ -682,7 +682,7 @@ In a period of 5 years, we would have a random path of ups (1.46) and downs (0.6
 ```{r}
 u = 0.46
 d = 0.34
-set.seed(2, sample.kind="Rounding")
+set.seed(2, sample.kind = "Rounding")
 a <- sample(c(1+u, 1-d), 5, replace = TRUE)
 a
 ```
@@ -710,9 +710,9 @@ binomial_tree <- function(u, d, n) {
 See if it works.
 
 ```{r}
-set.seed(2, sample.kind="Rounding")
+set.seed(2, sample.kind = "Rounding")
 binomial_tree(u = 0.46, d = 0.34, n = 5)
-set.seed(2, sample.kind="Rounding")
+set.seed(2, sample.kind = "Rounding")
 binomial_tree(u = 0.46, d = 0.34, n = 30)
 ```
 
@@ -725,13 +725,12 @@ library(dplyr)
 u = 0.46
 d = 0.34
 n = 30
-set.seed(2, sample.kind="Rounding")
+set.seed(2, sample.kind = "Rounding")
 a.30 <- cumprod(sample(c(1+u, 1-d), n, replace = TRUE))
 a.30 <- as.data.frame(cbind(year = c(1:30), ret = a.30))
   ggplot(a.30, aes(x = year, y = ret)) +
   geom_line(size = 1) +
-      labs(y = "$",
-       x = "Year",
+      labs(y = "$", x = "Year",
        title = "Cumulative return asset A.",
        subtitle = "Evolution of $1 invested in year 0.")
 ```
@@ -742,7 +741,7 @@ These results represent one single path. So, if we are interested in the most li
 u = 0.46
 d = 0.34
 n = 30
-set.seed(2, sample.kind="Rounding")
+set.seed(2, sample.kind = "Rounding")
 a.30x10k <- replicate(10000, 
                       cumprod(sample(c(1+u, 1-d), n, replace = TRUE))) |>
   as.data.frame() |>
@@ -757,8 +756,7 @@ a.30x10k |>
 ggplot(aes(x = year, y = c.ret, color = name)) +
   geom_line(size = 1) +
   theme(legend.position = "none", legend.title = element_blank()) +
-  labs(y = "$",
-       x = "Year",
+  labs(y = "$", x = "Year",
        title = "Cumulative return asset A.",
        subtitle = "10,000 paths of the evolution of $1 invested in year 0.")
 ```
@@ -770,8 +768,7 @@ a.30x10k |>
 ggplot(aes(x = year, y = c.ret, color = name)) +
   geom_line(size = 1) +
   theme(legend.position = "none", legend.title = element_blank()) +
-  labs(y = "Log10 cumulative returns",
-       x = "Year",
+  labs(y = "Log10 cumulative returns", x = "Year",
        title = "Log10 cumulative return asset A.",
        subtitle = "10,000 paths of the evolution of $1 invested in year 0.") +
   scale_y_log10()
@@ -819,7 +816,7 @@ As stated earlier, this asset B is a loosing investment. Let's verify this for 5
 binomial_tree <- function(u, d, n) {
   prod(sample(c(1+u, 1-d), n, replace = TRUE))
 }
-set.seed(2, sample.kind="Rounding")
+set.seed(2, sample.kind = "Rounding")
 binomial_tree(u = (-0.001), d = (0.001), 5)
 binomial_tree(u = (-0.001), d = (0.001), 30)
 ```
@@ -849,7 +846,7 @@ Let's visualize how these assets behave. I have to set the seed to have nice res
 u = 0.46
 d = 0.34
 xx = 8
-set.seed(xx, sample.kind="Rounding")
+set.seed(xx, sample.kind = "Rounding")
 a30 <- sample(c(1+u, 1-d), 30, replace = TRUE)
 u = - 0.001
 d = 0.001
@@ -884,8 +881,7 @@ cx <- (replicate(10000, binomial_tree(u = (0.46-0.001)/2,
 set.seed(2, sample.kind = "Rounding")
 bx <-(replicate(10000, binomial_tree(u = 0.46, d = 0.34, 30)))
 
-abcx <- as.data.frame(cbind(
-  year = c(1:30), a = ax, b = bx, c = cx))
+abcx <- as.data.frame(cbind(year = c(1:30), a = ax, b = bx, c = cx))
 
 abcx |>
   gather(a:c, key = name, value = c.ret) |>
@@ -893,7 +889,6 @@ abcx |>
   geom_boxplot() +
   theme(legend.position = "none")
   #geom_hline(yintercept = 0, linetype = "longdash")
-
 ```
 
 Stock price paths are useful to value option stocks. Let's review some stochastic processes in the next section.
@@ -1204,7 +1199,7 @@ delta_x <- (axt * dt) + delta_z
 xI <- cumsum(delta_x)
 zI <- cumsum(delta_z)
 # Now plot.
-plot(Time, xI, type= "l", lwd = 2, ylim = c(0, 18), ylab = "x")
+plot(Time, xI, type = "l", lwd = 2, ylim = c(0, 18), ylab = "x")
 lines(Time, zI, col = "red", lwd = 2)
 lines(Time, axt * Time, col = "blue", lwd = 2)
 abline(0, 0)

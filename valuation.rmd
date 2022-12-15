@@ -10,6 +10,13 @@ title: ''
 rm(list=ls())
 ```
 
+```{r}
+library(knitr)
+library(kableExtra)
+library(plotly)
+```
+
+
 \newpage
 
 # Options properties.
@@ -29,8 +36,6 @@ The main determinants of option prices are those parameters of the Black-Scholes
 This is, $BS = f(S_0, K, rf, T, \sigma)$. Here we set up the BS function and then evaluate it at $BS = f(S_0=50, K=50, rf=0.05, T=1, \sigma=0.3)$.
 
 ```{r}
-library(knitr)
-library(kableExtra)
 # Black-Scholes call.
 c.bs <- function(S, K, rf, TT, sigma) {
   d1 <- (log(S / K) + (rf + sigma^2 / 2) * TT) / (sigma * sqrt(TT))
@@ -46,13 +51,10 @@ p.bs <- function(S, K, rf, TT, sigma) {
 # Calculate and report results.
 c <- c.bs(50, 50, 0.05, 1, 0.3)
 p <- p.bs(50, 50, 0.05, 1, 0.3)
-option.prices <- data.frame("call" = c, "put" = p)
-row.names(option.prices) <- c("Black-Scholes option prices")
-kable(option.prices, caption = "Theoretical option prices.") |>
-kable_styling(latex_options = "HOLD_position")
+data.frame("Black-Scholes call" = c, "Black-Scholes put" = p)
 ```
 
-Now, let's see how BS changes (call and put) when we leave $S_0$ as a variable and the rest of the parameters as fixed: $BS = f(S_0, K=50, rf=0.05, T=1, \sigma=0.3)$.
+Now, let's see how Black-Scholes option prices changes (call and put) when we leave $S_0$ as a variable and the rest of the parameters as fixed: $BS = f(S_0, K=50, rf=0.05, T=1, \sigma=0.3)$.
 
 ```{r}
 # Parameters.
@@ -70,9 +72,9 @@ p.S0 <- mapply(p.bs, S0.seq, K, rf, TT, sigma)
 
 We produce as many <tt>`c.S0`</tt> as values for <tt>`S0.seq`</tt>. Then, we can plot.
 
-```{r fig.cap="Call price as a function of the stock price at time zero."}
+```{r fig.cap="Call price as a function of $S_0$."}
 # See the results.
-plot(S0.seq, c.S0, type = "l", lwd = 2, xlab = expression(paste(S[0])), 
+plot(S0.seq, c.S0, type = "l", lwd = 4, xlab = expression(paste(S[0])), 
      ylab = "Call option price, c")
 ```
 
@@ -80,8 +82,8 @@ The call option price is an increasing function of $S_0$. This makes sense becau
 
 See the case of the put option.
 
-```{r fig.cap="Put price as a function of the stock price at time zero."}
-plot(S0.seq, p.S0, type = "l", lwd = 2, xlab = expression(paste(S[0])), 
+```{r fig.cap="Put price as a function of $S_0$."}
+plot(S0.seq, p.S0, type = "l", lwd = 4, xlab = expression(paste(S[0])), 
      ylab = "Put option price, p")
 ```
 
@@ -89,28 +91,28 @@ Here, it is cheaper to lock the price of an expensive asset for a potential sell
 
 Let's put both plots together.
 
-```{r fig.cap="Call and put prices as a function of the stock price at time zero (zoom)."}
+```{r fig.cap="Call and put prices as a function of $S_0$ (zoom)."}
 # What is the interpretation of S0.star, and how did I found this value?
 S0.star <- K * exp(-rf * TT)
 c.S0.star <- mapply(c.bs, S0.star, K, rf, TT, sigma)
 # Plot.
-plot(S0.seq, c.S0, type = "l", lwd = 3, col = "blue", ylim = c(4, 8), 
+plot(S0.seq, c.S0, type = "l", lwd = 4, col = "blue", ylim = c(4, 8), 
      xlab = expression(paste(S[0])), ylab = "Option theoretical price", 
      xlim = c(40, 55))
-lines(S0.seq, p.S0, lwd = 3, col = "red")
+lines(S0.seq, p.S0, lwd = 4, col = "red")
 abline(v = S0.star, lty = 2)
 abline(h = c.S0.star, lty = 2)
 abline(h = c, lty = 2, col = "blue")
 abline(h = p, lty = 2, col = "red")
 abline(v = S0, lty = 2)
-points(S0, c, pch = 19, col = "blue", cex = 2)
-points(S0, p, pch = 19, col = "red", cex = 2)
-points(S0.star, c.S0.star, pch = 19, cex = 2)
+points(S0, c, pch = 19, col = "blue", cex = 3)
+points(S0, p, pch = 19, col = "red", cex = 3)
+points(S0.star, c.S0.star, pch = 19, cex = 3)
 legend("topleft", legend = c("Call", "Put"),
        col = c("blue", "red"), lwd = 3, bg = "white")
 ```
 
-Apparently, there is a single case in which both options (call and put) are the same. It is interesting to find out the value of $S_0$ that makes $c=p$. Clearly, this value is lower than $S_0=50$, the point here is to find the mathematical expression of $S_0$ that makes $c=p$.
+Note that there is a single case in which both options (call and put) are the same. It is interesting to find out the value of $S_0$ that makes $c=p$. Clearly, this value is lower than $S_0=50$, the point here is to find the mathematical expression of $S_0$ that makes $c=p$.
 
 ## Option bounds.
 
@@ -118,7 +120,7 @@ Option values (or prices) are subject or constrained to upper and lower bounds. 
 
 We can extend our analysis by incorporating the corresponding call and put option bounds.
 
-```{r fig.cap="Option values as a function of the stock price at time zero including option bounds."}
+```{r fig.cap="Option values as a function of $S_0$ including option bounds."}
 # Put lower bound.
 lb.put <- pmax(K * exp(-rf * TT) - S0.seq, 0)
 # Call lower bound.
@@ -171,7 +173,7 @@ Every number from 1 to 9 is assigned to a specific geometric shape in the plot a
 
 Now, let's see how Black-Scholes option prices changes (call and put) when we leave $S_0$ as a variable, three levels of $\sigma$ and the rest of the parameters as fixed: $BS = f(S_0, K=50, rf=0.05, T=1, \sigma)$. We can show this in a 2 dimension plot, including the correspondent bounds.
 
-```{r fig.cap="Call option changes as the stock price at time zero and sigma increases: the role of bounds."}
+```{r fig.cap="Call option changes as $S_0$ and $\\sigma$ increases: the role of bounds."}
 # Evaluate the function.
 c.S0.s1 <- mapply(c.bs, S0.seq, K, rf, TT, sigma)
 c.S0.s5 <- mapply(c.bs, S0.seq, K, rf, TT, sigma * 5)
@@ -183,15 +185,15 @@ lines(S0.seq, c.S0.s5, lwd = 3, col = "blue") # call with higher sigma
 lines(S0.seq, c.S0.s15, lwd = 3, col = "red") # call with even higher sigma
 lines(S0.seq, lb.call, lwd = 3, lty = 2) # lower bound
 lines(S0.seq, S0.seq, lwd = 3, lty = 2) # upper bound
-legend("topleft", legend = c("Call sigma=0.3", "Call sigma*5", 
-                             "Call sigma*15", "Call bounds"),
-       col = c("black", "blue", "red", "black"), lwd = 2,
+legend("topleft",legend=expression(sigma == 0.3, sigma == 1.5,
+                                   sigma == 4.5, "call bounds"), 
+       text.width = 12, col = c("black", "blue", "red", "black"), lwd = 2,
        lty = c(1, 1, 1, 2), bg = "white", cex = 0.8)
 ```
 
 And the same for the put option.
 
-```{r fig.cap="Put option changes as the stock price at time zero and sigma increases: the role of bounds."}
+```{r fig.cap="Put option changes as $S_0$ and $\\sigma$ increases: the role of bounds."}
 # Evaluate the function.
 p.S0.s1 <- mapply(p.bs, S0.seq, K, rf, TT, sigma)
 p.S0.s5 <- mapply(p.bs, S0.seq, K, rf, TT, sigma * 5)
@@ -203,17 +205,30 @@ lines(S0.seq, p.S0.s5, lwd = 3, col = "blue") # put with higher sigma
 lines(S0.seq, p.S0.s15, lwd = 3, col = "red") # put with even higher sigma
 lines(S0.seq, lb.put, lwd = 3, lty = 2) # lower bound
 lines(S0.seq, rep(S0.star, 50) , lwd = 3, lty = 2) # upper bound
-legend("bottomleft", legend = c("Put sigma=0.3", "Put sigma*5", 
-                             "Put sigma*15", "Put bounds"),
-       col = c("black", "blue", "red", "black"), lwd = 2,
+legend("bottomleft", legend=expression(sigma == 0.3, sigma == 1.5,
+                                   sigma == 4.5, "put bounds"), 
+       text.width = 12, col = c("black", "blue", "red", "black"), lwd = 2,
        lty = c(1, 1, 1, 2), bg = "white", cex = 0.8)
+```
+```{r fig.cap="Put option changes as $S_0$ and $\\sigma$ increases: the role of bounds (zoom)."}
+# Evaluate the function.
+p.S0.s1 <- mapply(p.bs, S0.seq, K, rf, TT, sigma)
+p.S0.s5 <- mapply(p.bs, S0.seq, K, rf, TT, sigma * 5)
+p.S0.s15 <- mapply(p.bs, S0.seq, K, rf, TT, sigma * 15)
+# Plot.
+plot(S0.seq, p.S0.s5, type = "l", lwd = 3,  xlab = expression(paste(S[0])),
+     ylab = "Pall option price, p", col = "blue",
+     xlim = c(0, 1), ylim = c(47, 47.8))
+lines(S0.seq, p.S0.s15, lwd = 3, col = "red") # put with even higher sigma
+lines(S0.seq, lb.put, lwd = 3, lty = 2) # lower bound
+lines(S0.seq, rep(S0.star, 50) , lwd = 3, lty = 2) # upper bound
 ```
 
 Then, regardless of the extreme value of parameters, option bounds represent the maximum and minimum values for the call and put options. These option prices are theoretical as they are calculated by implementing the Black-Scholes formula. We normally evaluate whether the option *market* prices violates these bounds because this will flag an opportunity to implement an arbitrage strategy to generate a risk-free profit.
 
 A different way to illustrate the option properties is by looking at a plane. Here, we let $S_0$ and $K$ as a free variables and remain the rest as fixed: $BS = f(S_0, K, rf=0.05, T=1, \sigma = 0.3)$.
 
-```{r fig.cap="Call value as the stock price at time zero and the strike price change: a plane view."}
+```{r fig.cap="Call value as $S_0$ and $K$ change: a plane view."}
 # K as a variable.
 K.seq <- S0.seq
 # Create the empty matrix.
@@ -223,7 +238,8 @@ for(i in 1:50){ # Is there an easier way to do this?
   for(j in 1:50){
     c.S0.s[i, j] <- c.bs(S0.seq[i], K.seq[j], rf, TT, sigma) } }
 # Plot.
-c.S0.s.plot <- persp(S0.seq, K.seq, c.S0.s, zlab = "Call", xlab = "S_0", 
+c.S0.s.plot <- persp(S0.seq, K.seq, c.S0.s, zlab = "Call", 
+                     xlab = "S_0", 
       ylab = "K", theta = -60, phi = 10, expand =  0.5, col = "orange", 
       shade = 0.2, ticktype = "detailed") 
 points(trans3d(S0, K, c, c.S0.s.plot), cex = 2, pch = 19, col = "blue")
@@ -231,7 +247,7 @@ points(trans3d(S0, K, c, c.S0.s.plot), cex = 2, pch = 19, col = "blue")
 
 An alternative view is by showing a contour plot. A contour plot is a graphical technique for representing a 3-dimensional surface by plotting constant $z$ slices (option prices), called contours, on a 2-dimensional format. That is, given a value for $z$, lines are drawn for connecting the $(x, y)$ coordinates ($S_0$, $K$) where that $z$ value occurs.
 
-```{r fig.cap="Call value as the stock price at time zero and the strike price change: a contour view."}
+```{r fig.cap="Call value as $S_0$ and $K$ change: a contour view."}
 contour(S0.seq, K.seq, c.S0.s, xlab = expression(paste(S[0])), 
         ylab = "K", lwd = 2, nlevels = 20)
 points(S0, K, pch = 19, col = "blue", cex = 2)
@@ -239,12 +255,23 @@ points(S0, K, pch = 19, col = "blue", cex = 2)
 
 Note that the blue circle $(S_0=50, K=50)$ is between the contour line 5 and 10, this makes sense because the call option at $call(S_0=50, K=50, rf=0.05, T=1, \sigma = 0.3) = 7.115627$.
 
+
+```{r fig.cap="Call value as $S_0$ and $K$ change: an interactive view."}
+plot_ly(type = "surface" , x = S0.seq, y = K.seq , z = c.S0.s ) %>%
+layout(#title = "Minimization of f at V0=12.395 an sv=0.212",
+       scene = list(xaxis = list(title = "Stock price"), 
+                    yaxis = list(title = "K", 
+                    zaxis = list(title = "Call price"))))  %>%
+hide_colorbar()
+#add_markers(y = 12.3957765, x = 0.2123041, z = 0, inherit = TRUE)
+```
+
 An interesting case is the value of the put as a function of the time to maturity. Let's see the simplest case.
 
-```{r fig.cap="Put value as time to maturity increases: the mysterious hump."}
+```{r fig.cap="Put value as $T$ increases: the mysterious hump."}
 TT.seq <- seq(from = 1, to = 25, length.out = 50)
 p.TT <- mapply(p.bs, S0, K, rf, TT.seq, sigma)
-plot(TT.seq, p.TT, type = "l", lwd = 2, ylab = "Put value", xlab = "T")
+plot(TT.seq, p.TT, type = "l", lwd = 4, ylab = "Put value", xlab = "T")
 points(TT, p, col = "red", cex = 2, pch = 19)
 ```
 
@@ -252,7 +279,7 @@ The put option price first increases as the time to maturity increases and after
 
 Let's illustrate the case when time to maturity and the stock price at time zero changes.
 
-```{r fig.cap="Put value as the stock price at time zero and time to maturity change: a plane."}
+```{r fig.cap="Put value as $S_0$ and $T$ change: a plane."}
 p.S0.T <- matrix(0, nrow = 50, ncol = 50)
 for(i in 1:50) { # Is there an easier way to do this?
   for(j in 1:50) {
@@ -265,13 +292,23 @@ points(trans3d(S0, TT, p, p.S0.T.plot), cex = 2, pch = 19, col = "blue")
 
 That is not quite clear. So, here is the contour view.
 
-```{r fig.cap="Put value as the stock price at time zero and time to maturity change: a contour view, or the hypnotic plot."}
+```{r fig.cap="Put value as $S_0$ and $T$ change: a contour view, or the hypnotic plot."}
 contour(S0.seq, TT.seq, p.S0.T, xlab = expression(paste(S[0])), 
         ylab = "T", lwd = 2, nlevels = 40, drawlabels = TRUE)
 points(S0, TT, pch = 19, col = "blue", cex = 2)
 ```
 
 Now the mysterious hump is clearer than before. Remember the value of $put(S_0=50, K=50, rf=0.05, T=1, \sigma = 0.3) = 4.677099$.
+
+```{r fig.cap="Put value as $S_0$ and $T$ change: an interactive view."}
+plot_ly(type = "surface" , x = S0.seq, y = TT.seq , z = p.S0.T ) %>%
+layout(#title = "Minimization of f at V0=12.395 an sv=0.212",
+       scene = list(xaxis = list(title = "Stock price"), 
+                    yaxis = list(title = "T", 
+                    zaxis = list(title = "Pall price"))))  %>%
+hide_colorbar()
+#add_markers(y = 12.3957765, x = 0.2123041, z = 0, inherit = TRUE)
+```
 
 ## Put-call parity.
 
@@ -321,9 +358,9 @@ legend("topleft", legend = c("Put option", "Share", "Total (Portfolio C)"),
 
 The point here is that the black line (total) is the same in both cases. This is why we argue that we payoffs of both portfolios are worth the same. If this is so, then they have to value the same in time $t=0$.
 
-In sum, this is the payoff of portfolios A and C: $max(S_T, K)$.
+In sum, this is the payoff of portfolios A and C: $\mathrm{max}(S_T,K)$.
 
-```{r fig.cap="Portfolio A and C payoffs: max(ST,K)."}
+```{r fig.cap="Portfolio A and C payoffs: $\\mathrm{max}(S_T,K)$."}
 par(pty = "s")
 plot(ST.seq, pc, type = "l", ylab = "Payoff", 
      xlab = expression(paste(S[T])), lwd = 3, ylim = c(0, 150))

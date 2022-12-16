@@ -305,7 +305,7 @@ plot_ly(type = "surface" , x = S0.seq, y = TT.seq , z = p.S0.T ) %>%
 layout(#title = "Minimization of f at V0=12.395 an sv=0.212",
        scene = list(xaxis = list(title = "Stock price"), 
                     yaxis = list(title = "T", 
-                    zaxis = list(title = "Pall price"))))  %>%
+                    zaxis = list(title = "Put price"))))  %>%
 hide_colorbar()
 #add_markers(y = 12.3957765, x = 0.2123041, z = 0, inherit = TRUE)
 ```
@@ -337,20 +337,21 @@ par(pty = "s")
 par(mfrow = c(1, 2), oma = c(0, 0, 2, 0))
 par(pty = "s")
 # Portfolio A.
-plot(ST.seq, cT, type = "l", ylab = "Payoff", xlab = expression(paste(S[T])), lwd = 2, 
+plot(ST.seq, cT, type = "l", ylab = "Payoff", 
+     xlab = expression(paste(S[T])), lwd = 2, 
      lty = 2, col = "blue", ylim = c(0, 150))
+lines(ST.seq, (cT + BT), lwd = 5)
 lines(ST.seq, BT, lwd = 2, lty = 2, col = "red")
-lines(ST.seq, (cT + BT), lwd = 2)
 legend("topleft", legend = c("Call option", "Zero coupon bond", 
                            "Total (Portfolio A)"),
        col = c("blue", "red", "black"), lwd = c(2, 2, 2), lty = c(2, 2, 1), 
        bg = "white", cex = 0.7)
 par(pty = "s")
 # Portfolio C.
-plot(ST.seq, ST.seq, type = "l", ylab = "Payoff", xlab = expression(paste(S[T])),
-     lwd = 2, lty = 2, col = "orange", ylim = c(0, 150))
+plot(ST.seq, (pT + ST.seq), lwd = 5, type = "l", ylab = "Payoff", 
+     xlab = expression(paste(S[T])), ylim = c(0, 150))
+lines(ST.seq, ST.seq, lwd = 2, lty = 2, col = "orange")
 lines(ST.seq, pT, lwd = 2, lty = 2, col = "purple")
-lines(ST.seq, (pT + ST.seq), lwd = 2)
 legend("topleft", legend = c("Put option", "Share", "Total (Portfolio C)"),
        col = c("purple", "orange", "black"), lwd = 2, 
        lty = c(2, 2, 1), bg = "white", cex = 0.7)
@@ -363,7 +364,7 @@ In sum, this is the payoff of portfolios A and C: $\mathrm{max}(S_T,K)$.
 ```{r fig.cap="Portfolio A and C payoffs: $\\mathrm{max}(S_T,K)$."}
 par(pty = "s")
 plot(ST.seq, pc, type = "l", ylab = "Payoff", 
-     xlab = expression(paste(S[T])), lwd = 3, ylim = c(0, 150))
+     xlab = expression(paste(S[T])), lwd = 5, ylim = c(0, 150))
 ```
 
 Nice. We can manipulate the put-call parity to create a synthetic stock. This is:
@@ -374,8 +375,9 @@ Graphically:
 
 ```{r fig.cap="A synthetic stock."}
 par(pty = "s")
-plot(ST.seq, (cT + BT - pT), type = "l", ylab = "Payoff", xlab = expression(paste(S[T])), 
-     lwd = 3, ylim = c(-50, 150), xlim = c(0, 200), col = "orange")
+plot(ST.seq, (cT + BT - pT), type = "l", ylab = "Payoff", 
+     xlab = expression(paste(S[T])), 
+     lwd = 5, ylim = c(-50, 100), xlim = c(0, 150), col = "orange")
 lines(ST.seq, cT, lwd = 2, lty = 2, col = "blue") # positive call.
 lines(ST.seq, BT, lwd = 2, lty = 2, col = "red") # positive bond.
 lines(ST.seq, -pT, lwd = 2, lty = 2, col = "purple") # negative put.
@@ -395,16 +397,16 @@ Graphically:
 
 ```{r fig.cap="A synthetic bond."}
 par(pty = "s")
-plot(ST.seq, (-cT + ST.seq + pT), type = "l", ylab = "Payoff", xlab = expression(paste(S[T])), 
-     lwd = 3, ylim = c(-50, 150), xlim = c(0, 200), col = "orange",
-     main = "A synthetic bond.")
+plot(ST.seq, (-cT + ST.seq + pT), type = "l", ylab = "Payoff", 
+     xlab = expression(paste(S[T])), 
+     lwd = 5, ylim = c(-50, 100), xlim = c(0, 150), col = "orange")
 lines(ST.seq, -cT, lwd = 2, lty = 2, col = "blue") 
 lines(ST.seq, ST.seq, lwd = 2, lty = 2, col = "red") 
 lines(ST.seq, pT, lwd = 2, lty = 2, col = "purple") 
-legend("bottomright", legend = c("Call option (short)", "Stock", 
+legend("bottomleft", legend = c("Call option (short)", "Stock", 
                                "Put option", "Total (bond)"),
        col = c("blue", "red", "purple", "orange"), lwd = 2, 
-       lty = c(2, 2, 2, 1), bg = "white")
+       lty = c(2, 2, 2, 1), bg = "white", cex = 0.65)
 ```
 
 There is an alternative to the Black-Scholes formula we indirectly review before. Next section introduces the binomial trees.
@@ -422,14 +424,14 @@ pl <- pmax(K - ST.seq, 0) - p # long put payoff.
 cs <- pmin(K - ST.seq, 0) + c # short call payoff.
 ps <- pmin(ST.seq - K, 0) + c # short put payoff.
 
-plot(ST.seq, cl, type = "l", ylim = c(-10,40))
+plot(ST.seq, cl, type = "l", ylim = c(-10, 40))
 abline(h = 0, lty = 2)
 abline(v = K, lty = 2)
 lines(ST.seq, ps)
 lines(ST.seq, - ST.seq + S0)
 lines(ST.seq, rep((S0 + p - c) * exp(r * TT), 200))
 
-cl + cs - (ST.seq + S0)+(S0 + p - c) * exp(r * TT)
+cl + cs - (ST.seq + S0) + (S0 + p - c) * exp(r * TT)
 
 cl + ps - (ST.seq + S0)
 ```
@@ -509,8 +511,7 @@ bin.bs <- rbind("Binomial (1 step)" = b1t, "Binomial (4 steps)" = b4t,
                 "Binomial (200 steps)" = b200t, 
                 "Binomial (500 steps)" = b500t, 
                 "Black-Scholes" = Black.Scholes)
-kable(bin.bs, caption = "Binomial and Black-Scholes comparison.") |>
-kable_styling(latex_options = "HOLD_position")
+bin.bs
 ```
 
 In the extreme, the binomial method converges to the Black-Scholes method. Let's explore these differences.
@@ -526,9 +527,9 @@ b20 <- mapply(bin, S0.seq, K, sigma, TT, rf, 20)
 Here we compare the value of the binomial method and the Black-Scholes as a function of $S_0$.
 
 ```{r fig.cap="Binomial and Black-Scholes comparison."}
-plot(S0.seq, b1[1, ], type = "l", col = "red", lwd = 2, 
+plot(S0.seq, b1[1, ], type = "l", col = "red", lwd = 5, 
      xlab = expression(paste(S[0])), ylab = "Call")
-lines(S0.seq, c.S0.s1, col = "black", lwd = 2)
+lines(S0.seq, c.S0.s1, col = "black", lwd = 5)
 legend("topleft", legend = c("1 step binomial", "Black-Scholes"),
        col = c("red", "black"), lwd = 2, bg = "white")
 ```
@@ -573,9 +574,7 @@ S.paths <- function(S0, sigma, TM, steps) {
 Spaths <- S.paths(50, 0.3, 1, 10)
 # A table.
 colnames(Spaths) <- c(0, cumsum(rep(1/10, 10)))
-kable(Spaths, caption = "Stock price paths given to the binomial model.",
-      digits = 2) |>
-kable_styling(latex_options = "HOLD_position")
+round(Spaths, 2)
 ```
 
 This does not look like a typical binomial tree. In fact, it is not very clear whether a given price corresponds to an increase or decrease. We can make a few arrangements to visualize this as a tree.
@@ -602,17 +601,12 @@ S.paths <- function(S0, sigma, TM, steps) {
 Spaths <- S.paths(50, 0.3, 1, 10)
 # A table.
 colnames(Spaths) <- round(c(0, cumsum(rep(1/10, 10))), 2)
-kable(Spaths, caption = "Stock price paths given to the binomial model.",
-      digits = 2) |>
-kable_styling(latex_options = "HOLD_position")
+round(Spaths, 2)
 ```
 
-Nice.
-
+Nice. Evaluate the function for a single case.
 ```{r}
-# Evaluate the function.
 # bin <- function(S0, K, sigma, TM, r, steps) {
-
 b2 <- mapply(bin, 50, 52, 0.3, 2, 0.05, 2)
 b2
 ```
@@ -620,13 +614,14 @@ b2
 ```{r}
 # E2 Q1
 # the value of being American; or the cost of being European.
-S.seq <- seq(30, 70, 0.5)
+S.seq <- seq(0, 80, 0.5)
 AEoptions <- mapply(bin, S.seq, 52, 0.3, 1, 0.05, 50)
 plot(S.seq, unlist(AEoptions[4,]) - unlist(AEoptions[2,]), 
-     type = "l", lwd = 2, main = "The value of being American.",
+     type = "l", lwd = 5, main = "The value of being American.",
      xlab = expression(paste(S[0])),
      ylab = "Option premium for American put options.")
 abline(v = 52, lty = 2)
+abline(h = 0, lty = 2)
 ```
 
 ```{r}

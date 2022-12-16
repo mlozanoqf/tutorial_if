@@ -54,9 +54,13 @@ htmltools::tagList(
 )
 ```
 
-# [`r fa("arrow-circle-left", fill = "black")`](https://mlozanoqf.github.io/) {-}
+````{=html}
+```{r, echo=FALSE, results='asis'}
+xfun::file_string('contact.html')
+```
+````
 
----
+# [`r fa("arrow-circle-left", fill = "black")`](https://mlozanoqf.github.io/) Back to main. {-}
 
 \newpage
 

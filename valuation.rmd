@@ -641,16 +641,17 @@ plot(bin_paths$st, bin_paths$pa, pch = 19, ylab = expression(paste(S[t])),
      xlab = "t")
 ```
 
-Nice. Evaluate the function for a single case.
+Nice. Evaluate the function for a single 2-step case: $S_0 = 50$, $K=52$, $\sigma = 0.3$, $T=2$, $rf=0.05$.
+
 ```{r}
 # bin <- function(S0, K, sigma, TM, r, steps) {
 b2 <- mapply(bin, 50, 52, 0.3, 2, 0.05, 2)
 b2
 ```
 
-```{r}
-# E2 Q1
-# the value of being American; or the cost of being European.
+There is no difference between American and European call options theoretical prices as there are no incentives to exercise American call options early. The case of put options is different as incentives to exercise American put options early may arise. As a consequence, American put options are in general more expensive than European put options. Let's evaluate this difference in a 50-step case: $S_0 = 50$, $K=52$, $\sigma = 0.3$, $T=2$, $rf=0.05$.
+
+```{r fig.cap="The value of being American; or the cost of being European."}
 S.seq <- seq(0, 80, 0.5)
 AEoptions <- mapply(bin, S.seq, 52, 0.3, 1, 0.05, 50)
 plot(S.seq, unlist(AEoptions[4,]) - unlist(AEoptions[2,]), 
@@ -661,52 +662,73 @@ abline(v = 52, lty = 2)
 abline(h = 0, lty = 2)
 ```
 
-```{r}
-# Risk neutral probability, note that r is the risk-free rate.
-# This is the substitution of equation 13.3.
-p.12 <- (exp(0.12*(3/12))-0.9)/(1.1-0.9)
-p.12
-```
+## Real vs. risk-neutral world.
+
+This section is based on @Hull section 13.1. The risk-neutral probability for the case of $rf=0.12$, $T=3/12$, $u=1.1$ and $d=0.9$:
+
+$p = \frac{e^{rT}-d}{u-d} \rightarrow p = \frac{e^{0.12\times(3/12)}-0.9}{1.1-0.9} \rightarrow p = 0.6522727.$
+
 
 ```{r}
-# Option expected value ($) at time T
-option_T <- p.12*1 + (1-p.12)*0
+# This is the substitution of equation 13.3.
+rnp <- (exp(0.12*(3/12))-0.9)/(1.1-0.9)
+rnp
+```
+
+Following @Hull, This option will have one of two values at the end of the 3 months. If the stock price turns out to be \$22, the value of the option will be \$1; if the stock price turns out to be \$18, the value of the option will be zero. This is the option expected value at time $T$.
+
+$p\times(\$1) + (1-p)\times \$0 = 0.6522727.$
+
+```{r}
+option_T <- rnp * 1 + (1 - rnp) * 0
 option_T
 ```
 
+We can calculate the option value at $t=0$. This option value is valid for the real world, not only the risk-neutral world.
+
+$0.6522727 \times e^{-rT} = 0.6329951.$
+
 ```{r}
-# Option value ($) at time 0.
-# This option value is valid for the real world, not only the risk-neutral world.
 option_0 <- option_T * exp(-0.12*(3/12))
 option_0
 ```
+Suppose that, in the real world, we know the expected return on the stock is 16%. This is easily calculated as we have historical information of stock returns. Then, the probability of an up movement in the real world $p^*$is:
+
+$p^* = \frac{e^{rT}-d}{u-d} \rightarrow p^* = \frac{e^{0.16\times(3/12)}-0.9}{1.1-0.9} \rightarrow p^* = 0.7040539.$
+
 
 ```{r}
 # Real world probability.
-# Suppose that, in the real world, the expected return on the stock is 16%
 p.real <- (exp(0.16*(3/12))-0.9)/(1.1-0.9)
 p.real
 ```
+This is the option expected value in the real world at time $T$.
+
+$p\times(\$1) + (1-p)\times \$0 = 0.7040539.$
 
 ```{r}
-# The expected payoff ($) from the option in the real world is then:
 option_T_real <- p.real*1 + (1-p.real)*0
 option_T_real
 ```
 
 Can we calculate the present value of \$0.7040539? We only need the option discount factor. The problem is that we do not know this rate. It is not easy to know the correct discount rate of the option to apply to the expected payoff in the real world. Using risk-neutral valuation solves this problem because we know that in a risk-neutral world the expected return on all assets (and therefore the discount rate to use for all expected payoffs) is the risk-free rate.
 
-What can we do to find out the option discount factor? Since we know the correct value of the option is 0.6329951, we can deduce that the correct real-world discount rate is 42.55688%. This is because $0.6329951 = 0.704053e^{-0.4255688\times3/12}$.
+What can we do to find out the option discount factor? Since we know the correct value of the option is $f=0.6329951$, we can deduce that the correct real-world discount rate.
 
-To solve for the real-world option discount rate we do the following: $r=-log(0.6329951 / 0.704053)\times (12/3)$.
+$0.6329951 = 0.704053e^{-r\times3/12} \rightarrow \frac{0.6329951}{0.704053} = e^{-r\times3/12}$ 
+
+$\rightarrow log{\frac{0.6329951}{0.704053}} = -r\times3/12$ 
+
+$\rightarrow r = -log{\frac{0.6329951}{0.704053}}\times12/3$
+
+$\rightarrow r=0.4255688$.
 
 ```{r}
-# Real world option discount factor:
 option.df <- -log(option_0/option_T_real)*(12/3)
 option.df
 ```
 
-The correct real-world discount rate for the option is 42.55688%.
+The real-world discount rate for the option is 42.55688%.
 
 ```{r}
 # Put everything in a function.
@@ -726,20 +748,17 @@ option.df.fun(0.16)
 
 Everything looks correct.
 
-```{r}
+```{r fig.cap="Options are in general much risker compared with the underlying stock."}
 # Evaluate the function in a range of values.
 r.seq <- seq(0.11, 0.17, 0.001)
 df <- mapply(option.df.fun, r.seq)
-par(pty = "s")
-plot(r.seq, df, type = "l", lwd = 2,
-     main = "Options are in general much risker compared with the 
-     underlying stock.",
+plot(r.seq, df, type = "l", lwd = 5, 
      xlab = "Expected return of the stock (the underlying)",
      ylab = "Expected return of the option")
-abline(v = 0.12, lty = 2, col = "blue")
-abline(h = option.df.fun(0.12), lty = 2, col = "blue")
-abline(v = 0.16, lty = 2, col = "red")
-abline(h = option.df.fun(0.16), lty = 2, col = "red")
+abline(v = 0.12, lty = 2, col = "blue", lwd = 2)
+abline(h = option.df.fun(0.12), lty = 2, col = "blue", lwd = 2)
+abline(v = 0.16, lty = 2, col = "red", lwd = 2)
+abline(h = option.df.fun(0.16), lty = 2, col = "red", lwd = 2)
 ```
 
 ## Parrondo's Paradox: Combine two losing investments into a winner.

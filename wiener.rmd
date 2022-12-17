@@ -1,0 +1,443 @@
+---
+title: ''
+#output: bookdown::gitbook:
+  html_document:
+    df_print: paged
+---
+
+```{r echo=FALSE}
+# This removes all items in environment. 
+rm(list=ls())
+```
+
+```{r}
+library(knitr)
+library(kableExtra)
+library(plotly)
+```
+
+
+\newpage
+
+# Wiener processes.
+
+Here we review stochastic process that are useful in finance, especially in the Black-Scholes context.
+
+## The basic process.
+
+A simple Wiener process.
+
+```{r}
+rm(list=ls()) #Removes all items in Environment!
+# A typical Wiener process.
+TT <- 5
+N <- 10000
+dt <- TT / N
+Time <- seq(from = dt, to = TT, by = dt)
+set.seed(560746) # for reproducibility purposes.
+delta_z <- rnorm(N, 0, 1) * dt^0.5 
+z <- 25 + cumsum(delta_z) # The initial price is 25.
+```
+
+Graphically:
+
+```{r fig.cap="Wiener process 10,000 steps from blue z(0)=25 to z(T)=26.2 in red."}
+plot(Time, z, type = "l",
+     ylab = "z in the texbook, it could be a stock price",
+     xlab = "Time, this could be 5 days or even shorter periods")
+lines(Time, seq(25, (25 + sum(delta_z)), length.out = N), lty = 2,
+      col = "purple")
+points(Time[1], 25, col = "blue", cex = 2, pch = 16)
+points(Time[N], z[N], col = "red", cex = 2, pch = 16)
+legend("topleft", legend = c(round(z[N], 2)), bg = "white", 
+       text.col = "red")
+```
+
+This is supposed to mimic the evolution of a stock price. Now, we propose to produce not only one but 100 processes.
+
+```{r}
+# 100 Wiener processes.
+set.seed(365633)
+mat.delta_z <- matrix(rnorm(100 * N, mean = 0, sd = 1), 100, N) 
+mat.z1 <- 25 + t(apply(mat.delta_z, 1, cumsum)) 
+mat.z <- t(cbind(matrix(25, 100), mat.z1))
+Time2 <- c(0, Time)
+pred <- mean(mat.z[(N + 1), ])
+# 95% range.
+rangetop <- pred + qnorm(0.975) * var(mat.z[(N + 1), ])^0.5
+rangedown <- pred - qnorm(0.975) * var(mat.z[(N + 1), ])^0.5
+```
+
+Graphically.
+
+```{r fig.cap="100 Wiener process 10,000 steps, initial price at 25, red is the mean at T."}
+matplot(Time2, mat.z, type = "l", lty = 1, col = rgb(0, 0, 1, 0.3),
+     ylab = "z in the texbook, it could be a stock price",
+     xlab = "Time")
+abline(h = pred, lty = 2, col = "red")
+abline(v = 0, lty = 2)
+lines(Time2, seq(25, pred, length.out = N + 1), lty = 2)
+points(Time2[N + 1], pred, col = "red", cex = 2, pch = 16)
+points(0, 25, col = "black", cex = 2, pch = 16)
+legend("topleft", legend = c(round(pred, 2)), bg = "white", 
+       text.col = "red")
+abline(h = rangetop, lty = 2)
+abline(h = rangedown, lty = 2)
+```
+
+Let's confirm this 95% confidence interval.
+
+```{r}
+sum(mat.z[(N + 1), ] > rangetop)
+sum(mat.z[(N + 1), ] < rangedown)
+```
+
+This means that 5 values are outside this 95% confidence interval. Confidence intervals are then correct.
+
+```{r}
+summary(mat.z[(N + 1), ])
+```
+
+A potential problem is that the values can be negative. This is problematic when we are interested to model stock prices.
+
+Let's explore deeper the stochastic process below.
+
+```{r fig.cap="A stochastic process."}
+set.seed(1)
+delta_z <- rnorm(N, 0, 1) * dt^0.5 
+z <- 25 + cumsum(delta_z)
+### A stochastic process
+par(mfrow = c(2, 2), mai = c(0.4, 0.4, 0.4, 0.4))
+par(pty = "s")
+plot(Time, z, type = "l", xlim = c(0, TT), ylim = c(22.5, 26),
+     main = "z", ylab = "")
+plot(Time, delta_z, type = "h", xlim = c(0, TT),
+     main = "delta_z", ylab = "")
+abline(h = 0, lty = 2, col = "orange", lwd = 2)
+plot(Time, z, type = "l", xlim = c(0, 1/12), ylim = c(24.9, 25.35),
+     main = "z (first month only)", ylab = "")
+plot(Time, delta_z, type = "h", xlim = c(0, 1/12), 
+     col = ifelse(delta_z < 0, "red", "blue"), ylim = c(-0.055, 0.055),
+     main = "delta_z (first month only)", ylab = "")
+```
+
+These processes are driven by a random component. The lower panel is revealing because we can see how the random component goes from positive to negative without any pattern, it is entirely random. Now, let's explore the role of $\Delta t$.
+
+```{r fig.cap="Wiener process."}
+par(mfrow=c(2, 2), mai = c(0.4, 0.4, 0.4, 0.4))
+par(pty = "s")
+plot(Time[(seq(from = 1, to = N, length.out = 10))],
+     z[(seq(from = 1, to = N, length.out = 10))], type = "l",
+     ylim = c(22.5, 26), main = "Relatively large value of delta_t",
+     ylab = "")
+abline(v = 0, lty = 2)
+abline(v = 5, lty = 2)
+plot(Time[(seq(from = 1, to = N, length.out = 100))],
+     z[(seq(from = 1, to = N, length.out = 100))], type = "l", 
+     ylim = c(22.5, 26), ylab = "z", main = "Smaller value of delta_t")
+abline(v = 0, lty = 2)
+abline(v = 5 , lty = 2)
+plot(Time[(seq(from = 1, to = N, length.out = 1000))],
+     z[(seq(from = 1, to = N, length.out = 1000))], type = "l", 
+     ylim = c(22.5, 26), ylab = "z", main = "Smaller value of delta_t")
+abline(v = 0, lty = 2)
+abline(v = 5 , lty = 2)
+plot(Time, z, type = "l", ylim = c(22.5, 26), # length 10,000
+     main = "True process as delta_t tends to 0")
+abline(v = 0, lty = 2)
+abline(v = 5, lty = 2)
+```
+
+The $\Delta t$ value determines how frequent are the changes.
+
+A few properties of stochastic processes.
+
+```{r}
+mean(delta_z) # should be zero
+var(delta_z)^0.5 # should be dt^.5
+dt^0.5
+var(delta_z) # should be dt
+dt
+```
+
+## The generalized Wiener process.
+
+Now let's analyze the case of the generalized Wiener process.
+
+```{r}
+# Figure 14.2
+TT <- 50
+N <- 200
+dt <- TT / N
+Time <- seq(from = 0, to = TT, by = dt)
+set.seed(123)
+delta_z <- 1.5 * rnorm(N, 0, 1) * dt^0.5
+delta_x <- (0.3 * dt) + delta_z
+x <- c(0, cumsum(delta_x))
+z <- c(0, cumsum(delta_z))
+```
+
+Graphically:
+
+```{r fig.cap="In Hull: Figure 14.2"}
+plot(Time, x, type = "l", lwd = 2, ylim = c(-7, 22))
+lines(Time, z, col = "red", lwd = 2)
+lines(Time, 0.3 * Time, col = "blue", lwd = 2)
+abline(0, 0)
+abline(v = 0)
+legend("topleft", legend = c("Generalized Wiener process", 
+                             "Drift", "Basic Wiener process"),
+       col = c("black", "blue", "red"), lwd = 3, bg = "white", cex = 0.8)
+```
+
+Here, the generalized Wiener process is decomposed into the drift and the basic Wiener process. A zoom of the same plot.
+
+```{r fig.cap="In Hull: Figure 14.2 (zoom)"}
+# Figure 14.2 Zoom
+plot(Time, x, type = "b", ylim = c(-0.6, 1), xlim = c(0, 1), lwd = 2)
+lines(Time, z, col = "red", lwd = 2, type = "b")
+lines(Time, 0.3 * Time, col = "blue", lwd = 2, type = "b")
+abline(0, 0)
+abline(v = 0)
+abline(v = dt, lty = 2)
+abline(v = dt * 2, lty = 2)
+abline(v = dt * 3, lty = 2)
+abline(v = dt * 4, lty = 2)
+points(dt, 0, pch = 1, col = "blue", lwd = 2)
+points(dt * 2, 0, pch = 1, col = "blue", lwd = 2)
+points(dt * 3, 0, pch = 1, col = "blue", lwd = 2)
+points(dt * 4, 0, pch = 1, col = "blue", lwd = 2)
+legend("topleft", legend = c("Generalized Wiener process", 
+                           "Drift", "Basic Wiener process"),
+       col = c("black", "blue", "red"), lty = 1, bg = "white", lwd = 2)
+```
+
+This is a nice visual representation of: generalized = drift + Wiener.
+
+See how the process changes when we consider a lower value of $a$.
+
+```{r fig.cap="Generalized Wiener process: lower a"}
+set.seed(123)
+delta_xlow <- (0.15 * dt) + delta_z
+xlow <- c(0, cumsum(delta_xlow))
+# Now plot.
+plot(Time, xlow, type = "l", ylim = c(-7, 22), lwd = 2, ylab = "x")
+lines(Time, x, lwd = 2, col = "grey")
+lines(Time, z, lwd = 2, col = "red")
+lines(Time, 0.15 * Time, lty = 2, lwd = 2)
+lines(Time, 0.3 * Time, lty = 2, lwd = 2, col = "grey")
+abline(0, 0)
+abline(v = 0)
+legend("topleft", legend = c("Original generalized Wiener process", 
+    "Original drift", "New generalized Wiener process", "New drift",
+    "Basic Wiener process"), lty = c(1, 2, 1, 2, 1), bg = "white", lwd = 2,
+     col = c("grey", "grey", "black", "black", "red"), cex = 0.7)
+```
+
+And a higher value of $b$.
+
+```{r fig.cap="Generalized Wiener process: higher b"}
+set.seed(123)
+delta_zhigh <- 3 * rnorm(N, 0, 1) * dt^0.5
+delta_xhigh <- (0.3 * dt) + delta_zhigh
+xhigh <- c(0, cumsum(delta_xhigh))
+zhigh <- c(0, cumsum(delta_zhigh))
+plot(Time, xhigh, type = "l", ylim = c(-7, 22), lwd = 2, ylab = "x")
+lines(Time, x, lwd = 2, col = "grey")
+lines(Time, zhigh, lwd = 2, col = "red")
+lines(Time, z, lwd = 2, col = "grey")
+lines(Time, 0.3 * Time, lty = 2, lwd = 2)
+abline(0, 0)
+abline(v = 0)
+legend("topleft", legend = c("New generalized Wiener process", 
+      "Original generalized Wiener process", "Drift" ,
+      "New basic Wiener process", "Original basic Wiener process"), 
+      lty = c(1, 1, 2, 1, 1), bg = "white", lwd = 2,
+       col = c("black", "grey", "black", "red", "grey"), cex = 0.7)
+```
+
+Note the changes are now more pronounced.
+
+```{r}
+# Table 14.1
+set.seed(19256)
+delta_S <- rep(0, 10)
+S <- rep(100, 10)
+epsilon <- rep(0, 10)
+for(i in 1:10){
+  epsilon[i] <- rnorm(1, 0, 1)
+  delta_S[i] <- 0.15 * (1 / 52) * S[i] + 0.3 * ((1 / 52)^0.5) * 
+    epsilon[i] * S[i]
+  S[i+1] <- S[i] + delta_S[i]
+}
+epsilon <- c(epsilon, NA)
+delta_S <- c(delta_S, NA)
+results <- data.frame(S, epsilon, delta_S)
+kable(results, caption = "Simulation of stock price (Table 14.1 in Hull).", 
+      digits = 4) |>
+kable_styling(latex_options = "HOLD_position")
+```
+
+It is interesting to note that in Hull the final simulated price is 111.54 and here it is 111.5401. Is this a pure coincidence?
+
+A correlated process.
+
+```{r}
+# Section 14.5
+rho <- 0.8
+TT <- 1
+steps <- 1000
+dt <- TT / steps
+Time <- seq(from = dt, to = TT, by = dt)
+set.seed(123)
+e1 <- rnorm(steps, 0, 1)
+e2 <- rho * e1 + ((1 - rho^2)^0.5) * rnorm(steps, 0, 1)
+delta_z1 <- 1.5 * e1 * dt^0.5
+delta_z2 <- 1.5 * e2 * dt^0.5
+delta_x1 <- (0.3 * dt) + delta_z1
+delta_x2 <- (0.3 * dt) + delta_z2
+x1 <- cumsum(delta_x1)
+x2 <- cumsum(delta_x2)
+x <- c(x1, x2)
+```
+
+Visually:
+
+```{r fig.cap="Correlated processes x1 and x2."}
+plot(Time, x1, type = "l", ylim = c(min(x), max(x)), ylab = "x1 and x2")
+lines(Time, x2, col = "red")
+abline(0, 0)
+```
+
+The following code needs revision.
+
+```{r fig.cap="Itô process. This figure needs revision."}
+# Figure 14.2 with Itô process
+TT <- 50
+N <- 200
+dt <- TT / N
+Time <- seq(from = 0, to = TT, by = dt)
+set.seed(1)
+axt <- 0.3 + rnorm(N + 1, 0, 1) * 0.001 * Time
+bxt <- 0.001 * Time + 0.1
+delta_z <- bxt * rnorm(N + 1, 0, 1) * dt^0.5
+delta_x <- (axt * dt) + delta_z
+xI <- cumsum(delta_x)
+zI <- cumsum(delta_z)
+# Now plot.
+plot(Time, xI, type = "l", lwd = 2, ylim = c(0, 18), ylab = "x")
+lines(Time, zI, col = "red", lwd = 2)
+lines(Time, axt * Time, col = "blue", lwd = 2)
+abline(0, 0)
+abline(v = 0)
+legend("topleft", legend = c("Itô process", 
+                           "Stochastic drift", "Wiener process"),
+       col = c("black", "blue", "red"), lty = 1, bg = "white", lwd = 2)
+```
+
+This is a clear view of a typical Itô process. Taken from Esteban Moro.
+
+```{r echo=FALSE, out.width='50%', fig.align="center", fig.cap="Itô process."}
+knitr::include_graphics('./pdf1.jpg')
+```
+
+The model of stock price behavior implies that a stock's price at time $T$, given its price today, is lognormally distributed. The following is similar to example 15.1 in Hull.
+
+```{r fig.cap="A geometric Brownian motion simulation: 100 stock price paths."}
+set.seed(10101010)
+for(j in 1:100) {
+  delta_S <- NULL 
+  S <- rep(40, 365) # Now it is 40 for all days, the loop fill this out.
+  epsilon <- NULL 
+  for(i in 1:365) {
+    epsilon[i] <- rnorm(1, 0, 1)
+    delta_S[i] <- 0.16 * (1 / 365) * S[i] + 0.2 * ((1 / 365)^0.5) *
+      epsilon[i] * S[i]
+    S[i+1] <- S[i] + delta_S[i]
+    }
+  if (j==1) {
+    plot(S, type = "l", ylim = c(20, 80), ylab = "$", xlab = "Time (days)")
+    abline(h = 10, col = "red", lwd = 3)
+    }
+  lines(S)
+  }
+abline(h = 32.55, lwd = 2, col = "red")
+abline(h = 56.56, lwd = 2, col = "red")
+abline(v = 180, lwd = 2, col = "red")
+```
+
+The code above can be problematic for a few reasons. Can you see why? An alternative code is the following. Again, this is similar to example 15.1 in Hull.
+
+```{r}
+S0 <- 40
+nDays <- 360
+mu <- 0.16
+sig <- 0.2
+TT <- 0.5
+mean.logST <- log(S0)+(mu - (sig^2 / 2)) * TT
+variance.logST <- sig^2 * TT
+lower.ST <- exp(mean.logST + qnorm(0.025) * variance.logST^0.5)
+upper.ST <- exp(mean.logST + qnorm(0.975) * variance.logST^0.5)
+set.seed(3)
+nSim <- 1000
+SP_sim <- matrix(0, nrow = nDays, ncol = nSim)
+for(i in 1:nSim){
+  SVec <- rep(0, nDays)
+  SVec[1] <- S0
+  for(j in 2:nDays){
+    DeltaS <- mu * SVec[j - 1] * (1 / nDays) + sig * SVec[j - 1] *
+      rnorm(1) * (1 / nDays)^0.5
+    SVec[j] <- SVec[j - 1] + DeltaS
+  }
+  SP_sim[, i] <- SVec
+}
+```
+
+Now, let's plot the results.
+
+```{r fig.cap="A geometric Brownian motion simulation: 1000 stock price paths."}
+matplot(SP_sim, type = 'l', col = rgb(0, 0, 1 ,0.3), lty = 1,
+        ylab = 'This is similar as example 15.1',
+        xlab = "Time")
+points(0, S0, col = "black", pch = 19)
+abline(h = lower.ST)
+abline(h = upper.ST)
+abline(v = 180)
+```
+
+Let's verify that the there is a 95% probability that the stock price in 6 months will lie between 32.55 and 56.56.
+
+```{r}
+1 - (sum(SP_sim[180, ] < lower.ST) + sum(SP_sim[180, ] > upper.ST)) / 1000
+```
+
+```{r}
+S0 <- 40
+mu <- 0.16
+sig <- 0.2
+TT <- 0.5
+mean.logST <- log(S0)+(mu - (sig^2 / 2)) * TT
+variance.logST <- sig^2 * TT
+lower.ST <- exp(mean.logST + qnorm(0.025) * variance.logST^0.5)
+upper.ST <- exp(mean.logST + qnorm(0.975) * variance.logST^0.5)
+lower.ST
+upper.ST
+```
+
+```{r}
+S0 <- 40
+mu <- 0.16
+sig <- 0.2
+TT <- 1
+mean.logST <- log(S0)+(mu - (sig^2 / 2)) * TT
+variance.logST <- sig^2 * TT
+lower.ST <- exp(mean.logST + qnorm(0.05) * variance.logST^0.5)
+upper.ST <- exp(mean.logST + qnorm(0.95) * variance.logST^0.5)
+lower.ST
+upper.ST
+```
+
+Nice.
+
+This is how a stock price evolves according to the Black-Scholes formula.
+

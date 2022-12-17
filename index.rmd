@@ -74,6 +74,11 @@ xfun::file_string('contact.html')
 
 \newpage
 
+```{r wiener, child = 'wiener.Rmd'}
+```
+
+\newpage
+
 ```{r VaR, child = 'VaR.Rmd'}
 ```
 

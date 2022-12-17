@@ -193,7 +193,7 @@ legend("topleft",legend=expression(sigma == 0.3, sigma == 1.5,
 
 And the same for the put option.
 
-```{r fig.cap="Put option changes as $S_0$ and $\\sigma$ increases: the role of bounds."}
+```{r fig.cap="Put option changes as $S_0$ and $\\sigma$ increase: the role of bounds."}
 # Evaluate the function.
 p.S0.s1 <- mapply(p.bs, S0.seq, K, rf, TT, sigma)
 p.S0.s5 <- mapply(p.bs, S0.seq, K, rf, TT, sigma * 5)
@@ -210,7 +210,7 @@ legend("bottomleft", legend=expression(sigma == 0.3, sigma == 1.5,
        text.width = 12, col = c("black", "blue", "red", "black"), lwd = 2,
        lty = c(1, 1, 1, 2), bg = "white", cex = 0.8)
 ```
-```{r fig.cap="Put option changes as $S_0$ and $\\sigma$ increases: the role of bounds (zoom)."}
+```{r fig.cap="Put option changes as $S_0$ and $\\sigma$ increase: the role of bounds (zoom)."}
 # Evaluate the function.
 p.S0.s1 <- mapply(p.bs, S0.seq, K, rf, TT, sigma)
 p.S0.s5 <- mapply(p.bs, S0.seq, K, rf, TT, sigma * 5)
@@ -220,15 +220,15 @@ plot(S0.seq, p.S0.s5, type = "l", lwd = 3,  xlab = expression(paste(S[0])),
      ylab = "Pall option price, p", col = "blue",
      xlim = c(0, 1), ylim = c(47, 47.8))
 lines(S0.seq, p.S0.s15, lwd = 3, col = "red") # put with even higher sigma
-lines(S0.seq, lb.put, lwd = 3, lty = 2) # lower bound
-lines(S0.seq, rep(S0.star, 50) , lwd = 3, lty = 2) # upper bound
+lines(S0.seq, lb.put, lwd = 1, lty = 2) # lower bound
+lines(S0.seq, rep(S0.star, 50) , lwd = 1, lty = 2) # upper bound
 ```
 
 Then, regardless of the extreme value of parameters, option bounds represent the maximum and minimum values for the call and put options. These option prices are theoretical as they are calculated by implementing the Black-Scholes formula. We normally evaluate whether the option *market* prices violates these bounds because this will flag an opportunity to implement an arbitrage strategy to generate a risk-free profit.
 
 A different way to illustrate the option properties is by looking at a plane. Here, we let $S_0$ and $K$ as a free variables and remain the rest as fixed: $BS = f(S_0, K, rf=0.05, T=1, \sigma = 0.3)$.
 
-```{r fig.cap="Call value as $S_0$ and $K$ change: a plane view."}
+```{r fig.cap="Call value as $S_0$ and $K$ change, a plane view."}
 # K as a variable.
 K.seq <- S0.seq
 # Create the empty matrix.
@@ -247,7 +247,7 @@ points(trans3d(S0, K, c, c.S0.s.plot), cex = 2, pch = 19, col = "blue")
 
 An alternative view is by showing a contour plot. A contour plot is a graphical technique for representing a 3-dimensional surface by plotting constant $z$ slices (option prices), called contours, on a 2-dimensional format. That is, given a value for $z$, lines are drawn for connecting the $(x, y)$ coordinates ($S_0$, $K$) where that $z$ value occurs.
 
-```{r fig.cap="Call value as $S_0$ and $K$ change: a contour view."}
+```{r fig.cap="Call value as $S_0$ and $K$ change, a contour view."}
 contour(S0.seq, K.seq, c.S0.s, xlab = expression(paste(S[0])), 
         ylab = "K", lwd = 2, nlevels = 20)
 points(S0, K, pch = 19, col = "blue", cex = 2)
@@ -256,7 +256,7 @@ points(S0, K, pch = 19, col = "blue", cex = 2)
 Note that the blue circle $(S_0=50, K=50)$ is between the contour line 5 and 10, this makes sense because the call option at $call(S_0=50, K=50, rf=0.05, T=1, \sigma = 0.3) = 7.115627$.
 
 
-```{r fig.cap="Call value as $S_0$ and $K$ change: an interactive view."}
+```{r fig.cap="Call value as $S_0$ and $K$ change, an interactive view."}
 plot_ly(type = "surface" , x = S0.seq, y = K.seq , z = c.S0.s ) %>%
 layout(scene = list(xaxis = list(title = "Stock price"), 
                     yaxis = list(title = "K", 
@@ -266,7 +266,7 @@ hide_colorbar()
 
 An interesting case is the value of the put as a function of the time to maturity. Let's see the simplest case.
 
-```{r fig.cap="Put value as $T$ increases: the mysterious hump."}
+```{r fig.cap="European put as $T$ increases: the mysterious hump."}
 TT.seq <- seq(from = 1, to = 25, length.out = 50)
 p.TT <- mapply(p.bs, S0, K, rf, TT.seq, sigma)
 plot(TT.seq, p.TT, type = "l", lwd = 4, ylab = "Put value", xlab = "T")
@@ -277,7 +277,7 @@ The put option price first increases as the time to maturity increases and after
 
 Let's illustrate the case when time to maturity and the stock price at time zero changes.
 
-```{r fig.cap="Put value as $S_0$ and $T$ change: a plane."}
+```{r fig.cap="European put value as $S_0$ and $T$ change: a plane."}
 p.S0.T <- matrix(0, nrow = 50, ncol = 50)
 for(i in 1:50) { # Is there an easier way to do this?
   for(j in 1:50) {
@@ -290,7 +290,7 @@ points(trans3d(S0, TT, p, p.S0.T.plot), cex = 2, pch = 19, col = "blue")
 
 That is not quite clear. So, here is the contour view.
 
-```{r fig.cap="Put value as $S_0$ and $T$ change: a contour view, or the hypnotic plot."}
+```{r fig.cap="Put value as $S_0$ and $T$ change, a contour view, or the hypnotic plot."}
 contour(S0.seq, TT.seq, p.S0.T, xlab = expression(paste(S[0])), 
         ylab = "T", lwd = 2, nlevels = 40, drawlabels = TRUE)
 points(S0, TT, pch = 19, col = "blue", cex = 2)
@@ -298,7 +298,7 @@ points(S0, TT, pch = 19, col = "blue", cex = 2)
 
 Now the mysterious hump is clearer than before. Remember the value of $put(S_0=50, K=50, rf=0.05, T=1, \sigma = 0.3) = 4.677099$.
 
-```{r fig.cap="Put value as $S_0$ and $T$ change: an interactive view."}
+```{r fig.cap="Put value as $S_0$ and $T$ change, an interactive view."}
 plot_ly(type = "surface" , x = S0.seq, y = TT.seq , z = p.S0.T ) %>%
 layout(scene = list(xaxis = list(title = "Stock price"), 
                     yaxis = list(title = "T", 
@@ -330,7 +330,7 @@ pc <- pmax(ST.seq, K) # this will be important.
 
 Then we plot.
 
-```{r fig.cap="Portfolio A and C payoffs: the put-call parity."}
+```{r fig.cap="Portfolio A and C payoffs, the put-call parity."}
 par(pty = "s")
 par(mfrow = c(1, 2), oma = c(0, 0, 2, 0))
 par(pty = "s")
@@ -359,7 +359,7 @@ The point here is that the black line (total) is the same in both cases. This is
 
 In sum, this is the payoff of portfolios A and C: $\mathrm{max}(S_T,K)$. This is already stored in <tt>`pc`</tt>.
 
-```{r fig.cap="Portfolio A and C payoffs: $\\mathrm{max}(S_T,K)$."}
+```{r fig.cap="Portfolio A and C payoffs, $\\mathrm{max}(S_T,K)$."}
 par(pty = "s")
 plot(ST.seq, pc, type = "l", ylab = "Payoff", 
      xlab = expression(paste(S[T])), lwd = 5, ylim = c(0, 150))
@@ -532,7 +532,7 @@ legend("topleft", legend = c("1 step binomial", "Black-Scholes"),
 
 There are some differences between the binomial and the Black-Scholes. Let's zoom to see the differences clearer.
 
-```{r fig.cap="Binomial and Black-Scholes convergence: a zoom view."}
+```{r fig.cap="Binomial and Black-Scholes convergence, a zoom view."}
 plot(S0.seq, b1[1,], type = "l", ylim = c(0, 4), xlim = c(30, 45), 
      col = "green", lwd = 2, xlab = expression(paste(S[0])), 
      ylab = "European call")
@@ -549,7 +549,7 @@ legend("topleft", legend = c("1 step binomial", "2 steps binomial",
 ```
 Not clear yet. Let's see a panel view.
 
-```{r fig.cap="Binomial and Black-Scholes convergence: a panel view."}
+```{r fig.cap="Binomial and Black-Scholes convergence, a panel view."}
 par(mfrow = c(2, 2), mai = c(0.7, 0.4, 0.4, 0.4))
 par(pty = "s")
 plot(S0.seq, c.S0.s1, type = "l", ylim = c(0, 4), xlim = c(30, 45), 
@@ -632,6 +632,13 @@ Spaths <- S.paths(50, 0.3, 1, 10)
 # A table.
 colnames(Spaths) <- round(c(0, cumsum(rep(1/10, 10))), 2)
 round(Spaths, 2)
+```
+
+```{r fig.cap="$S_t$ binomial paths from $S_0$ to $S_T$."}
+nona <- ! is.na(Spaths)
+bin_paths <- data.frame(st = rep(1:11, 1:11)/10-0.1, pa = Spaths[nona])
+plot(bin_paths$st, bin_paths$pa, pch = 19, ylab = expression(paste(S[t])),
+     xlab = "t")
 ```
 
 Nice. Evaluate the function for a single case.

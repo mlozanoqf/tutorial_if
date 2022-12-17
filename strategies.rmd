@@ -135,7 +135,7 @@ abline(v = 0, lty = 2)
 
 ## Options, stocks and bonds.
 
-We look at what can be achieved when an option is traded in conjunction with other assets. In particular, we examine the properties of portfolios consisting of (a) an option and a zero-coupon bond, (b) an option and the asset underlying the option, and (c) two or more options on the same asset. This section is based in @Hull chapter 12.
+We look at what can be achieved when an option is traded in conjunction with other assets. In particular, we examine the properties of portfolios consisting of (a) an option and a zero-coupon bond, (b) an option and the asset underlying the option, and (c) two or more options on the same asset. This section is based in @Hull chapter 12, you can also see @brealey2020principles.
 
 ```{r fig.cap="Hull: Figure 12.1a, profit diagram. A synthetic short put."}
 S0 = 65

@@ -5,7 +5,7 @@ subtitle: Dr. Martín Lozano.
 author:
 #- name: Back to main [`r fontawesome::fa("home")`](https://mlozanoqf.github.io/)
 #  affiliation: Academic website. [Web.](https://sites.google.com/site/mlozanoqf/)
-date: "\\faClock \\hspace{1 mm} Current commit: `r format(Sys.time(), '%d/%m/%Y, %H:%M:%S.')`"
+date: Current `r fontawesome::fa("code-commit") ` `r format(Sys.time(), '%d %b %Y, %H:%M:%S.')`
 #  bookdown::gitbook: default
 output: 
   bookdown::html_document2:
@@ -18,7 +18,7 @@ output:
     theme: readable #darkly 
     includes:
       after_body: analytics_if.html
-abstract: This material relies on John C. Hull [@Hull]. Some mathematical background is skipped to emphasize the data analysis, model logic, discussion, graphical approach and R coding. As in the philosophy of Donald Knuth [@knuth1984literate], the objective of this document is to explain to human beings what we want a computer to do as literate programming. This is a work in progress and it is under revision.
+abstract: This material relies on John C. Hull [@Hull]. Some mathematical background is skipped to emphasize the data analysis, model logic, discussion, graphical approach and R coding [@Rref]. As in the philosophy of Donald Knuth [@knuth1984literate], the objective of this document is to explain to human beings what we want a computer to do as literate programming. This is a work in progress and it is under revision.
 bibliography: references.bib
 ---
 
@@ -60,7 +60,7 @@ xfun::file_string('contact.html')
 ```
 ````
 
-# [`r fa("arrow-circle-left", fill = "black")`](https://mlozanoqf.github.io/) Back to main. {-}
+# [`r fa("arrow-circle-left", fill = "black")`](https://mlozanoqf.github.io/) [<span style="color: black">Back to main.</span>](https://mlozanoqf.github.io/) {-}
 
 \newpage
 

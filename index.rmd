@@ -86,7 +86,7 @@ xfun::file_string('contact.html')
 a <- toc()
 ```
 
-This document took `r as.numeric(a$toc-a$tic)` seconds to compile in Rmarkdown, `r R.version.string`.
+This document took `r round(as.numeric((a$toc-a$tic)/60), 2)` minutes to compile in Rmarkdown, `r R.version.string`.
 
 # References.
 

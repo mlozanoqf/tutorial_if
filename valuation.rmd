@@ -386,7 +386,7 @@ lines(ST.seq, -pT, lwd = 2, lty = 2, col = "purple") # negative put.
 legend("bottomright", legend = c("Call option", "Zero coupon bond", 
                                "Put option", "Total (stock)"),
        col = c("blue", "red", "purple", "orange"), lwd = 2, 
-       lty = c(2, 2, 2, 1), bg = "white", cex = 0.65)
+       lty = c(2, 2, 2, 1), bg = "white", cex = 0.8)
 ```
 
 So, we created a stock that did not exist with a call, a bond and a put. We can manipulate the put-call parity to create a synthetic bond $Ke^{-rT}$. This is:
@@ -406,7 +406,7 @@ lines(ST.seq, pT, lwd = 2, lty = 2, col = "purple")
 legend("bottomleft", legend = c("Call option (short)", "Stock", 
                                "Put option", "Total (bond)"),
        col = c("blue", "red", "purple", "orange"), lwd = 2, 
-       lty = c(2, 2, 2, 1), bg = "white", cex = 0.65)
+       lty = c(2, 2, 2, 1), bg = "white", cex = 0.7)
 ```
 
 There is an alternative to the Black-Scholes formula we indirectly review before. Next section introduces the binomial trees.
@@ -1020,7 +1020,11 @@ median(replicate(1, binomial_tree(u = (0.46-0.001)/2,
 
 This is how we combine two losing investments into a winner.
 
-The new asset C or portfolio C has a return of: $0.06/2 - 0.001/2=0.0295%$ or $2.95\%$. The volatility of C is $\sqrt{0.5^2(0.4)^2+0.5^2(0)^2-0}=0.2$ or $20\%$. Therefore, portfolio C has a lower return and risk than asset A. Given that A and B are uncorrelated, the diversification gain is high so we can combine two losing investments into a winner.
+The new asset C or portfolio C has a return of: $0.06/2 - 0.001/2=0.0295%$ or $2.95\%$. 
+
+The volatility of C is $\sqrt{0.5^2(0.4)^2+0.5^2(0)^2-0}=0.2$ or $20\%$. 
+
+Therefore, portfolio C has a lower return and risk than asset A. Given that A and B are uncorrelated, the diversification gain is high so we can combine two losing investments into a winner.
 
 Let's visualize how these assets behave. I have to set the seed to have nice results. But as we show before this works well when simulating many paths and computing the median to evaluate the expected cumulative return of each asset.
 
@@ -1039,7 +1043,7 @@ set.seed(xx, sample.kind = "Rounding")
 c30 <- sample(c(1+u, 1-d), 30, replace = TRUE)
 ```
 
-Below, it is clear that asset C wins less when asset A wins. Similarly, asset C looses less when asset A losses. This is because asset C is less risky than asset A.
+Below, it is clear that portfolio C wins less when asset A wins. Similarly, portfolio C looses less when asset A losses. This is because portfolio C is less risky than asset A.
 
 ```{r}
 abc <- as.data.frame(cbind(
@@ -1047,17 +1051,20 @@ abc <- as.data.frame(cbind(
   B = cumprod(b30), C = cumprod(c30)))
 head(abc)
 ```
+This is the cumulative return evolution for each asset and portfolio C in one single path.
 
-```{r fig.cap="30-year cumulative returns asset A, B and portfolio C."}
+```{r fig.cap="30-year cumulative returns asset A, B and portfolio C, one single path."}
 abc |>
   gather(A:C, key = name, value = c.ret) |>
   ggplot(aes(x = year, y = c.ret, color = name)) +
   geom_line(size = 1) +
   geom_point(aes(x = 0, y = 1), size = 5, col = "black") +
-  labs(y = "Cumulative returns", x = "Year")
+  labs(y = "Cumulative returns ($)", x = "Year")
 ```
 
-```{r fig.cap="30-year Log10 cumulative returns asset A, B and portfolio C, many paths."}
+Now we plot the 10,000 possible values of the 30 year cumulative returns.
+
+```{r fig.cap="30-year log cumulative returns asset A, B and portfolio C, only the final cumulative return."}
 set.seed(2, sample.kind = "Rounding")
 bx <- (replicate(10000, binomial_tree(u = -0.001, d = 0.001, 30)))
 set.seed(2, sample.kind = "Rounding")
@@ -1070,10 +1077,27 @@ abcx <- as.data.frame(cbind(year = c(1:30), A = ax, B = bx, C = cx))
 
 abcx |>
   gather(A:C, key = name, value = c.ret) |>
+  filter(year == 30) |>
   ggplot(aes(x = name, y = log(c.ret), color = name)) +
+  geom_hline(yintercept = 0, lty = 2) +
   geom_boxplot() +
   theme(legend.position = "none") +
-  labs(y = "Log cumulative returns", x = "")
+  labs(y = "Log cumulative returns at year 30", x = "")
+```
+
+An alternative to the boxplot is a density plot.
+
+```{r fig.cap="30-year log cumulative returns asset A and portfolio C, only the final cumulative return, a density view."}
+abcx |>
+  gather(A:C, key = name, value = c.ret) |>
+  filter(year == 30) |>
+  filter(name == c("A", "C")) |>
+  ggplot(aes(x = log(c.ret), fill = name)) +
+  geom_vline(xintercept = 0, lty = 2) +
+  geom_density(alpha = 0.5) +
+  theme(legend.position = "bottom") +
+  labs(x = "Log cumulative returns at year 30") +
+  geom_hline(yintercept = 0) 
 ```
 
 

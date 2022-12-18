@@ -959,7 +959,13 @@ Not good news as our 30 year investment of $\$1$ in this asset A with 6% gross r
 median(replicate(10000, binomial_tree(u = 0.46, d = 0.34, 30)))
 ```
 
-It would be a mistake to consider the mean as the maximum value is very high and not likely to happen. The asset A is then a loosing investment, $\$1$ would most likely lead to $\$0.5733923$ in 30 years.
+It would be a mistake to consider the mean \$5.816 as the estimated value of our investment in asset A since the maximum value is very high and not likely to happen. Note that the mean is very close to $(\$1+0.06)^{30}=\$5.743491$.
+
+```{r}
+(1+0.06)^30
+```
+
+The asset A is then a loosing investment, $\$1$ would most likely lead to $\$0.5733923$ in 30 years.
 
 Now, let's consider an asset B. Asset B has a known excess return of $-0.1\%$. In the context of a binomial tree: 
 

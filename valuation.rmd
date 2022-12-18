@@ -670,7 +670,7 @@ abline(h = 0, lty = 2)
 
 ## Real vs. risk-neutral world.
 
-This section is based on @Hull section 13.1. The risk-neutral probability $p$ for the case of $rf=0.12$, $T=3/12$, $u=1.1$ and $d=0.9$:
+This section is based on @Hull section 13.1. A stock price is currently \$20, and it is known that at the end of 3 months it will be either \$22 or \$18. We are interested in valuing a European call option to buy the stock for \$21 in 3 months. The risk-neutral probability $p$ for the case of $rf=0.12$, $T=3/12$, $u=1.1$ and $d=0.9$:
 
 $p = \frac{e^{rT}-d}{u-d} \rightarrow p = \frac{e^{0.12\times(3/12)}-0.9}{1.1-0.9} \rightarrow p = 0.6522727$.
 
@@ -681,10 +681,11 @@ rnp <- (exp(0.12*(3/12))-0.9)/(1.1-0.9)
 rnp
 ```
 
-Following @Hull, This option will have one of two values at the end of the 3 months. If the stock price turns out to be \$22, the value of the option will be \$1; if the stock price turns out to be \$18, the value of the option will be zero. This is the option expected value at time $T$.
+Following @Hull, this option will have one of two values at the end of the 3 months. If the stock price turns out to be \$22, the value of the option will be \$1; if the stock price turns out to be \$18, the value of the option will be zero. This is the European call option expected value at time $T$:
 
-$p\times(\$1) + (1-p)\times \$0$,
-$0.6522727\times(\$1) + (1-0.6522727)\times \$0 = \$0.6522727$.
+$[p\times(\$1)] + [(1-p)\times \$0]$
+
+$\rightarrow [0.6522727\times(\$1)] + [(1-0.6522727)\times \$0] = \$0.6522727$.
 
 
 ```{r}
@@ -692,15 +693,15 @@ option_T <- rnp * 1 + (1 - rnp) * 0
 option_T
 ```
 
-We can calculate the option value at $t=0$. This option value is valid for the real world, not only the risk-neutral world.
+We can calculate the European call option value at $t=0$ according to the risk-neutral valuation. This option value $f$ is valid in the real world, not only in the risk-neutral world.
 
-$\$0.6522727 \times e^{-rT} = \$0.6329951$.
+$f = \$0.6522727 \times e^{-rT} \rightarrow f = \$0.6522727 \times e^{-0.12\times3/12} \rightarrow f = \$0.6329951$.
 
 ```{r}
 option_0 <- option_T * exp(-0.12*(3/12))
 option_0
 ```
-Suppose that, in the real world, we know the expected return on the stock is 16%. This is easily calculated as we have historical information of stock returns. Then, the probability of an up movement in the real world $p^*$is:
+Suppose that, in the real world, we know the expected return on the stock is 16%. This is easily calculated as we have historical information of stock returns. It is also a reasonable assumption as this is higher than the risk-free rate. Then, the probability of an up movement in the real world $p^*$ is:
 
 $p^* = \frac{e^{rT}-d}{u-d} \rightarrow p^* = \frac{e^{0.16\times(3/12)}-0.9}{1.1-0.9} \rightarrow p^* = 0.7040539$.
 
@@ -712,8 +713,9 @@ p.real
 ```
 This is the option expected value in the real world at time $T$:
 
-$p^*\times(\$1) + (1-p^*)\times \$0$,
-$0.7040539\times(\$1) + (1-0.7040539)\times \$0 = \$0.7040539$.
+$[p^*\times(\$1)] + [(1-p^*)\times \$0]$ 
+
+$\rightarrow 0.7040539\times(\$1) + (1-0.7040539)\times \$0 = \$0.7040539$.
 
 
 ```{r}
@@ -721,15 +723,18 @@ option_T_real <- p.real*1 + (1-p.real)*0
 option_T_real
 ```
 
-Can we calculate the present value of \$0.7040539? We only need the option discount factor. The problem is that we do not know this rate. It is not easy to know the correct discount rate of the option to apply to the expected payoff in the real world. Using risk-neutral valuation solves this problem because we know that in a risk-neutral world the expected return on all assets (and therefore the discount rate to use for all expected payoffs) is the risk-free rate.
+Can we calculate the present value of \$0.7040539? We only need the option discount factor in the real world. The problem is that we do not know this rate, it should be higher than the risk-free rate, even higher than the the expected return on the stock. It is not easy to know the correct discount rate of the option to apply to the expected payoff in the real world. Using risk-neutral valuation solves this problem because we know that in a risk-neutral world the expected return on all assets (and therefore the discount rate to use for all expected payoffs) is the risk-free rate.
 
-What can we do to find out the option discount factor? Since we know the correct value of the option is $f=\$0.6329951$, we can deduce that the correct real-world discount rate.
+What can we do to find out the option discount factor? Since we know the correct value of the option is $f=\$0.6329951$ in both real and risk-neutral world, we can deduce the real-world discount rate $r$ of this European call option.
 
-$\$0.6329951 = \$0.704053e^{-r\times3/12} \rightarrow \frac{\$0.6329951}{\$0.704053} = e^{-r\times3/12}$ 
+We know this is true: $\$0.6329951 = \$0.704053e^{-r\times3/12}$.
 
-$\rightarrow log{\frac{\$0.6329951}{\$0.704053}} = -r\times3/12$ 
+Then, solve for $r$:
+$\rightarrow \frac{\$0.6329951}{\$0.704053} = e^{-r\times3/12}$,
 
-$\rightarrow r = -log{\frac{\$0.6329951}{\$0.704053}}\times12/3$
+$\rightarrow log{\frac{\$0.6329951}{\$0.704053}} = -r\times3/12$,
+
+$\rightarrow r = -log{\frac{\$0.6329951}{\$0.704053}}\times12/3$,
 
 $\rightarrow r=0.4255688$.
 
@@ -738,7 +743,7 @@ option.df <- -log(option_0/option_T_real)*(12/3)
 option.df
 ```
 
-The real-world discount rate for the option is 42.55688%. Let's put everything in a function.
+The *implied* real-world discount rate for the option is 42.55688%. Let's put everything in a function.
 
 ```{r}
 option.df.fun <- function(r) {
@@ -758,18 +763,21 @@ option.df.fun(0.16)
 
 Everything looks correct.
 
-```{r fig.cap="Options are in general much risker compared with the underlying stock."}
+```{r fig.cap="Red pill, blue pill."}
 # Evaluate the function in a range of values.
 r.seq <- seq(0.11, 0.17, 0.001)
 df <- mapply(option.df.fun, r.seq)
 plot(r.seq, df, type = "l", lwd = 5, 
      xlab = "Expected return of the stock (the underlying)",
      ylab = "Expected return of the option")
+points(0.12, 0.12, pch = 19, col = "blue", cex = 3)
+points(0.16, 0.4255688, pch = 19, col = "red", cex = 3)
 abline(v = 0.12, lty = 2, col = "blue", lwd = 2)
 abline(h = option.df.fun(0.12), lty = 2, col = "blue", lwd = 2)
 abline(v = 0.16, lty = 2, col = "red", lwd = 2)
 abline(h = option.df.fun(0.16), lty = 2, col = "red", lwd = 2)
 ```
+As in the movie, *The Matrix*, the blue pill describes living life without knowing its meaning or running away from the truth in order to stay as is. This is equivalent to the risk-neutral world. The red pill is described as the solution for knowing the real truth in life. This is equivalent to the real-world.
 
 ## Parrondo's paradox.
 
@@ -858,7 +866,7 @@ ggplot(a.30, aes(x = year, y = ret)) +
        subtitle = "Evolution of $1 invested in year 0.")
 ```
 
-These results represent one single path. So, if we are interested in the most likely value of our investment we need to simulate many paths and then estimate the median. Let's simulate 10000 paths and see the most likely value of our $\$1$ dollar investment in 30 years.
+These results represent one single path. So, if we are interested in the most likely value of our investment we need to simulate many paths and then estimate the median. Let's simulate 10,000 paths and see the most likely value of our $\$1$ dollar investment in 30 years.
 
 ```{r}
 u = 0.46
@@ -866,7 +874,7 @@ d = 0.34
 n = 30
 set.seed(2, sample.kind = "Rounding")
 a.30x10k <- replicate(10000, 
-                      cumprod(sample(c(1+u, 1-d), n, replace = TRUE))) |>
+                  cumprod(sample(c(1+u, 1-d), n, replace = TRUE))) |>
   as.data.frame() |>
   mutate(year = c(1:30)) |>
   gather(V1:V10000, key = name, value = c.ret)
@@ -878,32 +886,60 @@ See the results.
 a.30x10k |>
 ggplot(aes(x = year, y = c.ret, color = name)) +
   geom_line(size = 1) +
+  geom_point(aes(x = 0, y = 1), col = "black", size = 4) +
   theme(legend.position = "none", legend.title = element_blank()) +
-  labs(y = "Cumulative return", x = "Year",
-       subtitle = "10,000 paths of the evolution of $1 invested in year 0.")
+  labs(y = "Cumulative return ($)", x = "Year",
+  subtitle = "10,000 paths of the evolution of $1 invested in year 0.")
+```
+Most of these paths are concentrated in low cumulative returns by the end of the 30 years. In fact, 1,586 paths end up with a cumulative return lower than \$1 by the end of the 30 years:
+
+```{r}
+a.30x10k |>
+  group_by(name) |>
+  filter(c.ret < 1) |>
+  filter(length(year) == 30) |>
+  distinct(name) |>
+  nrow()
+```
+Let's plot these 1,586 paths.
+
+```{r fig.cap="30-year cumulative return asset A, 1,586 selected paths."}
+a.30x10k |>
+  group_by(name) |>
+  filter(c.ret < 1) |>
+  filter(length(year) == 30) |>
+  ggplot(aes(x = year, y = c.ret, color = name)) +
+  geom_line(size = 1) +
+  geom_point(aes(x = 0, y = 1), col = "black", size = 4) +
+  theme(legend.position = "none", legend.title = element_blank()) +
+  labs(y = "Cumulative return ($)", x = "Year",
+  subtitle = "1,586 paths of the evolution of $1 invested in year 0.")
 ```
 
-```{r fig.cap="30-year cumulative return asset A, many paths, a density plot."}
+```{r fig.cap="30-year log cumulative return asset A, 1,586 selected paths."}
 a.30x10k |>
-  filter(year == 30) |>
-  ggplot(aes(log(c.ret))) +
-  geom_density(size = 2) +
+  group_by(name) |>
+  filter(c.ret < 1) |>
+  filter(length(year) == 30) |>
+  ggplot(aes(x = year, y = log(c.ret), color = name)) +
+  geom_line(size = 1) +
+  geom_point(aes(x = 0, y = log(1)), col = "black", size = 4) +
   theme(legend.position = "none", legend.title = element_blank()) +
-  labs(x = "Log cumulative returns in year 30",
-       subtitle = "10,000 paths of the evolution of $1 invested in year 0.")
+  labs(y = "Log cumulative return", x = "Year",
+  subtitle = "Selected paths.")
 ```
+
 
 Note the plot is highly concentrated at low values. It is easier to show the results in logarithm form.
 
-```{r fig.cap="30-year Log10 cumulative return asset A, many paths."}
+```{r fig.cap="30-year Log cumulative return asset A, many paths."}
 a.30x10k |>
-ggplot(aes(x = year, y = c.ret, color = name)) +
+ggplot(aes(x = year, y = log(c.ret), color = name)) +
   geom_line(size = 1) +
-  geom_point(aes(x = 0, y = 1), size = 5) +
+  geom_point(aes(x = 0, y = log(1)), size = 5, col = "black") +
   theme(legend.position = "none", legend.title = element_blank()) +
-  labs(y = "Log10 cumulative returns", x = "Year",
-  subtitle = "10,000 paths of the evolution of $1 invested in year 0.") +
-  scale_y_log10()
+  labs(y = "Log cumulative returns", x = "Year",
+  subtitle = "10,000 paths of the evolution of $1 invested in year 0.")
 ```
 
 Here it is easier to see that the paths actually follow a binomial structure. Now, let's see the summary statistics for the 10,000 possible investment value at year 30.

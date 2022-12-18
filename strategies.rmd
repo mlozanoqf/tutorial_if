@@ -14,13 +14,15 @@ rm(list=ls())
 
 # Payoff functions.
 
+The payoff is the cash realized by the holder of an option or other asset at the end of its life.
+
 ## European options.
 
-The payoff functions for European options are the following.
+It is often useful to characterize a European option in terms of its payoff to the purchaser of the option. The initial cost of the option is then not included in the calculation. The payoff functions for European options are the following.
 
 * Payoff from a long position in a European call option: $\mathrm{max}(S_T-K, 0)$. Or equivalently: $-\mathrm{min}(K-S_T, 0)$.
-* Payoff from to the holder of a long position in a European put option: $\mathrm{max}(K-S_T, 0)$. Or equivalently: $-\mathrm{min}(S_T-K, 0)$.
 * Payoff to the holder of a short position in the European call option: $\mathrm{min}(K-S_T, 0)$. Or equivalently: $-\mathrm{max}(S_T-K, 0)$.
+* Payoff to the holder of a long position in a European put option: $\mathrm{max}(K-S_T, 0)$. Or equivalently: $-\mathrm{min}(S_T-K, 0)$.
 * Payoff from a short position in a European put option: $\mathrm{min}(S_T-K, 0)$. Or equivalently: $-\mathrm{max}(K-S_T, 0)$.
 
 Options are zero sum games because the payoffs to the holder or a long position and to the holder of a short position offset each other. 

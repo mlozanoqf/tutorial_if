@@ -793,7 +793,7 @@ Consider asset A which has a known 6% gross return. In the context of a binomial
 
 $0.5(1+u)+0.5(1-d)=1.06$. 
 
-Asset A has 40% volatility, so: 
+Asset A has a known 40% volatility, so: 
 
 $0.4=\sqrt{0.5(1+u)^2+0.5(1-d)^2-1.06^2}$. 
 
@@ -826,7 +826,7 @@ plot(c(0:5), c(1, cumprod(a)), type = "b", lwd = 5,
      ylab = c("Cumulative $ return"), xlab = c("Year"))
 ```
 
-Even simpler, a $\$1$ dollar invested at $t=0$ would lead to $\$0.6128265$ at $t=5$.
+Even simpler and quicker, a $\$1$ dollar invested at $t=0$ would lead to $\$0.6128265$ at $t=5$.
 
 ```{r}
 prod(a)
@@ -915,6 +915,7 @@ a.30x10k |>
   labs(y = "Cumulative return ($)", x = "Year",
   subtitle = "1,586 paths of the evolution of $1 invested in year 0.")
 ```
+The figure above looks still unclear as the concentration around \$0 is still high. It is better to show the results in logarithm form.
 
 ```{r fig.cap="30-year log cumulative return asset A, 1,586 selected paths."}
 a.30x10k |>
@@ -923,20 +924,23 @@ a.30x10k |>
   filter(length(year) == 30) |>
   ggplot(aes(x = year, y = log(c.ret), color = name)) +
   geom_line(size = 1) +
+  geom_point(col = "black", alpha = 0.01, size = 4) +
   geom_point(aes(x = 0, y = log(1)), col = "black", size = 4) +
-  theme(legend.position = "none", legend.title = element_blank()) +
+  theme(legend.position = "none", 
+        legend.title = element_blank()) +
   labs(y = "Log cumulative return", x = "Year",
-  subtitle = "Selected paths.")
+  subtitle = "Losing paths.")
 ```
+The figure now resembles a binomial tree. The black circles are more transparent for less concentrated values and less transparent for more concentrated values.
 
-
-Note the plot is highly concentrated at low values. It is easier to show the results in logarithm form.
+Let's do a similar plot for all the 10,000 paths.
 
 ```{r fig.cap="30-year Log cumulative return asset A, many paths."}
 a.30x10k |>
 ggplot(aes(x = year, y = log(c.ret), color = name)) +
   geom_line(size = 1) +
-  geom_point(aes(x = 0, y = log(1)), size = 5, col = "black") +
+  geom_point(aes(x = 0, y = log(1)), size = 3, col = "black") +
+  geom_point(col = "black", alpha = 0.01, size = 3) +
   theme(legend.position = "none", legend.title = element_blank()) +
   labs(y = "Log cumulative returns", x = "Year",
   subtitle = "10,000 paths of the evolution of $1 invested in year 0.")

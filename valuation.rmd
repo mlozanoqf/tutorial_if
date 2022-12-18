@@ -766,11 +766,19 @@ abline(v = 0.16, lty = 2, col = "red", lwd = 2)
 abline(h = option.df.fun(0.16), lty = 2, col = "red", lwd = 2)
 ```
 
-## Parrondo's Paradox: Combine two losing investments into a winner.
+## Parrondo's Paradox.
 
-Consider asset A which has a known 6% gross return. In the context of a binomial tree: $[p\times(1+u)]+[(1-p)\times(1-d)]=1.06$. Let's assume $p=0.5$, so we have: $0.5(1+u)+0.5(1-d)=1.06$. Asset A has 40% volatility, so $0.4=\sqrt{0.5(1+u)^2+0.5(1-d)^2-1.06^2}$. We have two equations and two unknown variables, so we can solve for $(1+u)$ and $(1-d)$: $(1+u)=1.46$ and $(1-d)=0.66$.
+Can we combine two losing investments into a winner?
 
-In a period of 5 years, we would have a random path of ups (1.46) and downs (0.66) for asset A.
+Consider asset A which has a known 6% gross return. In the context of a binomial tree: $[p\times(1+u)]+[(1-p)\times(1-d)]=1.06$. Let's assume $p=0.5$, so we have: 
+
+$0.5(1+u)+0.5(1-d)=1.06$. 
+
+Asset A has 40% volatility, so: 
+
+$0.4=\sqrt{0.5(1+u)^2+0.5(1-d)^2-1.06^2}$. 
+
+We have two equations and two unknown variables, so we can solve for $(1+u)$ and $(1-d)$: $(1+u)=1.46$ and $(1-d)=0.66$. In a period of 5 years, we would have a random path of ups (1.46) and downs (0.66) for asset A.
 
 ```{r}
 u = 0.46
@@ -779,9 +787,11 @@ set.seed(2, sample.kind = "Rounding")
 a <- sample(c(1+u, 1-d), 5, replace = TRUE)
 a
 ```
+Graphically:
 
-```{r fig.cap="5-year simulation of u and d for asset A."}
-barplot(c(0, a-1), ylim = c(-0.6, 0.6), ylab = c("Returns: u or d."))
+```{r fig.cap="5-year simulation of $u$ and $d$ for asset A."}
+barplot(c(0, a-1), ylim = c(-0.6, 0.6), ylab = c("Returns: u or d."),
+        col = ifelse(c(0, a-1) < 0, "red", "blue"))
 abline(h = 0)
 ```
 
@@ -790,13 +800,14 @@ The evolution of \$1 dollar invested in this 5 year period would look like this:
 ```{r}
 cumprod(a)
 ```
+Graphically:
 
 ```{r fig.cap="5-year simulation of cumulative returns for asset A."}
-plot(c(0:5), c(1, cumprod(a)), type = "b", lwd = 3,
-     ylab = c("Cumulative $ return"), xlab = c("Time"))
+plot(c(0:5), c(1, cumprod(a)), type = "b", lwd = 5,
+     ylab = c("Cumulative $ return"), xlab = c("Year"))
 ```
 
-Even simpler, a $\$1$ dollar invested at $t=0$ would lead to $\$0.6128265$ at $T=5$.
+Even simpler, a $\$1$ dollar invested at $t=0$ would lead to $\$0.6128265$ at $t=5$.
 
 ```{r}
 prod(a)
@@ -810,7 +821,7 @@ binomial_tree <- function(u, d, n) {
 }
 ```
 
-See if it works.
+See if it works. Calculate the asset A cumulative return of a 5-year and 30-year investment.
 
 ```{r}
 set.seed(2, sample.kind = "Rounding")
@@ -831,7 +842,7 @@ a.30 <- as.data.frame(cbind(year = c(0:30), ret = a.30))
 
 ggplot(a.30, aes(x = year, y = ret)) +
   geom_line(size = 1) +
-  geom_point(aes(x = 5, y = 0.6128265), size = 5) +
+  geom_point(aes(x = 5, y = 0.6128265), size = 6) +
       labs(y = "Cumulative return ($)", x = "Year",
        subtitle = "Evolution of $1 invested in year 0.")
 ```
@@ -857,7 +868,17 @@ a.30x10k |>
 ggplot(aes(x = year, y = c.ret, color = name)) +
   geom_line(size = 1) +
   theme(legend.position = "none", legend.title = element_blank()) +
-  labs(y = "$", x = "Year",
+  labs(y = "Cumulative return", x = "Year",
+       subtitle = "10,000 paths of the evolution of $1 invested in year 0.")
+```
+
+```{r fig.cap="30-year cumulative return asset A, many paths, a density plot."}
+a.30x10k |>
+  filter(year == 30) |>
+  ggplot(aes(log(c.ret))) +
+  geom_density(size = 2) +
+  theme(legend.position = "none", legend.title = element_blank()) +
+  labs(x = "Log cumulative returns in year 30",
        subtitle = "10,000 paths of the evolution of $1 invested in year 0.")
 ```
 
@@ -870,7 +891,7 @@ ggplot(aes(x = year, y = c.ret, color = name)) +
   geom_point(aes(x = 0, y = 1), size = 5) +
   theme(legend.position = "none", legend.title = element_blank()) +
   labs(y = "Log10 cumulative returns", x = "Year",
-       subtitle = "10,000 paths of the evolution of $1 invested in year 0.") +
+  subtitle = "10,000 paths of the evolution of $1 invested in year 0.") +
   scale_y_log10()
 ```
 
@@ -889,7 +910,11 @@ median(replicate(10000, binomial_tree(u = 0.46, d = 0.34, 30)))
 
 It would be a mistake to consider the mean as the maximum value is very high and not likely to happen. The asset A is then a loosing investment, $\$1$ would most likely lead to $\$0.5733923$ in 30 years.
 
-Now, let's consider an asset B. Asset B has a known excess return of $-0.1\%$. In the context of a binomial tree: $0.5(1+u)+0.5(1-d)=0.999$. Asset B has no volatility, imagine is a Treasury Bill or a similar risk-free asset. Solving for $(1+u)$ and $(1-d)$ leads to $(1+u)=0.999$ and $(1-d)=0.999$. Asset B is for sure a loosing investment as well.
+Now, let's consider an asset B. Asset B has a known excess return of $-0.1\%$. In the context of a binomial tree: 
+
+$0.5(1+u)+0.5(1-d)=0.999$. 
+
+Asset B has no volatility, imagine is a Treasury Bill or a similar risk-free asset. Solving for $(1+u)$ and $(1-d)$ leads to $(1+u)=0.999$ and $(1-d)=0.999$. Asset B is for sure a loosing investment as well.
 
 In a period of 5 years, we would have a random path of ups and downs in the context of a binomial path. Although in this case the result is the same as we have no risk.
 
@@ -898,7 +923,7 @@ b <- sample(c(1+(-0.001), 1-(0.001)), 5, replace = TRUE)
 b
 ```
 
-The evolution of \$1 dollar invested in this 5 year period would look like this:
+The evolution of \$1 dollar invested in this 5-year period would look like this:
 
 ```{r}
 cumprod(b)
@@ -963,7 +988,7 @@ Below, it is clear that asset C wins less when asset A wins. Similarly, asset C 
 abc <- as.data.frame(cbind(
   year = c(1:30), A = cumprod(a30), 
   B = cumprod(b30), C = cumprod(c30)))
-abc
+head(abc)
 ```
 
 ```{r fig.cap="30-year cumulative returns asset A, B and portfolio C."}
@@ -975,14 +1000,14 @@ abc |>
   labs(y = "Cumulative returns", x = "Year")
 ```
 
-```{r fig.cap="30-year Log10 cumulative return asset A, B and portfolio C, many paths."}
+```{r fig.cap="30-year Log10 cumulative returns asset A, B and portfolio C, many paths."}
 set.seed(2, sample.kind = "Rounding")
-ax <- (replicate(10000, binomial_tree(u = -0.001, d = 0.001, 30)))
+bx <- (replicate(10000, binomial_tree(u = -0.001, d = 0.001, 30)))
 set.seed(2, sample.kind = "Rounding")
 cx <- (replicate(10000, binomial_tree(u = (0.46-0.001)/2, 
                                       d = (0.34+0.001)/2, 30)))
 set.seed(2, sample.kind = "Rounding")
-bx <-(replicate(10000, binomial_tree(u = 0.46, d = 0.34, 30)))
+ax <-(replicate(10000, binomial_tree(u = 0.46, d = 0.34, 30)))
 
 abcx <- as.data.frame(cbind(year = c(1:30), A = ax, B = bx, C = cx))
 
@@ -990,8 +1015,9 @@ abcx |>
   gather(A:C, key = name, value = c.ret) |>
   ggplot(aes(x = name, y = log(c.ret), color = name)) +
   geom_boxplot() +
-  theme(legend.position = "none")
-  #geom_hline(yintercept = 0, linetype = "longdash")
+  theme(legend.position = "none") +
+  labs(y = "Log cumulative returns", x = "")
 ```
+
 
 Stock price paths are useful to value option stocks. Let's review some stochastic processes in the next section.

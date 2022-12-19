@@ -176,9 +176,7 @@ dt
 
 Now let's analyze the case of the generalized Wiener process.
 
-$\Delta x = a \Delta t + b \epsilon \sqrt{\Delta t}$
-
-Assume $a=1.5$ and $b=0.3$:
+$\Delta x = a \Delta t + b \epsilon \sqrt{\Delta t}$. Assume $a=1.5$ and $b=0.3$:
 
 ```{r}
 # Figure 14.2
@@ -249,7 +247,7 @@ legend("topleft", legend = c("Original generalized Wiener process",
     "Original drift", "New generalized Wiener process", "New drift",
     "Basic Wiener process"), lty = c(1, 2, 1, 1, 1), 
     bg = "white", lwd = 2,
-    col = c("grey", "grey", "black", "blue", "red"), cex = 0.7)
+    col = c("grey", "grey", "black", "blue", "red"), cex = 0.85)
 ```
 
 And a higher value of $b$.
@@ -271,7 +269,7 @@ legend("topleft", legend = c("New generalized Wiener process",
       "Original generalized Wiener process", "Drift" ,
       "New basic Wiener process", "Original basic Wiener process"), 
       lty = 1, bg = "white", lwd = 2,
-      col = c("black", "grey", "blue", "red", "grey"), cex = 0.7)
+      col = c("black", "grey", "blue", "red", "grey"), cex = 0.75)
 ```
 
 Note the changes are now more pronounced.
@@ -296,9 +294,15 @@ results <- data.frame(S, epsilon, delta_S)
 results
 ```
 
-It is interesting to note that in Hull the final simulated price is 111.54 and here it is 111.5401. Is this a pure coincidence?
+It is interesting to note that in @Hull the final simulated price is \$111.54 and here it is \$111.5401. Is this a pure coincidence?
 
 A correlated process.
+
+$\Delta x_1 = a_1 \Delta t + b_1 \epsilon_1 \sqrt{\Delta t}$,
+
+$\Delta x_2 = a_2 \Delta t + b_2 \epsilon_2 \sqrt{\Delta t}$.
+
+Where: $\epsilon_1 = u$, and $\epsilon_2=\rho u + \sqrt{1-\rho^{2}}v$.
 
 ```{r}
 # Section 14.5
@@ -319,73 +323,88 @@ x2 <- cumsum(delta_x2)
 x <- c(x1, x2)
 ```
 
-Visually:
+Assume $a=1.5$, $b=0.3$ and $\rho=0.8$. Visually:
 
 ```{r fig.cap="Correlated processes x1 and x2."}
-plot(Time, x1, type = "l", ylim = c(min(x), max(x)), 
-     ylab = "x1 and x2")
+plot(Time, x1, type = "l", ylim = c(min(x), max(x)), ylab = "x1 and x2")
 lines(Time, x2, col = "red")
 abline(0, 0)
 ```
 
-The following code needs revision.
+<!-- The following code needs revision. -->
 
-```{r fig.cap="Itô process. This figure needs revision."}
-# Figure 14.2 with Itô process
-TT <- 50
-N <- 200
-dt <- TT / N
-Time <- seq(from = 0, to = TT, by = dt)
-set.seed(1)
-axt <- 0.3 + rnorm(N + 1, 0, 1) * 0.001 * Time
-bxt <- 0.001 * Time + 0.1
-delta_z <- bxt * rnorm(N + 1, 0, 1) * dt^0.5
-delta_x <- (axt * dt) + delta_z
-xI <- cumsum(delta_x)
-zI <- cumsum(delta_z)
-# Now plot.
-plot(Time, xI, type = "l", lwd = 2, ylim = c(0, 18), ylab = "x")
-lines(Time, zI, col = "red", lwd = 2)
-lines(Time, axt * Time, col = "blue", lwd = 2)
-abline(0, 0)
-abline(v = 0)
-legend("topleft", legend = c("Itô process", 
-                           "Stochastic drift", "Wiener process"),
-       col = c("black", "blue", "red"), lty = 1, bg = "white", lwd = 2)
+<!-- ```{r fig.cap="Itô process. This figure needs revision."} -->
+<!-- # Figure 14.2 with Itô process -->
+<!-- TT <- 50 -->
+<!-- N <- 200 -->
+<!-- dt <- TT / N -->
+<!-- Time <- seq(from = 0, to = TT, by = dt) -->
+<!-- set.seed(1) -->
+<!-- axt <- 0.3 + rnorm(N + 1, 0, 1) * 0.001 * Time -->
+<!-- bxt <- 0.001 * Time + 0.1 -->
+<!-- delta_z <- bxt * rnorm(N + 1, 0, 1) * dt^0.5 -->
+<!-- delta_x <- (axt * dt) + delta_z -->
+<!-- xI <- cumsum(delta_x) -->
+<!-- zI <- cumsum(delta_z) -->
+<!-- # Now plot. -->
+<!-- plot(Time, xI, type = "l", lwd = 2, ylim = c(0, 18), ylab = "x") -->
+<!-- lines(Time, zI, col = "red", lwd = 2) -->
+<!-- lines(Time, axt * Time, col = "blue", lwd = 2) -->
+<!-- abline(0, 0) -->
+<!-- abline(v = 0) -->
+<!-- legend("topleft", legend = c("Itô process",  -->
+<!--                            "Stochastic drift", "Wiener process"), -->
+<!--        col = c("black", "blue", "red"), lty = 1, bg = "white", lwd = 2) -->
+<!-- ``` -->
+
+<!-- This is a clear view of a typical Itô process. Taken from Esteban Moro. -->
+
+<!-- ```{r echo=FALSE, out.width='50%', fig.align="center", fig.cap="Itô process."} -->
+<!-- knitr::include_graphics('./pdf1.jpg') -->
+<!-- ``` -->
+
+The model of stock price behavior implies that a stock's price at time $T$, given its price today, is lognormally distributed. The following is similar to example 15.1 in @Hull. In particular, consider a stock with an initial price of \$40, an expected return of 16% per annum, and a volatility of 20% per annum. 
+
+$\frac{\Delta S}{S} = a \Delta t + b \epsilon \sqrt{\Delta t}$,
+
+$\frac{\Delta S}{S} = 0.16 \Delta t + 0.2 \epsilon \sqrt{\Delta t}$,
+
+Assume $\Delta t = \frac{1}{365}$: $\frac{\Delta S}{S} = 0.16 \frac{1}{365} + 0.2 \epsilon \sqrt{\frac{1}{365}}$,
+
+Calculate the constants:
+```{r}
+0.16/365
+0.2*(1/365)^0.5
 ```
+Finally: $\Delta S = 0.0004383562 S + 0.01046848 S \epsilon$. The 100 simulated 6-months paths of the stock price $S$ are:
 
-This is a clear view of a typical Itô process. Taken from Esteban Moro.
-
-```{r echo=FALSE, out.width='50%', fig.align="center", fig.cap="Itô process."}
-knitr::include_graphics('./pdf1.jpg')
-```
-
-The model of stock price behavior implies that a stock's price at time $T$, given its price today, is lognormally distributed. The following is similar to example 15.1 in Hull.
 
 ```{r fig.cap="A geometric Brownian motion simulation: 100 stock price paths."}
 set.seed(10101010)
 for(j in 1:100) {
   delta_S <- NULL 
-  S <- rep(40, 365) # Now it is 40 for all days, the loop fill this out.
+  S <- rep(40, 180) # Now it is 40 for all days, the loop fill this out.
   epsilon <- NULL 
-  for(i in 1:365) {
+  for(i in 1:180) {
     epsilon[i] <- rnorm(1, 0, 1)
     delta_S[i] <- 0.16 * (1 / 365) * S[i] + 0.2 * ((1 / 365)^0.5) *
       epsilon[i] * S[i]
     S[i+1] <- S[i] + delta_S[i]
     }
   if (j==1) {
-    plot(S, type = "l", ylim = c(20, 80), ylab = "$", xlab = "Time (days)")
+    plot(S, type = "l", ylim = c(30, 60), 
+         ylab = expression(paste(S[t])), xlab = "t (days)")
+    points(0, 40, pch = 19, col = "blue", cex = 3)
     abline(h = 10, col = "red", lwd = 3)
     }
   lines(S)
   }
 abline(h = 32.55, lwd = 2, col = "red")
 abline(h = 56.56, lwd = 2, col = "red")
-abline(v = 180, lwd = 2, col = "red")
+abline(v = 181, lwd = 2, col = "red")
 ```
 
-The code above can be problematic for a few reasons. Can you see why? An alternative code is the following. Again, this is similar to example 15.1 in Hull.
+The code above can be problematic because we are not collecting all paths in an object. An alternative code is the following. Again, this is similar to example 15.1 in @Hull.
 
 ```{r}
 S0 <- 40
@@ -399,11 +418,11 @@ lower.ST <- exp(mean.logST + qnorm(0.025) * variance.logST^0.5)
 upper.ST <- exp(mean.logST + qnorm(0.975) * variance.logST^0.5)
 set.seed(3)
 nSim <- 1000
-SP_sim <- matrix(0, nrow = nDays, ncol = nSim)
+SP_sim <- matrix(0, nrow = 180, ncol = nSim)
 for(i in 1:nSim){
-  SVec <- rep(0, nDays)
+  SVec <- rep(0, 180)
   SVec[1] <- S0
-  for(j in 2:nDays){
+  for(j in 2:180){
     DeltaS <- mu * SVec[j - 1] * (1 / nDays) + sig * SVec[j - 1] *
       rnorm(1) * (1 / nDays)^0.5
     SVec[j] <- SVec[j - 1] + DeltaS
@@ -416,9 +435,9 @@ Now, let's plot the results.
 
 ```{r fig.cap="A geometric Brownian motion simulation: 1000 stock price paths."}
 matplot(SP_sim, type = 'l', col = rgb(0, 0, 1 ,0.3), lty = 1,
-        ylab = 'This is similar as example 15.1',
+        ylab = expression(paste(S[t])),
         xlab = "Time")
-points(0, S0, col = "black", pch = 19)
+points(0, S0, pch = 19, cex = 3)
 abline(h = lower.ST)
 abline(h = upper.ST)
 abline(v = 180)
@@ -439,19 +458,6 @@ mean.logST <- log(S0)+(mu - (sig^2 / 2)) * TT
 variance.logST <- sig^2 * TT
 lower.ST <- exp(mean.logST + qnorm(0.025) * variance.logST^0.5)
 upper.ST <- exp(mean.logST + qnorm(0.975) * variance.logST^0.5)
-lower.ST
-upper.ST
-```
-
-```{r}
-S0 <- 40
-mu <- 0.16
-sig <- 0.2
-TT <- 1
-mean.logST <- log(S0)+(mu - (sig^2 / 2)) * TT
-variance.logST <- sig^2 * TT
-lower.ST <- exp(mean.logST + qnorm(0.05) * variance.logST^0.5)
-upper.ST <- exp(mean.logST + qnorm(0.95) * variance.logST^0.5)
 lower.ST
 upper.ST
 ```

@@ -178,6 +178,8 @@ $p_2 = 4000 \frac{10925.97}{11022.06} + 3000 \frac{9676.957}{9599.898} + 1000 \f
 
 $p_2 = \$10,027.481$.
 
+And so on.
+
 
 ```{r}
 df.Adj.S <- df.Adj.S %>%
@@ -231,10 +233,10 @@ legend("bottomleft", legend = c("Gains", "Losses", "Historic VaR: 253.385"),
 Now, a histogram of losses.
 
 ```{r fig.cap="Histogram of losses for the scenarios considered between September 25 and 26, 2008: a histogram."}
-hist(l, 15, xlab = "Losses (+) and gains (-)", main = NULL)
+hist(l, 15, xlab = "Portfolio losses (+) and gains (-)", main = NULL)
 points(l.tomorrow, 1, pch = 19, cex = 2)
 abline(v = 253.385, col = "red", lwd = 2)
-legend("topleft", legend = c("Historic VaR (253.385)"), col = "red", 
+legend("topleft", legend = c("Historic VaR: 253.385"), col = "red", 
        bg = "white", lwd = 2)
 ```
 
@@ -278,12 +280,12 @@ Note that one of the highest gains happen in scenario 497, almost at the end.
 
 ```{r}
 VaR.hist <- 253.3850	
-Results <- data.frame(VaR.method = "Historical simulation", 
+Results <- data.frame(VaR.method = "Historical simulation, sub-optimal weights", 
                       VaR = VaR.hist)
 Results
 ```
 
-The VaR according to the historic approach is the highest 5th loss because the top 1% of 500 scenarios is the 5th scenario. We can view this in a barplot.
+We call sub-optimal weights because the allocation of 40% in the DJIA, 30% in the FTSE, 10% in the CAC, and 20% in the Nikkei is arbitrary. The VaR according to the historic approach is the highest 5th loss because the top 1% of 500 scenarios is the 5th scenario. We can view this in a barplot.
 
 ```{r fig.cap="Extract of table 22.4 in a graph VaR historical approach 1 percent 253.385 What really happen in green."}
 barplot(l[order(l, decreasing = TRUE)], 
@@ -304,7 +306,7 @@ The top 1% can be also estimated by implementing the <tt>`quantile()`</tt> funct
 VaR.hist.quantile <- quantile(l, 0.99)
 VaR.hist.quantile
 ```
-The reason is that the <tt>`quantile()`</tt> function is continuous, and the historic simulation approach is discrete. With 500 discrete values we can take the highest 5th loss in the table above to represent the top 1% as we count: $0.002 + 0.002 + 0.002 + 0.002 + 0.002 = 0.01$. However, if we want to fit 500 values in a continuous framework we have to start from 0, so from 0 to 100% we end up with different breaks as: $0 + 0.002004008 + 0.002004008 + 0.002004008 + 0.002004008 = 0.008016032$. Then, in order to match the discrete and continuous approach we have to set 0.08% instead of 1%:
+The reason is that the <tt>`quantile()`</tt> function is continuous, and the historic simulation approach is discrete. With 500 discrete values we can take the highest 5th loss in the table above to represent the top 1% as we count: $0.002 + 0.002 + 0.002 + 0.002 + 0.002 = 0.01$. However, if we want to fit 500 values in a continuous framework we have to start from 0, so from 0 to 100% we end up with different breaks as: $0 + 0.002004008 + 0.002004008 + 0.002004008 + 0.002004008 = 0.008016032$. Then, in order to match the discrete and continuous approach we have to set 0.8016032% instead of 1%:
 
 ```{r}
 quantile(l, 1-(0.008016032))
@@ -323,12 +325,13 @@ A graphical approach:
 ```{r fig.cap="A quantile approach."}
 plot(seq(from = 0.902, to = 1, by = 0.002), 
      quantile(l, seq(from = 0.902, to = 1, by = 0.002)), cex = 1.5,
-     xlab = "Confidence level (vertical line at 99%)", ylab = "VaR")
+     xlab = "Confidence level (vertical line at 99%)", 
+     ylab = "Portfolio VaR")
 abline(v = 0.99, lty = 2, lwd = 2)
 abline(h = quantile(l, 0.99), col = "blue", lty = 2, lwd = 2)
 abline(h = Table22.4[5, 2], col = "red", lty = 2, lwd = 2)
-legend("topleft", legend = c("99% level", "Historic VaR (253.385)", 
-                             "99% quantile VaR (218.3281)"),
+legend("topleft", legend = c("99% level", "Historic VaR: 253.385", 
+                             "99% quantile VaR: 218.3281"),
        col = c("black", "red", "blue"), lty = 2, bg = "white", lwd = 2)
 ```
 
@@ -345,7 +348,8 @@ Summary of results.
 
 ```{r}
 Results.updated <- Results %>%
-  add_row(VaR.method = "Historical approximate quantile()", 
+  add_row(VaR.method = 
+            "Historical approximate quantile(), sub-optimal weights", 
           VaR = VaR.hist.quantile) %>%
   arrange(desc(-VaR))
 Results.updated
@@ -415,7 +419,8 @@ In Hull, this value is \$217,757, which compares with \$253,385, calculated usin
 
 ```{r}
 Results.updated <- Results.updated %>%
-  add_row(VaR.method = "Model building equally weighted", 
+  add_row(VaR.method = 
+            "Model building equally weighted, sub-optimal weights", 
           VaR = VaR.ew) %>%
   arrange(desc(-VaR))
 Results.updated
@@ -488,7 +493,7 @@ In @Hull, this value is 471,025, over twice as high as the value given when retu
 
 ```{r}
 Results.updated <- Results.updated %>%
-  add_row(VaR.method = "Model building equally EWMA", 
+  add_row(VaR.method = "Model building equally EWMA, sub-optimal weights", 
           VaR = VaR.ewma) %>%
   arrange(desc(-VaR))
 Results.updated
@@ -567,7 +572,7 @@ VCV <- matrix(VCV, 4, 4)
 
 Again: The estimated daily standard deviations are much higher when EWMA is used than when data are equally weighted. This is because volatilities were much higher during the period immediately preceding September 25, 2008, than during the rest of the 500 days covered by the data.
 
-## Optimal allocation of resources and VaR.
+## Optimal allocation.
 
 The current portfolio weights are:
 
@@ -575,16 +580,12 @@ The current portfolio weights are:
 W_hull <- alpha / 10000
 W_hullt <- data.frame(W_hull)
 rownames(W_hullt) <- c("DJIA", "FTSE 100", "CAC 40", "Nikkei 225")
-#kable(t(W_hullt), caption = "Original (and presumible sub-optimal) Hull's
-#      portfolio weights.", digits = 4) |>
-#kable_styling(latex_options = "HOLD_position")
 t(W_hullt)
 ```
 
 Let's calculate optimal weights.
 
 ```{r}
-# Further extension: propose an optimal allocation of resources
 R <- R * 100
 R.tomorrow <- R.tomorrow * 100
 stocks<- c("DJIA", "FTSE100", "CAC40", "Nikkei")
@@ -625,9 +626,6 @@ Now we have four different portfolio weights alternatives. Two of them are optim
 W <- data.frame(W_hull, W_min, W.cac40, c(0.25,0.25,0.25,0.25))
 rownames(W) <- c("DJIA", "FTSE 100", "CAC 40", "Nikkei 225")
 colnames(W) <- c("Hull (original weights)", "minimum variance (Martín)", "CAC 40 target return", "naive (1/N)")
-#kable(t(W), caption = "Four different weights alternatives.",
-#      digits = 4) |>
-#kable_styling(latex_options = "HOLD_position")
 t(W)
 ```
 
@@ -745,7 +743,8 @@ abline(0,R_cac40 / S_cac40, lty = 3, col = "red")
 abline(0,E[3] / sd[3], lty = 3)
 abline(v = S_cac40, lty = 3)
 text(S_hull, R_hull, "Hull's alpha", adj = -0.3, cex = 0.8, pos = 1)
-legend("bottomleft", legend = c("DJ=0.4, FTSE=0.3, CAC=0.1, Nikkei=0.2",
+legend("bottomleft", legend = 
+         c("DJ=0.4,  FTSE=0.3,  CAC=0.1,  Nikkei=0.2",
                           "DJ=0.607, FTSE=-0.403, CAC=0.459, Nikkei=0.336"),
        col = c("blue", "red"), pch = 19, bg = "white", cex = 0.8)
 ```

@@ -16,8 +16,7 @@ library(tidyr)
 
 # Value at risk.
 
-Value at Risk (VaR) is an attempt to provide a single number summarizing the total
-risk in a portfolio of financial assets. Here, we develop and extend the example called *Investment in Four Stock Indices* in Chapters 22 and 23 of @Hull. The database used in this example <tt>`dataR.txt`</tt> is available [here](https://github.com/mlozanoqf/tutorial_if/blob/main/dataR.txt).
+Value at Risk (VaR) is an attempt to provide a single number summarizing the total risk in a portfolio of financial assets. Here, we develop and extend the example called *Investment in Four Stock Indices* in Chapters 22 and 23 of @Hull. The database used in this example <tt>`dataR.txt`</tt> is available [here](https://github.com/mlozanoqf/tutorial_if/blob/main/dataR.txt).
 
 Suppose that we want to calculate VaR for a portfolio using a one-day time horizon, a 99% confidence level, and 501 days of data, from Monday August 6, 2006 to Thursday September 25, 2008.
 
@@ -34,7 +33,7 @@ Take a look of the database.
 ```{r}
 head(df)
 ```
-These are four international stock indices: Dow Jones Industrial Average (DJIA) in the US, the FTSE 100 in the UK, the CAC 40 in France, and the Nikkei 225 in Japan together with the correspondent exchange rates.
+These are four international stock indices: Dow Jones Industrial Average (DJIA) in the US, the FTSE 100 in the UK, the CAC 40 in France, and the Nikkei 225 in Japan together with the corresponding exchange rates.
 
 Because we are considering a US investor in this example, the value of the FTSE 100, CAC 40, and Nikkei 225 must be measured in US dollars. The *adjusted* US dollar equivalent of stock indices are calculated as:
 
@@ -53,14 +52,14 @@ df.Adj <- df %>%
   mutate(ANikkei = Nikkei / YENUSD)
 ```
 
-The following is US dollar equivalent of stock indices for historical simulation. This is the same as @Hull, Table 22.2:
+The following is the US dollar equivalent of stock indices for historical simulation. This is the same as @Hull, Table 22.2:
 
 ```{r}
 df.Adj %>%
   select(Day, DJIA, AFTSE100, ACAC40, ANikkei) %>%
   slice(1, 2, 3, 4, 500, 501)
 ```
-The number of observations is 501 as we start in day zero. The *A* before the index name stands for *adjusted*. A graphical representation of the table above:
+The number of observations is 501 as we start on day zero. The *A* before the index name stands for *adjusted*. A graphical representation of the table above:
 
 ```{r fig.cap="Adjusted index values, Nikkei = Nikkei $\\times$ 100."}
 df.Adj %>%
@@ -75,7 +74,7 @@ df.Adj %>%
   labs(y = "US dollar equivalent of stock indices", x = "") +
   theme(legend.position = "bottom")
 ```
-The time-series starts in Monday August 6, 2006 and ends in Thursday September 25, 2008. These are 501 daily past observations. In the plot below, we also show the value of Friday September 26, 2008 as a dot, this is observation 502 and we call it <tt>`tomorrow`</tt>. This observation 502 is not included in the VaR estimation as it represents an unknown future value, but it will be useful for us to evaluate our estimations.
+The time-series starts on Monday August 6, 2006 and ends on Thursday September 25, 2008. These are 501 daily past observations. In the plot below, we also show the value of Friday September 26, 2008 as a dot, this is observation 502 and we call it <tt>`tomorrow`</tt>. This observation 502 is not included in the VaR estimation as it represents an unknown future value, but it will be useful for us to evaluate our estimations.
 
 ```{r fig.cap="Adjusted index values, Nikkei = Nikkei $\\times$ 100, zoom view."}
 tomorrow <- df.Adj %>%
@@ -108,9 +107,9 @@ tomorrow
 
 ## Historical simulation.
 
-The historical simulation method requires scenarios of the possible stock indices values for Friday September 26, 2008. In particular, we construct 500 scenarios for for Friday September 26, 2008 with 501 past observations. The historical simulation assumes that the stock index value of Friday September 26 2008 depends on the value of Thursday September 25 2008 times a percentage change (which could be positive or negative). The percentage changes are calculated as follows. The first percentage change is from Monday August 6 2006 to Tuesday August 7 2006. The second percentage change is from Tuesday August 7 2006 to Wednesday 8 2006, and so on. In sum, we assume that tomorrow may behave as the past 500 days.
+The historical simulation method requires scenarios of the possible stock indices values for Friday September 26, 2008. In particular, we constructed 500 scenarios for Friday September 26, 2008 with 501 past observations. The historical simulation assumes that the stock index value of Friday September 26 2008 depends on the value of Thursday September 25 2008 times a percentage change (which could be positive or negative). The percentage changes are calculated as follows. The first percentage change is from Monday August 6 2006 to Tuesday August 7 2006. The second percentage change is from Tuesday August 7 2006 to Wednesday 8 2006, and so on. In sum, we assume that tomorrow may behave as the past 500 days.
 
-Take the adjusted vales as a reference:
+Take the adjusted values as a reference:
 
 ```{r}
 df.Adj %>%
@@ -276,7 +275,7 @@ And the last values (not shown in Hull).
 tail(Table22.4)
 ```
 
-Note that one of the highest gains happen in scenario 497, almost at the end.
+Note that one of the highest gains happens in scenario 497, almost at the end.
 
 ```{r}
 VaR.hist <- 253.3850	
@@ -300,7 +299,7 @@ legend("topright", legend = c("Historic VaR: 253.385",
        bg = "white", lwd = 2)
 ```
 
-The top 1% can be also estimated by implementing the <tt>`quantile()`</tt> function. In theory, this should be equivalent as taking the highest 5th loss, however when we implement the <tt>`quantile()`</tt> function leads to a different result.
+The top 1% can be also estimated by implementing the <tt>`quantile()`</tt> function. In theory, this should be equivalent to taking the highest 5th loss, however when we implement the <tt>`quantile()`</tt> function leads to a different result.
 
 ```{r}
 VaR.hist.quantile <- quantile(l, 0.99)
@@ -653,7 +652,7 @@ legend("bottomleft", legend = c("DJ=0.4, FTSE=0.3, CAC=0.1, Nikkei=0.2",
        col = c("blue","red"), pch = 19, bg = "white", cex = 0.8)
 ```
 
-The figure suggest that the minimum variance alternative reduce the original portfolio risk. In fact, the minimum variance portfolio has a higher return and lower risk. This representation is an estimate of the future. We can evaluate what really happened by using the real returns.
+The figure suggests that the minimum variance alternative reduces the original portfolio risk. In fact, the minimum variance portfolio has a higher return and lower risk. This representation is an estimate of the future. We can evaluate what really happened by using the real returns.
 
 ```{r}
 (R_min.realized <- c(t(W_min) %*% E.tomorrow))

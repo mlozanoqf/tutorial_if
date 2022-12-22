@@ -62,7 +62,7 @@ xfun::file_string('contact.html')
 
 # [`r fa("arrow-circle-left", fill = "black")`](https://mlozanoqf.github.io/) [<span style="color: black">Back to main.</span>](https://mlozanoqf.github.io/) {-}
 
-# Top. {-}
+# Back to top. {-}
 
 \newpage
 

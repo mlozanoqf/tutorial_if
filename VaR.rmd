@@ -350,12 +350,13 @@ Results.updated <- Results %>%
   add_row(VaR.method = 
             "Historical approximate quantile(), sub-optimal weights", 
           VaR = VaR.hist.quantile) %>%
-  arrange(desc(-VaR))
+  arrange(VaR.method)
 Results.updated
 ```
 
 ## Model building approach.
 
+The drawback of this method is that it assumes a normal distribution and we know $l$ is not normal. The advantage of this method is its simplicity. 
 Transform adjusted indices to returns.
 
 ```{r}
@@ -391,7 +392,7 @@ Table23.6 <- Rcov
 Table23.6
 ```
 
-This covariance matrix is quite similar to the one in Hull. We are not taking round values this explains minor differences.
+This covariance matrix is quite similar to the one in @Hull. We are not taking round values this explains minor differences.
 
 The variance of the portfolio losses ($000s) is:
 
@@ -401,19 +402,19 @@ alpha <- c(4000, 3000, 1000, 2000)
 (Pvar <- t(alpha) %*% Rcov %*% alpha) # equation in page 506 (chapter 22)
 ```
 
-This is slightly different as in Hull: 8,761.833. The standard deviation is the square root of this
+This is slightly different as in @Hull: 8,761.833. The standard deviation is the square root of this:
 
 ```{r}
 (Psd <- Pvar^0.5)
 ```
 
-As expected, this is a bit different as in Hull (93.60). The one-day 99% VaR in is therefore
+As expected, this is a bit different as in @Hull (93.60). The one-day 99% VaR in is therefore:
 
 ```{r}
 (VaR.ew <- qnorm(0.99, 0, 1) * Psd)
 ```
 
-In Hull, this value is \$217,757, which compares with \$253,385, calculated using the historical simulation approach in @Hull Section 22.2.
+In @Hull, this value is \$217,757, which compares with \$253,385, calculated using the historical simulation approach.
 
 
 ```{r}
@@ -421,13 +422,11 @@ Results.updated <- Results.updated %>%
   add_row(VaR.method = 
             "Model building equally weighted, sub-optimal weights", 
           VaR = VaR.ew) %>%
-  arrange(desc(-VaR))
+  arrange(VaR.method)
 Results.updated
 ```
 
 We are interested to compare the equally weighted approach with the EWMA (exponentially weighted moving average method).
-
-Calculate an EWMA covariance considering $\lambda=0.94$.
 
 ```{r}
 # Model building example -- EWMA
@@ -492,9 +491,9 @@ In @Hull, this value is 471,025, over twice as high as the value given when retu
 
 ```{r}
 Results.updated <- Results.updated %>%
-  add_row(VaR.method = "Model building equally EWMA, sub-optimal weights", 
+  add_row(VaR.method = "Model building EWMA, sub-optimal weights", 
           VaR = VaR.ewma) %>%
-  arrange(desc(-VaR))
+  arrange(VaR.method)
 Results.updated
 ```
 
@@ -568,12 +567,11 @@ VCV <- c(C11 ,C12, C13, C14, C12, C22, C23, C24,C13, C23,
 VCV <- matrix(VCV, 4, 4)
 ```
 
-
-Again: The estimated daily standard deviations are much higher when EWMA is used than when data are equally weighted. This is because volatilities were much higher during the period immediately preceding September 25, 2008, than during the rest of the 500 days covered by the data.
+The estimated daily standard deviations are much higher when EWMA is used than when data are equally weighted. This is because volatilities were much higher during the period immediately preceding September 25, 2008, than during the rest of the 500 days covered by the data.
 
 ## Optimal allocation.
 
-The current portfolio weights are:
+The current sub-optimal portfolio weights are:
 
 ```{r}
 W_hull <- alpha / 10000
@@ -619,12 +617,14 @@ S_cac40 <- c(t(W.cac40) %*% sigma %*% W.cac40)^0.5
 R_hull.realized = c(t(W_hull) %*% E.tomorrow)
 ```
 
-Now we have four different portfolio weights alternatives. Two of them are optimal. Can we reduce the VaR by using optimal weights?
+Now we have four different portfolio weights alternatives. Two of them are optimal. *Can we reduce the VaR by using optimal weights?*
 
 ```{r}
-W <- data.frame(W_hull, W_min, W.cac40, c(0.25,0.25,0.25,0.25))
+W <- data.frame(W_hull, W_min, W.cac40, c(0.25, 0.25, 0.25, 0.25))
 rownames(W) <- c("DJIA", "FTSE 100", "CAC 40", "Nikkei 225")
-colnames(W) <- c("Hull (original weights)", "minimum variance (Martín)", "CAC 40 target return", "naive (1/N)")
+colnames(W) <- c("Hull, sub-optimal weights", 
+                 "minimum variance", "CAC40 target return", 
+                 "naive 1/N")
 t(W)
 ```
 
@@ -635,29 +635,34 @@ W_hull <- alpha / 10000
 R_hull <- c(t(W_hull) %*% E)
 S_hull <- c(t(W_hull) %*% sigma %*% W_hull)^0.5
 
-plot(S, ER, type = "l", lwd = 2, xlim = c(0.7, 1.6), ylim = c(-0.022, 0.005),
+plot(S, ER, type = "l", lwd = 3, xlim = c(0.7, 1.6), 
+     ylim = c(-0.022, 0.005),
      ylab = "Expected return", xlab = "Standard deviation")
 points(diag(sigma)^0.5, E)
 abline(0, R_hull / S_hull, lty = 3, col = "blue")
 abline(0, R_min / S_min, lty = 3, col = "red")
 points(S_min, R_min, col = "red", pch = 19, cex = 2)
 abline(0, 0, lty = 3)
-text(S_min, R_min, "Martin's
-     alpha", pos = 2, cex = 0.8)
+text(S_min, R_min, "Minimum
+     variance", pos = 2, cex = 0.8)
 text(sd, E, stocks, adj = -0.5, cex = 0.8)
 points(S_hull, R_hull, col = "blue", pch = 19, cex = 2)
-text(S_hull, R_hull, "Hull's alpha", adj = -0.3, cex = 0.8, pos = 1)
-legend("bottomleft", legend = c("DJ=0.4, FTSE=0.3, CAC=0.1, Nikkei=0.2",
+text(S_hull, R_hull, "Hull's 
+     sub-optimal allocation", adj = -0.3, cex = 0.8, pos = 1)
+legend("bottomleft", 
+       legend = c("DJ=0.4,   FTSE=0.3,     CAC=0.1,     Nikkei=0.2",
                             "DJ=0.56, FTSE=0.038, CAC=0.022, Nikkei=0.38"),
-       col = c("blue","red"), pch = 19, bg = "white", cex = 0.8)
+       col = c("blue", "red"), pch = 19, bg = "white", cex = 1)
 ```
 
-The figure suggests that the minimum variance alternative reduces the original portfolio risk. In fact, the minimum variance portfolio has a higher return and lower risk. This representation is an estimate of the future. We can evaluate what really happened by using the real returns.
+The figure suggests that the (optimal) minimum variance alternative reduces the original portfolio risk. In fact, the minimum variance portfolio has a higher return and lower risk. This representation is an estimate of the future. We can evaluate what really happened by using the actual returns.
 
 ```{r}
 (R_min.realized <- c(t(W_min) %*% E.tomorrow))
 (R_hull.realized = c(t(W_hull) %*% E.tomorrow))
 ```
+
+This is interesting as it suggests that the sub-optimal allocation would lead to a realized return on Friday September 26, 2008 of -0.5583249%. On the other hand, following the optimal minimum variance allocation would lead to a portfolio gain of 0.2629549%.
 
 ```{r fig.cap="Hull's allocation is sub-optimal, the red one is a better alternative, although with negative expected return."}
 W_hull <- alpha / 10000
@@ -668,7 +673,8 @@ W_1N <- c(0.25,0.25,0.25,0.25)
 R_1N <- c(t(W_1N) %*% E)
 S_1N <- c(t(W_1N) %*% sigma %*% W_1N)^0.5
 
-plot(S, ER, type = "l", lwd = 2, xlim = c(0.7, 1.6), ylim = c(-0.022, 0.005),
+plot(S, ER, type = "l", lwd = 3, xlim = c(0.7, 1.6), 
+     ylim = c(-0.022, 0.005),
      ylab = "Expected return", xlab = "Standard deviation")
 points(diag(sigma)^0.5, E)
 abline(0, R_hull / S_hull, lty = 3, col = "blue")
@@ -677,22 +683,27 @@ abline(0, R_1N / S_1N, lty = 3, col = "purple")
 points(S_min, R_min, col = "red", pch = 19, cex = 2)
 points(S_1N, R_1N, col = "purple", pch = 19, cex = 2)
 abline(0, 0, lty = 3)
-text(S_min, R_min, "Martin's
-     alpha", pos = 2, cex = 0.8)
+text(S_min, R_min, "Minimum
+     variance", pos = 2, cex = 0.8)
 text(sd, E, stocks, adj = -0.5, cex = 0.8)
 points(S_hull, R_hull, col = "blue", pch = 19, cex = 2)
-text(S_hull, R_hull, "Hull's alpha", adj = -0.3, cex = 0.8, pos = 1)
+text(S_hull, R_hull, "Hull's
+     sub-optimal allocation", adj = -0.3, cex = 0.8, pos = 1)
 text(S_1N, R_1N, "1/N alpha", adj = -0.3, cex = 0.8, pos = 3)
 legend("bottomleft",
-       legend = c("Hull: DJ=0.4, FTSE=0.3, CAC=0.1, Nikkei=0.2",
-"Martin: DJ=0.56, FTSE=0.038, CAC=0.022, Nikkei=0.38",
-"1/N: DJ=0.25, FTSE=0.25, CAC=0.25, Nikkei=0.25"),
-       col = c("blue","red", "purple"), pch = 19, bg = "white", cex = 0.8)
+       legend = 
+         c("Hull:    DJ=0.4,   FTSE=0.3,     CAC=0.1,     Nikkei=0.2",
+"Minvar: DJ=0.56, FTSE=0.038, CAC=0.022, Nikkei=0.38",
+"1/N:      DJ=0.25,  FTSE=0.25,  CAC=0.25,  Nikkei=0.25"),
+       col = c("blue","red", "purple"), pch = 19, 
+bg = "white", cex = 0.9)
 ```
 
-Hull's sub-optimal portfolio allocation turns out to be problematic. His recommendation would lead to a loss and the optimal minimum variance would lead to a positive return. Nice.
+Hull's sub-optimal portfolio allocation turns out to be problematic. We can simulate 10,000 possible values for Friday September 26, 2008 given the mean and standard deviation estimates.
 
-```{r fig.cap="Martin recommendation and realized outcome in blue."}
+First, the minimum variance portfolio:
+
+```{r fig.cap="Minimum variance recommendation and realized outcome in blue."}
 set.seed <- 1
 M <- rnorm(10000, R_min, S_min)
 hist(M, 100, xlim = c(-4, 4), ylim = c(0, 450), main = "")
@@ -700,15 +711,17 @@ abline(v = R_min.realized, col = "blue", lwd = 3)
 abline(v = quantile(M, 0.025), lty = 2)
 abline(v = quantile(M, 0.975), lty = 2)
 ```
+Then, the sub-optimal allocation:
 
-```{r fig.cap="Hull recommendation and realized outcome."}
+```{r fig.cap="Hull sub-optimal recommendation and realized outcome."}
 set.seed = 1
 H = rnorm(10000, R_hull, S_hull)
-hist(H,100, xlim = c(-4, 4), ylim = c(0, 450), main = "")
+hist(H, 100, xlim = c(-4, 4), ylim = c(0, 450), main = "")
 abline(v = R_hull.realized, col = "blue", lwd = 3)
 abline(v = quantile(H, 0.025), lty = 2)
 abline(v = quantile(H, 0.975), lty = 2)
 ```
+And finally, the portfolio that targets the CAC 40 expected return:
 
 ```{r fig.cap="CAC40 recommendation and realized outcome."}
 set.seed <- 1
@@ -719,10 +732,10 @@ abline(v = quantile(C, 0.025), lty = 2)
 abline(v = quantile(C, 0.975), lty = 2)
 ```
 
-Let's compare a different portfolio. This is optimal and targets the CAC 40 expected return.
+Let's see the portfolio that targets the CAC 40 expected return in a mean-variance plot:
 
 ```{r fig.cap="Estimation of a new optimal alpha: Replicate CAC40 ER."}
-plot(S, ER, type = "l", lwd = 2, xlim = c(0.7, 1.6),
+plot(S, ER, type = "l", lwd = 3, xlim = c(0.7, 1.6),
      ylim = c(-0.022, 0.007), ylab = "Expected return",
      xlab = "Standard deviation")
 points(diag(sigma)^0.5, E)
@@ -741,12 +754,14 @@ abline(0,R_hull / S_hull, lty = 3, col = "blue")
 abline(0,R_cac40 / S_cac40, lty = 3, col = "red")
 abline(0,E[3] / sd[3], lty = 3)
 abline(v = S_cac40, lty = 3)
-text(S_hull, R_hull, "Hull's alpha", adj = -0.3, cex = 0.8, pos = 1)
-legend("bottomleft", legend = 
-         c("DJ=0.4,  FTSE=0.3,  CAC=0.1,  Nikkei=0.2",
-                          "DJ=0.607, FTSE=-0.403, CAC=0.459, Nikkei=0.336"),
-       col = c("blue", "red"), pch = 19, bg = "white", cex = 0.8)
+text(S_hull, R_hull, "Hull's
+     sub-optimal allocation", adj = -0.3, cex = 0.8, pos = 1)
+legend("bottomleft", 
+       legend = c("DJ=0.4,     FTSE=0.3,      CAC=0.1,     Nikkei=0.2",
+                          "DJ=0.607, FTSE=-0.403, CAC=0.459, Nikkei=0.336"), col = c("blue", "red"), 
+       pch = 19, bg = "white", cex = 0.9)
 ```
+These are the realized returns on Friday September 26, 2008.
 
 ```{r}
 (R_min.realized)
@@ -754,7 +769,7 @@ legend("bottomleft", legend =
 (R_cac40.realized)
 ```
 
-As stated before, Hull's sub-optimal portfolio allocation turns out to be problematic. His recommendation would lead to a loss (-0.558) and the optimal minimum variance would lead to a positive return (0.2629), and the optimal portfolio that targets the CAC 40 expected return leads to an even higher return (0.518). Nice.
+As stated before, Hull's sub-optimal portfolio allocation turns out to be problematic. His recommendation would lead to a loss -0.558% and the optimal minimum variance would lead to a positive return 0.2629%, and the optimal portfolio that targets the CAC 40 expected return leads to an even higher return 0.518%.
 
 ## Model building approach with optimal weights.
 
@@ -779,15 +794,13 @@ Summary of results:
 ```{r}
 Results.updated <- Results.updated %>%
   add_row(VaR.method = 
-            c("Model building equally weighted minimum variance weights", 
-              "Model building equally weighted targeting CAC40"), 
+        c("Model building equally weighted, minimum variance weights", 
+          "Model building equally weighted, targeting CAC40"), 
           VaR = c(VaR.ew.optimal, VaR.ew.optimal.cac)) %>%
-  arrange(desc(-VaR))
+  arrange(VaR.method)
 Results.updated
 ```
-
-
-Second, the EWMA case.
+Second, the model building approach with EWMA.
 
 ```{r}
 Pvar2_EWMA <- t(alpha2) %*% C %*% alpha2
@@ -805,13 +818,12 @@ Summary of results.
 ```{r}
 Results.updated <- Results.updated %>%
   add_row(VaR.method = 
-            c("Model building EWMA minimum variance weights", 
-              "Model building EWMA targeting CAC40"), 
+            c("Model building EWMA, minimum variance weights", 
+              "Model building EWMA, targeting CAC40"), 
           VaR = c(VaR.ewma.optimal, VaR.ewma.optimal.cac)) %>%
-  arrange(desc(-VaR))
+  arrange(VaR.method)
 Results.updated
 ```
-
 
 ## Historic approach with optimal weights.
 
@@ -819,19 +831,19 @@ Let's go back to the historic approach. Now we can incorporate a comparison with
 
 ```{r}
 df.Adj.S <- df.Adj.S %>%
-  mutate(p2 = (alpha2[1] * SDJIA / DJIA[501]) + # Investment portfolio value
+  mutate(p2 = (alpha2[1] * SDJIA / DJIA[501]) + 
              (alpha2[2] * SFTSE100 / AFTSE100[501]) + 
              (alpha2[3] * SCAC40 / ACAC40[501]) + 
              (alpha2[4] * SNikkei / ANikkei[501])) %>%
   mutate(l2 = 10000 - p2) %>% # Losses l
-  mutate(p3 = (alpha3[1] * SDJIA / DJIA[501]) + # Investment portfolio value
+  mutate(p3 = (alpha3[1] * SDJIA / DJIA[501]) + 
              (alpha3[2] * SFTSE100 / AFTSE100[501]) + 
              (alpha3[3] * SCAC40 / ACAC40[501]) + 
              (alpha3[4] * SNikkei / ANikkei[501])) %>%
   mutate(l3 = 10000 - p3) # Losses l
 ```
 
-
+Calculate the new portfolio losses for optimal weights.
 
 ```{r}
 l2 <- df.Adj.S %>%
@@ -855,26 +867,13 @@ l3.tomorrow <- df.Adj.S %>%
   unlist()
 ```
 
-```{r eval=FALSE, include=FALSE}
-# Miniumu variance optimal weights.
-p2 <- (c * DJIA[2:501, ] / DJIA[1:500, ]) +
-  ( * AFTSE100[2:501, ] / AFTSE100[1:500, ]) +
-  ( * ACAC40[2:501, ] / ACAC40[1:500, ]) +
-  ( * ANikkei[2:501, ] / ANikkei[1:500, ])
-# Optimal portfolio targeting the CAC 40 expected return.
-p3 <- (alpha3[1] * DJIA[2:501, ] / DJIA[1:500, ]) +
-  (alpha3[2] * AFTSE100[2:501, ] / AFTSE100[1:500, ])+
-  (alpha3[3] * ACAC40[2:501, ] / ACAC40[1:500, ]) +
-  (alpha3[4] * ANikkei[2:501, ] / ANikkei[1:500, ])
-
-```
-
-This is the Hull original case.
+As a reference, this is the @Hull original case.
 
 ```{r fig.cap="Losses with Hull's suboptimal alpha DJ=0.4, FTSE=0.3, CAC=0.1, Nikkei=0.2."}
 plot(l, type = "h", ylim = c(-600, 600), lwd = 2,
      xlab = "500 scenarios (sorted by historical date)",
-ylab = "Gains (-) and losses (+)", col = ifelse(l < 0, "blue", "red"))
+ylab = "Portfolio gains (-) and losses (+)", 
+col = ifelse(l < 0, "blue", "red"))
 abline(0, 0)
 abline(v = 0)
 abline(h = max(l), lty = 2)
@@ -887,51 +886,70 @@ The one-day 99% value at risk can be estimated as the fifth-worst loss.
 sort(l)[496]
 ```
 
-Now, let's see the minimum variance optimal portfolio.
+Now, let's see the historical approach but with minimum variance optimal weights.
 
 ```{r fig.cap="Losses with optimal alpha DJ=0.56, FTSE=0.038, CAC=0.022, Nikkei=0.38."}
 plot(l2, type = "h", ylim = c(-600, 600), lwd = 2,
      xlab = "500 scenarios (sorted by historical date)",
-     ylab = "Gains (-) and losses (+)", col = ifelse(l2 < 0, "blue", "red"))
+     ylab = "Portfolio gains (-) and losses (+)", 
+     col = ifelse(l2 < 0, "blue", "red"))
 abline(0, 0)
 abline(v = 0)
 abline(h = max(l2), lty = 2)
 abline(h = min(l2), lty = 2)
 ```
 
-The one-day 99% value at risk can be estimated as the fifth-worst loss.
+See how the range of losses and gains is now reduced. The one-day 99% value at risk can be estimated as the fifth-worst loss.
 
 ```{r}
 sort(l2)[496]
 ```
+Let's update our table of results.
 
-See how the range of losses and gains is now reduced.
+```{r}
+Results.updated <- Results.updated %>%
+  add_row(VaR.method = "Historical simulation, minimum variance weights", 
+          VaR = sort(l2)[496]) %>%
+  arrange(VaR.method)
+Results.updated
+```
 
 And this is the optimal portfolio targeting the CAC 40 expected return.
 
 ```{r fig.cap="Losses with CAC40 optimal alpha DJ=0.607, FTSE=-0.403, CAC=0.459, Nikkei=0.336."}
 plot(l3, type = "h", ylim = c(-600, 600), lwd = 2,
      xlab = "500 scenarios (sorted by historical date)",
-     ylab = "Gains (-) and losses (+)", col = ifelse(l3 < 0, "blue", "red"))
+     ylab = "Portfolio gains (-) and losses (+)", 
+     col = ifelse(l3 < 0, "blue", "red"))
 abline(0, 0)
 abline(v = 0)
 abline(h = max(l3), lty = 2)
 abline(h = min(l3), lty = 2)
 ```
 
-The one-day 99% value at risk can be estimated as the fifth-worst loss.
+Note that the range is reduced but allows for a higher gains. Let's see these three together. The one-day 99% value at risk can be estimated as the fifth-worst loss.
 
 ```{r}
 sort(l3)[496]
 ```
+Let's update the table of results.
 
-Note that the range is reduced but allows for a higher gains. Let's see these three together.
+```{r}
+Results.updated <- Results.updated %>%
+  add_row(VaR.method = "Historical simulation, targeting CAC40", 
+          VaR = sort(l3)[496]) %>%
+  arrange(VaR.method)
+Results.updated
+```
+
+Let's see the three historical approaches together.
 
 ```{r fig.cap="Hull's suboptimal alpha (left); optimal alpha (center); optimal alpha CAC40 (right)."}
 par(mfrow=c(1, 3), oma = c(0, 0, 2, 0))
 par(pty = "s")
 plot(l, type = "h", ylim = c(-600, 600), lwd = 2, xlab = "",
-     main = "Hull original case.", ylab = "Gains (-) and losses (+)",
+     main = "Hull original case.", 
+     ylab = "Portfolio gains (-) and losses (+)",
      col = ifelse(l < 0, "blue", "red"))
 abline(0, 0)
 abline(v = 0)
@@ -965,8 +983,9 @@ colours <- c("red", "orange", "blue")
 ```
 
 ```{r fig.cap="Quantile comparison of losses distribution."}
-barplot(as.matrix(t(ll)), beside = TRUE, col = colours, ylim = c(-60, 60),
-        xlab = "Quantiles", ylab = "Gains (-) and Losses (+)")
+barplot(as.matrix(t(ll)), beside = TRUE, col = colours, 
+        ylim = c(-60, 60), xlab = "Quantiles", 
+        ylab = "Portfolio gains (-) and Losses (+)")
 legend("topleft", c("Hull original","Optimal minvar",
                     "Replicating CAC40 ER"), cex = 1.3, bty = "n",
        fill = colours)

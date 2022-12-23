@@ -60,9 +60,9 @@ xfun::file_string('contact.html')
 ```
 ````
 
-# [`r fa("arrow-circle-left", fill = "black")`](https://mlozanoqf.github.io/) [<span style="color: black">Back to main.</span>](https://mlozanoqf.github.io/) {-}
+# [`r fa("arrow-circle-left", fill = "black")`](https://mlozanoqf.github.io/) [<span style="color: black">Back to QFR.</span>](https://mlozanoqf.github.io/) {-}
 
-# Back to top. {-}
+# [`r fa("arrow-circle-up", fill = "black")`](https://mlozanoqf.github.io/tutorial_if/) [<span style="color: black">Back to top.</span>](https://mlozanoqf.github.io/tutorial_if/) {-}
 
 \newpage
 

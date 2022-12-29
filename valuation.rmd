@@ -116,7 +116,7 @@ legend("topleft", legend = c("Call", "Put"),
        col = c("blue", "red"), lwd = 3, bg = "white")
 ```
 
-Note that there is a single case in which both options (call and put) are the same. It is interesting to find out the value of $S_0$ that makes $c=p$. Clearly, this value is lower than $S_0=50$, the point here is to find the mathematical expression of $S_0$ that makes $c=p$.
+Note that there is a single case in which both options (call and put) are the same. It is interesting to find out the value of $S_0$ that makes $c=p$. Clearly, this value is lower than $S_0=\$50$, the point here is to find the mathematical expression of $S_0$ that makes $c=p$.
 
 ## Option bounds.
 
@@ -257,7 +257,7 @@ contour(S0.seq, K.seq, c.S0.s, xlab = expression(paste(S[0])),
 points(S0, K, pch = 19, col = "blue", cex = 2)
 ```
 
-Note that the blue circle $(S_0=50, K=50)$ is between the contour line 5 and 10, this makes sense because the call option at $call(S_0=50, K=50, rf=0.05, T=1, \sigma = 0.3) = 7.115627$.
+Note that the blue circle $S_0=\$50, K=\$50$ is between the contour line 5 and 10, this makes sense because the call option at $call(S_0=50, K=50, rf=0.05, T=1, \sigma = 0.3) = \$7.115627$.
 
 
 ```{r fig.cap="Call value as $S_0$ and $K$ change, an interactive view."}
@@ -300,7 +300,7 @@ contour(S0.seq, TT.seq, p.S0.T, xlab = expression(paste(S[0])),
 points(S0, TT, pch = 19, col = "blue", cex = 2)
 ```
 
-Now the mysterious hump is clearer than before. Remember the value of $put(S_0=50, K=50, rf=0.05, T=1, \sigma = 0.3) = 4.677099$.
+Now the mysterious hump is clearer than before. Remember the value of $put(S_0=50, K=50, rf=0.05, T=1, \sigma = 0.3) = \$4.677099$.
 
 ```{r fig.cap="Put value as $S_0$ and $T$ change, an interactive view."}
 plot_ly(type = "surface" , x = S0.seq, y = TT.seq , z = p.S0.T ) %>%
@@ -318,9 +318,9 @@ The put-call parity is: $c+Ke^{-rT}=p+S_0$.
 
 We can verify that this equation holds.
 
-$p=c+Ke^{-rT}-S_0 \rightarrow p=7.115627+50e^{-0.05\times 1}- 50 \rightarrow p=4.677098$.
+$p=c+Ke^{-rT}-S_0 \rightarrow p=7.115627+50e^{-0.05\times 1}- 50 \rightarrow p=\$4.677098$.
 
-$c=p+S_0-Ke^{-rT} \rightarrow c=4.677098+50-50e^{-0.05\times 1} \rightarrow c=7.115627$.
+$c=p+S_0-Ke^{-rT} \rightarrow c=4.677098+50-50e^{-0.05\times 1} \rightarrow c=\$7.115627$.
 
 Let's take one step back and demonstrate that both portfolios are worth the same at maturity. We first define the assets payoffs.
 
@@ -491,7 +491,7 @@ option
 }
 ```
 
-We can evaluate the function above to see how the price change depending on the number of steps in the binomial tree. Let's evaluate the <tt>`bin()`</tt> function assuming $S_0=50$, $K=50$, $rf=0.05$, $T=1$, and $\sigma=0.3$ at different time steps.
+We can evaluate the function above to see how the price change depending on the number of steps in the binomial tree. Let's evaluate the <tt>`bin()`</tt> function assuming $S_0=\$50$, $K=\$50$, $rf=0.05$, $T=1$, and $\sigma=0.3$ at different time steps.
 
 ```{r}
 b1t <- bin(S0, K, sigma, TT, rf, 1)
@@ -645,7 +645,7 @@ plot(bin_paths$st, bin_paths$pa, pch = 19, ylab = expression(paste(S[t])),
      xlab = "t")
 ```
 
-Nice. Evaluate the function for a single 2-step case: $S_0=50$, $K=52$, $\sigma = 0.3$, $T=2$, $rf=0.05$.
+Nice. Evaluate the function for a single 2-step case: $S_0=\$50$, $K=\$52$, $\sigma = 0.3$, $T=2$, $rf=0.05$.
 
 ```{r}
 # bin <- function(S0, K, sigma, TM, r, steps) {
@@ -655,7 +655,7 @@ b2
 
 There is no difference between American and European call options theoretical prices as there are no incentives to exercise American call options early. The case of put options is different as incentives to exercise American put options early may arise. As a consequence, American put options are in general more expensive than European put options. 
 
-Let's evaluate this difference in a 50-step case: $K=52$, $\sigma = 0.3$, $T=2$, $rf=0.05$, and different values of $S_0$.
+Let's evaluate this difference in a 50-step case: $K=\$52$, $\sigma = 0.3$, $T=2$, $rf=0.05$, and different values of $S_0$.
 
 ```{r fig.cap="The value of being American; or the cost of being European."}
 S.seq <- seq(0, 80, 0.5)
@@ -672,7 +672,7 @@ abline(h = 0, lty = 2)
 
 This section is based on @Hull section 13.1. A stock price is currently \$20, and it is known that at the end of 3 months it will be either \$22 or \$18. We are interested in valuing a European call option to buy the stock for \$21 in 3 months. The risk-neutral probability $p$ for the case of $rf=0.12$, $T=3/12$, $u=1.1$ and $d=0.9$:
 
-$p = \frac{e^{rT}-d}{u-d} \rightarrow p = \frac{e^{0.12\times(3/12)}-0.9}{1.1-0.9} \rightarrow p = 0.6522727$.
+$p = \frac{e^{rT}-d}{u-d} \rightarrow p = \frac{e^{0.12\times(3/12)}-0.9}{1.1-0.9} \rightarrow p = \$0.6522727$.
 
 
 ```{r}

@@ -20,25 +20,28 @@ The payoff is the cash realized by the holder of an option or other asset at the
 
 It is often useful to characterize a European option in terms of its payoff to the purchaser of the option. The initial cost of the option is then not included in the calculation. The payoff functions for European options are the following.
 
-* Payoff from a long position in a European call option: $\mathrm{max}(S_T-K, 0)$. Or equivalently: $-\mathrm{min}(K-S_T, 0)$.
-* Payoff to the holder of a short position in the European call option: $\mathrm{min}(K-S_T, 0)$. Or equivalently: $-\mathrm{max}(S_T-K, 0)$.
-* Payoff to the holder of a long position in a European put option: $\mathrm{max}(K-S_T, 0)$. Or equivalently: $-\mathrm{min}(S_T-K, 0)$.
-* Payoff from a short position in a European put option: $\mathrm{min}(S_T-K, 0)$. Or equivalently: $-\mathrm{max}(K-S_T, 0)$.
+* Payoff from a long position in a European call option: $c^{+} = \mathrm{max}(S_T-K, 0)$. Or equivalently: $c^{+}=-\mathrm{min}(K-S_T, 0)$.
+* Payoff to the holder of a short position in the European call option: $c^{-}=\mathrm{min}(K-S_T, 0)$. Or equivalently: $c^{-}=-\mathrm{max}(S_T-K, 0)$.
+* Payoff to the holder of a long position in a European put option: $p^{+}=\mathrm{max}(K-S_T, 0)$. Or equivalently: $p^{+}=-\mathrm{min}(S_T-K, 0)$.
+* Payoff from a short position in a European put option: $p^{-}=\mathrm{min}(S_T-K, 0)$. Or equivalently: $p^{-}=-\mathrm{max}(K-S_T, 0)$.
 
 Options are zero sum games because the payoffs to the holder or a long position and to the holder of a short position offset each other. 
 
 In the case of a call option: 
 
-$\mathrm{max}(S_T-K, 0) + \mathrm{min}(K-S_T, 0)$,
+$c^{+}+c^{-}=\mathrm{max}(S_T-K, 0) + \mathrm{min}(K-S_T, 0)$,
 
-$\mathrm{max}(S_T-K, 0) - \mathrm{max}(S_T-K, 0) = 0$.
+$\rightarrow c^{+}+c^{-}=\mathrm{max}(S_T-K, 0) - \mathrm{max}(S_T-K, 0)$,
+
+$\rightarrow c^{+}+c^{-}=0$.
 
 In the case of a put option: 
 
-$\mathrm{max}(K-S_T, 0) + \mathrm{min}(S_T-K, 0)$,
+$p^{+}+p^{-}=\mathrm{max}(K-S_T, 0) + \mathrm{min}(S_T-K, 0)$,
 
-$\mathrm{max}(K-S_T, 0) - \mathrm{max}(K-S_T, 0) = 0$.
+$\rightarrow p^{+}+p^{-}=\mathrm{max}(K-S_T, 0) - \mathrm{max}(K-S_T, 0)$,
 
+$\rightarrow p^{+}+p^{-}=0$.
 
 ```{r}
 ST.seq <- seq(from = 0, to = 150, length.out = 150)
@@ -49,7 +52,7 @@ cs <- pmin(K - ST.seq, 0) # short call payoff.
 ps <- pmin(ST.seq - K, 0) # short put payoff.
 ```
 
-Graphically (assuming $K=75$):
+Graphically (assuming $K=\$75$):
 
 ```{r fig.cap="Payoffs of European option positions."}
 par(mfrow = c(2, 2), mai = c(0.7, 0.4, 0.4, 0.4))
@@ -113,7 +116,7 @@ The payoff functions for zero coupon bonds are the following.
 
 * Short position in a bond: $-K$.
 
-Graphically (assuming $K=75$):
+Graphically (assuming $K=\$75$):
 
 ```{r fig.cap="Long and short zero coupon bond payoffs."}
 K = 75
@@ -193,7 +196,7 @@ points(K, K - S0, cex = 3, col = "orange", lwd = 3, pch = 0)
 points(K, 0, cex = 3, lwd = 3)
 ```
 
-We can identify at least three isosceles right triangles, they have two sides of equal measure. The short call profit is zero at $S_T = 80$, in the code above: <tt>`K + c_price`</tt>. The stock profit is zero at $S_T=65$, in the coded above: <tt>`S0`</tt>. Finally, the short put profit is zero at $S_T=60$, in the code above: <tt>`S0 - c_price`</tt>.
+We can identify at least three isosceles right triangles, they have two sides of equal measure. The short call profit is zero at $S_T = \$80$, in the code above: <tt>`K + c_price`</tt>. The stock profit is zero at $S_T=\$65$, in the coded above: <tt>`S0`</tt>. Finally, the short put profit is zero at $S_T=\$60$, in the code above: <tt>`S0 - c_price`</tt>.
 
 Now see how it looks if we plot a payoff diagram instead.
 

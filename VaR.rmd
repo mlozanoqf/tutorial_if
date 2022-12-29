@@ -6,10 +6,10 @@ title: ''
 
 ```{r echo=FALSE}
 rm(list=ls())
-#library(zoo)
 library(dplyr)
 library(ggplot2)
 library(tidyr)
+library(vembedr)
 ```
 
 \newpage
@@ -628,7 +628,19 @@ colnames(W) <- c("Hull, sub-optimal weights",
 t(W)
 ```
 
-See the results graphically.
+In this @Hull example we assume portfolio weights remains constant. However, we can rebalance portfolio weights. Here, we have the time evolution of minimum variance optimal weights when we consider 5 US industry portfolios as investment assets:
+
+```{r}
+embed_url("https://youtu.be/paH1-bDPsA4")
+```
+
+And a similar exercise but now with 10 US industry sorted portfolios:
+
+```{r}
+embed_url("https://youtu.be/DyjQbKm-NdE")
+```
+
+Let's go back to the main @Hull example and see the results graphically.
 
 ```{r fig.cap="Hull's allocation is sub-optimal, the red one is a better alternative, although with negative expected return."}
 W_hull <- alpha / 10000
@@ -662,7 +674,7 @@ The figure suggests that the (optimal) minimum variance alternative reduces the 
 (R_hull.realized = c(t(W_hull) %*% E.tomorrow))
 ```
 
-This is interesting as it suggests that the sub-optimal allocation would lead to a realized return on Friday September 26, 2008 of -0.5583249%. On the other hand, following the optimal minimum variance allocation would lead to a portfolio gain of 0.2629549%.
+This is interesting as it suggests that the sub-optimal allocation would lead to a realized return on Friday September 26, 2008 of -0.5583249%. On the other hand, following the optimal minimum variance allocation would lead to a portfolio gain of 0.2629549%. Hull's sub-optimal portfolio allocation turns out to be problematic.
 
 ```{r fig.cap="Hull's allocation is sub-optimal, the red one is a better alternative, although with negative expected return."}
 W_hull <- alpha / 10000
@@ -699,7 +711,24 @@ legend("bottomleft",
 bg = "white", cex = 0.9)
 ```
 
-Hull's sub-optimal portfolio allocation turns out to be problematic. We can simulate 10,000 possible values for Friday September 26, 2008 given the mean and standard deviation estimates.
+This @Hull example is static. If we consider a dynamic approach, then optimal portfolio weights may change as new data is available. As a result, we end up with different mean-variance frontiers. This is the time evolution of the US efficient frontier assuming 5 industry sorted portfolio as investment assets:
+
+```{r}
+embed_url("https://youtu.be/Fq4UlUCneyI")
+```
+
+In general, as we increase the number of investment assets, the mean-variance frontier expands. Here is the case of 10 versus 12 US industry sorted portfolios as investment assets:
+
+
+```{r}
+embed_url("https://youtu.be/_GnJRviyYJI")
+```
+
+We can simulate 10,000 possible values for Friday September 26, 2008 given the mean and standard deviation estimates. The following histograms are generated as in this video:
+
+```{r}
+embed_url("https://youtu.be/P1Ky6-a8DE0")
+```
 
 First, the minimum variance portfolio:
 

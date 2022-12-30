@@ -204,12 +204,12 @@ p.S0.s5 <- mapply(p.bs, S0.seq, K, rf, TT, sigma * 5)
 p.S0.s15 <- mapply(p.bs, S0.seq, K, rf, TT, sigma * 15)
 # Plot.
 plot(S0.seq, p.S0.s1, type = "l", lwd = 3,  xlab = expression(paste(S[0])),
-     ylab = "Pall option price, p")
+     ylab = "Put option price, p")
 lines(S0.seq, p.S0.s5, lwd = 3, col = "blue") # put with higher sigma
 lines(S0.seq, p.S0.s15, lwd = 3, col = "red") # put with even higher sigma
 lines(S0.seq, lb.put, lwd = 3, lty = 2) # lower bound
 lines(S0.seq, rep(S0.star, 50) , lwd = 3, lty = 2) # upper bound
-legend("bottomleft", legend=expression(sigma == 0.3, sigma == 1.5,
+legend("bottomleft", legend = expression(sigma == 0.3, sigma == 1.5,
                                    sigma == 4.5, "put bounds"), 
        text.width = 12, col = c("black", "blue", "red", "black"), lwd = 2,
        lty = c(1, 1, 1, 2), bg = "white", cex = 0.8)
@@ -221,11 +221,15 @@ p.S0.s5 <- mapply(p.bs, S0.seq, K, rf, TT, sigma * 5)
 p.S0.s15 <- mapply(p.bs, S0.seq, K, rf, TT, sigma * 15)
 # Plot.
 plot(S0.seq, p.S0.s5, type = "l", lwd = 3,  xlab = expression(paste(S[0])),
-     ylab = "Pall option price, p", col = "blue",
+     ylab = "Put option price, p", col = "blue",
      xlim = c(0, 1), ylim = c(47, 47.8))
 lines(S0.seq, p.S0.s15, lwd = 3, col = "red") # put with even higher sigma
 lines(S0.seq, lb.put, lwd = 1, lty = 2) # lower bound
 lines(S0.seq, rep(S0.star, 50) , lwd = 1, lty = 2) # upper bound
+legend("topleft", legend = expression(sigma == 1.5,
+                                   sigma == 4.5, "put bounds"), 
+       text.width = 12, col = c("blue", "red", "black"), lwd = 2,
+       lty = c(1, 1, 2), bg = "transparent", cex = 0.8, bty = "n")
 ```
 
 Then, regardless of the extreme value of parameters, option bounds represent the maximum and minimum values for the call and put options. These option prices are theoretical as they are calculated by implementing the Black-Scholes formula. We normally evaluate whether the option *market* prices violates these bounds because this will flag an opportunity to implement an arbitrage strategy to generate a risk-free profit.
@@ -862,8 +866,9 @@ a.30 <- as.data.frame(cbind(year = c(0:30), ret = a.30))
 ggplot(a.30, aes(x = year, y = ret)) +
   geom_line(size = 1) +
   geom_point(aes(x = 5, y = 0.6128265), size = 6) +
-      labs(y = "Cumulative return ($)", x = "Year",
-       subtitle = "Evolution of $1 invested in year 0.")
+      labs(y = "Cumulative return", x = "Year",
+       subtitle = "Evolution of $1 invested in year 0.") +
+  scale_y_continuous(labels = scales::dollar)
 ```
 
 These results represent one single path. So, if we are interested in the most likely value of our investment we need to simulate many paths and then estimate the median. Let's simulate 10,000 paths and see the most likely value of our $\$1$ dollar investment in 30 years.
@@ -888,8 +893,9 @@ ggplot(aes(x = year, y = c.ret, color = name)) +
   geom_line(size = 1) +
   geom_point(aes(x = 0, y = 1), col = "black", size = 4) +
   theme(legend.position = "none", legend.title = element_blank()) +
-  labs(y = "Cumulative return ($)", x = "Year",
-  subtitle = "10,000 paths of the evolution of $1 invested in year 0.")
+  labs(y = "Cumulative return", x = "Year",
+  subtitle = "10,000 paths of the evolution of $1 invested in year 0.") +
+  scale_y_continuous(labels = scales::dollar)
 ```
 Most of these paths are concentrated in low cumulative returns by the end of the 30 years. In fact, 1,586 paths end up with a cumulative return lower than \$1 by the end of the 30 years:
 
@@ -912,8 +918,9 @@ a.30x10k |>
   geom_line(size = 1) +
   geom_point(aes(x = 0, y = 1), col = "black", size = 4) +
   theme(legend.position = "none", legend.title = element_blank()) +
-  labs(y = "Cumulative return ($)", x = "Year",
-  subtitle = "1,586 paths of the evolution of $1 invested in year 0.")
+  labs(y = "Cumulative return", x = "Year",
+  subtitle = "1,586 paths of the evolution of $1 invested in year 0.") +
+  scale_y_continuous(labels = scales::dollar)
 ```
 The figure above looks still unclear as the concentration around \$0 is still high. It is better to show the results in logarithm form.
 
@@ -1059,7 +1066,8 @@ abc |>
   ggplot(aes(x = year, y = c.ret, color = name)) +
   geom_line(size = 1) +
   geom_point(aes(x = 0, y = 1), size = 5, col = "black") +
-  labs(y = "Cumulative returns ($)", x = "Year")
+  labs(y = "Cumulative return", x = "Year") +
+  scale_y_continuous(labels = scales::dollar)
 ```
 
 Now we plot the 10,000 possible values of the 30 year cumulative returns.

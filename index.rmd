@@ -20,6 +20,7 @@ output:
       after_body: analytics_if.html
 abstract: This material relies on John C. Hull [@Hull]. Some mathematical background is skipped to emphasize the data analysis, model logic, discussion, graphical approach and R coding [@Rref]. As in the philosophy of Donald Knuth [@knuth1984literate], the objective of this document is to explain to human beings what we want a computer to do as literate programming. This is a work in progress and it is under revision.
 bibliography: references.bib
+link-citations: yes
 ---
 
 ```{=tex}

@@ -283,6 +283,35 @@ points(TT, p, col = "red", cex = 2, pch = 19)
 
 The put option price first increases as the time to maturity increases and after reaching a maximum, the put option price decreases. What is the mathematical expression for the time to maturity which makes the put option price maximum? What is the reason or logic behind this mysterious hump? Those are interesting questions to address.
 
+
+```{r}
+p1.bs <- function(S, K, rf, TT, sigma) {
+  d1 <- (log(S / K) + (rf + sigma^2 / 2) * TT) / (sigma * sqrt(TT))
+  d2 <- d1 - sigma * sqrt(TT)
+  p1 <- K * exp(-rf * TT) * pnorm(-d2)
+}
+
+p2.bs <- function(S, K, rf, TT, sigma) {
+  d1 <- (log(S / K) + (rf + sigma^2 / 2) * TT) / (sigma * sqrt(TT))
+  d2 <- d1 - sigma * sqrt(TT)
+  p2 <- S * pnorm(-d1)
+}
+
+TT.seq <- seq(from = 1, to = 25, length.out = 50)
+p1.TT <- mapply(p1.bs, S0, K, rf, TT.seq, sigma)
+p2.TT <- mapply(p2.bs, S0, K, rf, TT.seq, sigma)
+plot(TT.seq, p.TT, type = "l", lwd = 4, ylab = "Put value", xlab = "T",
+     ylim = c(-20, 25))
+lines(TT.seq, p1.TT, col = "blue")
+lines(TT.seq, p2.TT, col = "red")
+points(TT, p, col = "red", cex = 2, pch = 19)
+
+
+```
+
+
+
+
 Let's illustrate the case when time to maturity and the stock price at time zero changes.
 
 ```{r fig.cap="European put value as $S_0$ and $T$ change: a plane."}

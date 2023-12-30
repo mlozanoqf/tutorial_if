@@ -50,7 +50,9 @@ ps <- pmin(ST.seq - K, 0) # short put payoff.
 
 Graphically (assuming $K=\$75$):
 
-```{r fig.cap="Payoffs of European option positions."}
+```{r}
+#| label: fig-poeop
+#| fig-cap: "Payoffs of European option positions."
 par(mfrow = c(2, 2), mai = c(0.7, 0.4, 0.4, 0.4))
 par(pty = "s")
 plot(ST.seq, cl, type = "l", ylim = c(0, 150), lwd = 4,
@@ -83,7 +85,9 @@ The payoff functions for stocks are the following.
 
 Graphically:
 
-```{r fig.cap="Long and short stock payoffs."}
+```{r}
+#| label: fig-lassp
+#| fig-cap: "Long and short stock payoffs."
 S0 = 75
 par(pty = "s")
 par(mfrow = c(1, 2), oma = c(0, 0, 2, 0))
@@ -114,7 +118,9 @@ The payoff functions for zero coupon bonds are the following.
 
 Graphically (assuming $K=\$75$):
 
-```{r fig.cap="Long and short zero coupon bond payoffs."}
+```{r}
+#| label: fig-laszcbp
+#| fig-cap: "Long and short zero coupon bond payoffs."
 K = 75
 par(pty = "s")
 par(mfrow = c(1, 2), oma = c(0, 0, 2, 0))
@@ -138,7 +144,9 @@ abline(v = 0, lty = 2)
 
 We look at what can be achieved when an option is traded in conjunction with other assets. In particular, we examine the properties of portfolios consisting of (a) an option and a zero-coupon bond, (b) an option and the asset underlying the option, and (c) two or more options on the same asset. This section is based in @Hull chapter 12, you can also see @brealey2020principles.
 
-```{r fig.cap="Hull: Figure 12.1a, profit diagram. A synthetic short put."}
+```{r}
+#| label: fig-hf1pdassp
+#| fig-cap: "Hull: Figure 12.1a, profit diagram. A synthetic short put."
 S0 = 65
 # Here I assume the stock price is currently 65.
 Sl <- ST.seq - S0
@@ -162,7 +170,9 @@ legend("topleft", legend = c("Short call", "Long stock", "Short put"),
        lwd = 2, bg = NULL)
 ```
 
-```{r fig.cap="Hull: Figure 12.1a, profit diagram (zoom). A synthetic short put."}
+```{r}
+#| label: fig-hf1pdzassp
+#| fig-cap: "Hull: Figure 12.1a, profit diagram (zoom). A synthetic short put."
 S0 = 65
 c_price = 5
 # Here I assume the stock price is currently 65.
@@ -196,7 +206,9 @@ We can identify at least three isosceles right triangles, they have two sides of
 
 Now see how it looks if we plot a payoff diagram instead.
 
-```{r fig.cap="Hull: Figure 12.1a, payoff diagram."}
+```{r}
+#| label: fig-hf1pd
+#| fig-cap: "Hull: Figure 12.1a, payoff diagram."
 S0 = K
 Sl <- ST.seq - S0
 cs.pr <- pmin(K - ST.seq, 0)

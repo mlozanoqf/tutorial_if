@@ -70,7 +70,9 @@ p.S0 <- mapply(p.bs, S0.seq, K, rf, TT, sigma)
 
 We produce as many <tt>`c.S0`</tt> as values for <tt>`S0.seq`</tt>. Then, we can plot.
 
-```{r fig.cap="Call price as a function of $S_0$."}
+```{r}
+#| label: fig-cpaafos
+#| fig-cap: "Call price as a function of $S_0$."
 # See the results.
 plot(S0.seq, c.S0, type = "l", lwd = 4, xlab = expression(paste(S[0])), 
      ylab = "Call option price, c")
@@ -80,7 +82,9 @@ The call option price is an increasing function of $S_0$. This makes sense becau
 
 See the case of the put option.
 
-```{r fig.cap="Put price as a function of $S_0$."}
+```{r}
+#| label: fig-ppaafos
+#| fig-cap: "Put price as a function of $S_0$."
 plot(S0.seq, p.S0, type = "l", lwd = 4, xlab = expression(paste(S[0])), 
      ylab = "Put option price, p")
 ```
@@ -89,7 +93,9 @@ Here, it is cheaper to lock the price of an expensive asset for a potential sell
 
 Let's put both plots together.
 
-```{r fig.cap="Call and put prices as a function of $S_0$ (zoom)."}
+```{r}
+#| label: fig-cappaafosz
+#| fig-cap: "Call and put prices as a function of $S_0$ (zoom)."
 # What is the interpretation of S0.star, and how did I found this value?
 S0.star <- K * exp(-rf * TT)
 c.S0.star <- mapply(c.bs, S0.star, K, rf, TT, sigma)
@@ -118,7 +124,9 @@ Option values (or prices) are subject or constrained to upper and lower bounds. 
 
 We can extend our analysis by incorporating the corresponding call and put option bounds.
 
-```{r fig.cap="Option values as a function of $S_0$ including option bounds."}
+```{r}
+#| label: fig-ovaafosiob
+#| fig-cap: "Option values as a function of $S_0$ including option bounds."
 # Put lower bound.
 lb.put <- pmax(K * exp(-rf * TT) - S0.seq, 0)
 # Call lower bound.
@@ -144,7 +152,9 @@ lines(S0.seq, lb.call, lwd = 2, col = "blue", lty = 2)
 
 Note that the stock price range of values is from zero to positive infinity. However, this is not the case for the options. The option values depend on these bounds. We can illustrate the same plot in a cleaner way, to make emphasis on a geometric approach.
 
-```{r fig.cap="Call and put option bounds: geometric inspection (or 'the puzzle')."}
+```{r}
+#| label: fig-capobgiotp
+#| fig-cap: "Call and put option bounds: geometric inspection (or 'the puzzle')."
 par(pty = "s")
 plot(S0.seq, lb.put, type = "l", lwd = 2, col = "red",  ylim = c(0, 100), 
      xlab = expression(paste(S[0])), ylab = "Call (blue), put (red)")
@@ -171,7 +181,9 @@ Every number from 1 to 9 is assigned to a specific geometric shape in the plot a
 
 Now, let's see how Black-Scholes option prices changes (call and put) when we leave $S_0$ as a variable, three levels of $\sigma$ and the rest of the parameters as fixed: $BS = f(S_0, K=50, rf=0.05, T=1, \sigma)$. We can show this in a 2 dimension plot, including the correspondent bounds.
 
-```{r fig.cap="Call option changes as $S_0$ and $\\sigma$ increases: the role of bounds."}
+```{r}
+#| label: fig-cocasasitrob
+#| fig-cap: "Call option changes as $S_0$ and $\\sigma$ increases: the role of bounds."
 # Evaluate the function.
 c.S0.s1 <- mapply(c.bs, S0.seq, K, rf, TT, sigma)
 c.S0.s5 <- mapply(c.bs, S0.seq, K, rf, TT, sigma * 5)
@@ -191,7 +203,9 @@ legend("topleft",legend=expression(sigma == 0.3, sigma == 1.5,
 
 And the same for the put option.
 
-```{r fig.cap="Put option changes as $S_0$ and $\\sigma$ increase: the role of bounds."}
+```{r}
+#| label: fig-pocaasasittrob
+#| fig-cap: "Put option changes as $S_0$ and $\\sigma$ increase: the role of bounds."
 # Evaluate the function.
 p.S0.s1 <- mapply(p.bs, S0.seq, K, rf, TT, sigma)
 p.S0.s5 <- mapply(p.bs, S0.seq, K, rf, TT, sigma * 5)
@@ -208,7 +222,9 @@ legend("bottomleft", legend = expression(sigma == 0.3, sigma == 1.5,
        text.width = 12, col = c("black", "blue", "red", "black"), lwd = 2,
        lty = c(1, 1, 1, 2), bg = "white", cex = 0.8)
 ```
-```{r fig.cap="Put option changes as $S_0$ and $\\sigma$ increase: the role of bounds (zoom)."}
+```{r}
+#| label: fig-pocaasasittrobz
+#| fig-cap: "Put option changes as $S_0$ and $\\sigma$ increase: the role of bounds (zoom)."
 # Evaluate the function.
 p.S0.s1 <- mapply(p.bs, S0.seq, K, rf, TT, sigma)
 p.S0.s5 <- mapply(p.bs, S0.seq, K, rf, TT, sigma * 5)
@@ -230,7 +246,9 @@ Then, regardless of the extreme value of parameters, option bounds represent the
 
 A different way to illustrate the option properties is by looking at a plane. Here, we let $S_0$ and $K$ as a free variables and remain the rest as fixed: $BS = f(S_0, K, rf=0.05, T=1, \sigma = 0.3)$.
 
-```{r fig.cap="Call value as $S_0$ and $K$ change, a plane view."}
+```{r}
+#| label: fig-cvasakcapv
+#| fig-cap: "Call value as $S_0$ and $K$ change, a plane view."
 # K as a variable.
 K.seq <- S0.seq
 # Create the empty matrix.
@@ -249,7 +267,9 @@ points(trans3d(S0, K, c, c.S0.s.plot), cex = 2, pch = 19, col = "blue")
 
 An alternative view is by showing a contour plot. A contour plot is a graphical technique for representing a 3-dimensional surface by plotting constant $z$ slices (option prices), called contours, on a 2-dimensional format. That is, given a value for $z$, lines are drawn for connecting the $(x, y)$ coordinates ($S_0$, $K$) where that $z$ value occurs.
 
-```{r fig.cap="Call value as $S_0$ and $K$ change, a contour view."}
+```{r}
+#| label: fig-cvasakcacv
+#| fig-cap: "Call value as $S_0$ and $K$ change, a contour view."
 contour(S0.seq, K.seq, c.S0.s, xlab = expression(paste(S[0])), 
         ylab = "K", lwd = 2, nlevels = 20)
 points(S0, K, pch = 19, col = "blue", cex = 2)
@@ -258,7 +278,9 @@ points(S0, K, pch = 19, col = "blue", cex = 2)
 Note that the blue circle $S_0=\$50, K=\$50$ is between the contour line 5 and 10, this makes sense because the call option at $call(S_0=50, K=50, rf=0.05, T=1, \sigma = 0.3) = \$7.115627$.
 
 
-```{r fig.cap="Call value as $S_0$ and $K$ change, an interactive view."}
+```{r}
+#| label: fig-cvasakcaiv
+#| fig-cap: "Call value as $S_0$ and $K$ change, an interactive view."
 plot_ly(type = "surface" , x = S0.seq, y = K.seq , z = c.S0.s ) %>%
 layout(scene = list(xaxis = list(title = "Stock price"), 
                     yaxis = list(title = "K", 
@@ -268,7 +290,9 @@ hide_colorbar()
 
 An interesting case is the value of the put as a function of the time to maturity. Let's see the simplest case.
 
-```{r fig.cap="European put as $T$ increases: the mysterious hump."}
+```{r}
+#| label: fig-epatitmh
+#| fig-cap: "European put as $T$ increases: the mysterious hump."
 TT.seq <- seq(from = 1, to = 25, length.out = 50)
 p.TT <- mapply(p.bs, S0, K, rf, TT.seq, sigma)
 plot(TT.seq, p.TT, type = "l", lwd = 4, ylab = "Put value", xlab = "T")
@@ -308,7 +332,9 @@ points(TT, p, col = "red", cex = 2, pch = 19)
 
 Let's illustrate the case when time to maturity and the stock price at time zero changes.
 
-```{r fig.cap="European put value as $S_0$ and $T$ change: a plane."}
+```{r}
+#| label: fig-epvasatcap
+#| fig-cap: "European put value as $S_0$ and $T$ change: a plane."
 p.S0.T <- matrix(0, nrow = 50, ncol = 50)
 for(i in 1:50) { # Is there an easier way to do this?
   for(j in 1:50) {
@@ -321,7 +347,9 @@ points(trans3d(S0, TT, p, p.S0.T.plot), cex = 2, pch = 19, col = "blue")
 
 That is not quite clear. So, here is the contour view.
 
-```{r fig.cap="Put value as $S_0$ and $T$ change, a contour view, or the hypnotic plot."}
+```{r}
+#| label: fig-pvasatcacvothp
+#| fig-cap: "Put value as $S_0$ and $T$ change, a contour view, or the hypnotic plot."
 contour(S0.seq, TT.seq, p.S0.T, xlab = expression(paste(S[0])), 
         ylab = "T", lwd = 2, nlevels = 40, drawlabels = TRUE)
 points(S0, TT, pch = 19, col = "blue", cex = 2)
@@ -329,7 +357,9 @@ points(S0, TT, pch = 19, col = "blue", cex = 2)
 
 Now the mysterious hump is clearer than before. Remember the value of $put(S_0=50, K=50, rf=0.05, T=1, \sigma = 0.3) = \$4.677099$.
 
-```{r fig.cap="Put value as $S_0$ and $T$ change, an interactive view."}
+```{r}
+#| label: fig-pvasatcaiv
+#| fig-cap: "Put value as $S_0$ and $T$ change, an interactive view."
 plot_ly(type = "surface" , x = S0.seq, y = TT.seq , z = p.S0.T ) %>%
 layout(scene = list(xaxis = list(title = "Stock price"), 
                     yaxis = list(title = "T", 
@@ -361,7 +391,9 @@ pc <- pmax(ST.seq, K) # this will be important.
 
 Then we plot.
 
-```{r fig.cap="Portfolio A and C payoffs, the put-call parity."}
+```{r}
+#| label: fig-paacptpcp
+#| fig-cap: "Portfolio A and C payoffs, the put-call parity."
 par(pty = "s")
 par(mfrow = c(1, 2), oma = c(0, 0, 2, 0))
 par(pty = "s")
@@ -390,7 +422,9 @@ The point here is that the black line (total) is the same in both cases. This is
 
 In sum, this is the payoff of portfolios A and C: $\mathrm{max}(S_T,K)$. This is already stored in <tt>`pc`</tt>.
 
-```{r fig.cap="Portfolio A and C payoffs, $\\mathrm{max}(S_T,K)$."}
+```{r}
+#| label: fig-paacp
+#| fig-cap: "Portfolio A and C payoffs, $\\mathrm{max}(S_T,K)$."
 par(pty = "s")
 plot(ST.seq, pc, type = "l", ylab = "Payoff", 
      xlab = expression(paste(S[T])), lwd = 5, ylim = c(0, 150))
@@ -402,7 +436,9 @@ $c+Ke^{-rT}=p+S_0 \rightarrow S_0 = c+Ke^{-rT}-p$.
 
 Graphically:
 
-```{r fig.cap="A synthetic stock $S_0$."}
+```{r}
+#| label: fig-asss
+#| fig-cap: "A synthetic stock $S_0$."
 par(pty = "s")
 plot(ST.seq, (cT + BT - pT), type = "l", ylab = "Payoff", 
      xlab = expression(paste(S[T])), 
@@ -422,7 +458,9 @@ $c+Ke^{-rT}=p+S_0 \rightarrow Ke^{-rT} = p+S_0-c$.
 
 Graphically:
 
-```{r fig.cap="A synthetic bond $Ke^{-rT}$."}
+```{r}
+#| label: fig-asbk
+#| fig-cap: "A synthetic bond $Ke^{-rT}$."
 par(pty = "s")
 plot(ST.seq, (-cT + ST.seq + pT), type = "l", ylab = "Payoff", 
      xlab = expression(paste(S[T])), 
@@ -553,7 +591,9 @@ b20 <- mapply(bin, S0.seq, K, sigma, TT, rf, 20)
 
 Here, we compare the value of the binomial method and the Black-Scholes at different time steps as a function of $S_0$.
 
-```{r fig.cap="One-step binomial and Black-Scholes comparison."}
+```{r}
+#| label: fig-osbabsc
+#| fig-cap: "One-step binomial and Black-Scholes comparison."
 plot(S0.seq, b1[1, ], type = "l", col = "red", lwd = 5, 
      xlab = expression(paste(S[0])), ylab = "European call")
 lines(S0.seq, c.S0.s1, col = "black", lwd = 5)
@@ -563,7 +603,9 @@ legend("topleft", legend = c("1 step binomial", "Black-Scholes"),
 
 There are some differences between the binomial and the Black-Scholes. Let's zoom to see the differences clearer.
 
-```{r fig.cap="Binomial and Black-Scholes convergence, a zoom view."}
+```{r}
+#| label: fig-babscaazv
+#| fig-cap: "Binomial and Black-Scholes convergence, a zoom view."
 plot(S0.seq, b1[1,], type = "l", ylim = c(0, 4), xlim = c(30, 45), 
      col = "green", lwd = 2, xlab = expression(paste(S[0])), 
      ylab = "European call")
@@ -580,7 +622,9 @@ legend("topleft", legend = c("1 step binomial", "2 steps binomial",
 ```
 Not clear yet. Let's see a panel view.
 
-```{r fig.cap="Binomial and Black-Scholes convergence, a panel view."}
+```{r}
+#| label: fig-babscapv
+#| fig-cap: "Binomial and Black-Scholes convergence, a panel view."
 par(mfrow = c(2, 2), mai = c(0.7, 0.4, 0.4, 0.4))
 par(pty = "s")
 plot(S0.seq, c.S0.s1, type = "l", ylim = c(0, 4), xlim = c(30, 45), 
@@ -665,7 +709,9 @@ round(Spaths, 2)
 
 Graphically:
 
-```{r fig.cap="$S_t$ binomial paths from $S_0$ to $S_T$."}
+```{r}
+#| label: fig-sbpfsts
+#| fig-cap: "$S_t$ binomial paths from $S_0$ to $S_T$."
 nona <- ! is.na(Spaths)
 bin_paths <- data.frame(st = rep(1:11, 1:11)/10-0.1, pa = Spaths[nona])
 plot(bin_paths$st, bin_paths$pa, pch = 19, ylab = expression(paste(S[t])),
@@ -684,7 +730,9 @@ There is no difference between American and European call options theoretical pr
 
 Let's evaluate this difference in a 50-step case: $K=\$52$, $\sigma = 0.3$, $T=2$, $rf=0.05$, and different values of $S_0$.
 
-```{r fig.cap="The value of being American; or the cost of being European."}
+```{r}
+#| label: fig-tvobaotcobe
+#| fig-cap: "The value of being American; or the cost of being European."
 S.seq <- seq(0, 80, 0.5)
 AEoptions <- mapply(bin, S.seq, 52, 0.3, 1, 0.05, 50)
 plot(S.seq, unlist(AEoptions[4,]) - unlist(AEoptions[2,]), 
@@ -790,7 +838,9 @@ option.df.fun(0.16)
 
 Everything looks correct.
 
-```{r fig.cap="Red pill, blue pill."}
+```{r}
+#| label: fig-rpbp
+#| fig-cap: "Red pill, blue pill."
 # Evaluate the function in a range of values.
 r.seq <- seq(0.11, 0.17, 0.001)
 df <- mapply(option.df.fun, r.seq)
@@ -835,7 +885,9 @@ a
 ```
 Graphically:
 
-```{r fig.cap="5-year simulation of $u$ and $d$ for asset A."}
+```{r}
+#| label: fig-fysouadfaa
+#| fig-cap: "5-year simulation of $u$ and $d$ for asset A."
 barplot(c(0, a-1), ylim = c(-0.6, 0.6), ylab = c("Returns: u or d."),
         col = ifelse(c(0, a-1) < 0, "red", "blue"))
 abline(h = 0)
@@ -848,7 +900,9 @@ cumprod(a)
 ```
 Graphically:
 
-```{r fig.cap="5-year simulation of cumulative returns for asset A."}
+```{r}
+#| label: fig-fysocrfaa
+#| fig-cap: "5-year simulation of cumulative returns for asset A."
 plot(c(0:5), c(1, cumprod(a)), type = "b", lwd = 5,
      ylab = c("Cumulative $ return"), xlab = c("Year"))
 ```
@@ -878,7 +932,9 @@ binomial_tree(u = 0.46, d = 0.34, n = 30)
 
 It works, a $\$1$ dollar invested at $t=0$ would lead to $\$0.6128265$ in 5 years as we show before. And now we know that a $\$1$ dollar invested at $t=0$ would lead $\$2.805884$ in 30 years. Let's view the 30 year case:
 
-```{r fig.cap="30-year cumulative return asset A."}
+```{r}
+#| label: fig-tycraa
+#| fig-cap: "30-year cumulative return asset A."
 u = 0.46
 d = 0.34
 n = 30
@@ -910,7 +966,9 @@ a.30x10k <- replicate(10000,
 
 See the results.
 
-```{r fig.cap="30-year cumulative return asset A, many paths."}
+```{r}
+#| label: fig-tycraamp
+#| fig-cap: "30-year cumulative return asset A, many paths."
 a.30x10k |>
 ggplot(aes(x = year, y = c.ret, color = name)) +
   geom_line(size = 1) +
@@ -932,7 +990,9 @@ a.30x10k |>
 ```
 Let's plot these 1,586 paths.
 
-```{r fig.cap="30-year cumulative return asset A, 1,586 selected paths."}
+```{r}
+#| label: fig-tycraa1sp
+#| fig-cap: "30-year cumulative return asset A, 1,586 selected paths."
 a.30x10k |>
   group_by(name) |>
   filter(c.ret < 1) |>
@@ -947,7 +1007,9 @@ a.30x10k |>
 ```
 The figure above looks still unclear as the concentration around \$0 is still high. It is better to show the results in logarithm form.
 
-```{r fig.cap="30-year log cumulative return asset A, 1,586 selected paths."}
+```{r}
+#| label: fig-tylcraa1sp
+#| fig-cap: "30-year log cumulative return asset A, 1,586 selected paths."
 a.30x10k |>
   group_by(name) |>
   filter(c.ret < 1) |>
@@ -965,7 +1027,9 @@ The figure now resembles a binomial tree. The black circles are more transparent
 
 Let's do a similar plot for all the 10,000 paths.
 
-```{r fig.cap="30-year Log cumulative return asset A, many paths."}
+```{r}
+#| label: fig-tylcraamp
+#| fig-cap: "30-year Log cumulative return asset A, many paths."
 a.30x10k |>
 ggplot(aes(x = year, y = log(c.ret), color = name)) +
   geom_line(size = 1) +
@@ -1083,7 +1147,9 @@ head(abc)
 ```
 This is the cumulative return evolution for each asset and portfolio C in one single path.
 
-```{r fig.cap="30-year cumulative returns asset A, B and portfolio C, one single path."}
+```{r}
+#| label: fig-tycraabapcosp
+#| fig-cap: "30-year cumulative returns asset A, B and portfolio C, one single path."
 abc |>
   gather(A:C, key = name, value = c.ret) |>
   ggplot(aes(x = year, y = c.ret, color = name)) +
@@ -1095,7 +1161,9 @@ abc |>
 
 Now we plot the 10,000 possible values of the 30 year cumulative returns.
 
-```{r fig.cap="30-year log cumulative returns asset A, B and portfolio C, only the final cumulative return."}
+```{r}
+#| label: fig-tylcraabapcotfcr
+#| fig-cap: "30-year log cumulative returns asset A, B and portfolio C, only the final cumulative return."
 set.seed(2, sample.kind = "Rounding")
 bx <- (replicate(10000, binomial_tree(u = -0.001, d = 0.001, 30)))
 set.seed(2, sample.kind = "Rounding")
@@ -1118,7 +1186,9 @@ abcx |>
 
 An alternative to the boxplot is a density plot.
 
-```{r fig.cap="30-year log cumulative returns asset A and portfolio C, only the final cumulative return, a density view."}
+```{r}
+#| label: fig-tylcraabapcotfcradv
+#| fig-cap: "30-year log cumulative returns asset A and portfolio C, only the final cumulative return, a density view."
 abcx |>
   gather(A:C, key = name, value = c.ret) |>
   filter(year == 30) |>

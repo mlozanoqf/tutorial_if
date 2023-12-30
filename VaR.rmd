@@ -56,7 +56,9 @@ df.Adj %>%
 ```
 The number of observations is 501 as we start on day zero. The *A* before the index name stands for *adjusted*. A graphical representation of the table above:
 
-```{r fig.cap="Adjusted index values, Nikkei = Nikkei $\\times$ 100."}
+```{r}
+#| label: fig-aivnn
+#| fig-cap: "Adjusted index values, Nikkei = Nikkei $\\times$ 100."
 df.Adj %>%
   mutate(ANikkei = ANikkei*100) %>%
   mutate(obs = c(1:502)) %>%
@@ -71,7 +73,9 @@ df.Adj %>%
 ```
 The time-series starts on Monday August 6, 2006 and ends on Thursday September 25, 2008. These are 501 daily past observations. In the plot below, we also show the value of Friday September 26, 2008 as a dot, this is observation 502 and we call it <tt>`tomorrow`</tt>. This observation 502 is not included in the VaR estimation as it represents an unknown future value, but it will be useful for us to evaluate our estimations.
 
-```{r fig.cap="Adjusted index values, Nikkei = Nikkei $\\times$ 100, zoom view."}
+```{r}
+#| label: fig-aivnnzv
+#| fig-cap: "Adjusted index values, Nikkei = Nikkei $\\times$ 100, zoom view."
 tomorrow <- df.Adj %>%
   mutate(ANikkei = ANikkei*100) %>%
   mutate(obs = c(1:502)) %>%
@@ -209,7 +213,9 @@ l.tomorrow <- df.Adj.S %>%
 ```
 
 
-```{r fig.cap="Today is September 25, 2008. What is the worst that can happen to my portfolio tomorrow?"}
+```{r}
+#| label: fig-tis22witwtchtmpt
+#| fig-cap: "Today is September 25, 2008. What is the worst that can happen to my portfolio tomorrow?"
 plot(l, type = "h", lwd = 2, 
      xlab = "500 scenarios (sorted by historical date)",
      ylab = "Portfolio gains (-) and losses (+)", 
@@ -226,7 +232,9 @@ legend("bottomleft", legend = c("Gains", "Losses", "Historic VaR: 253.385"),
 
 Now, a histogram of losses.
 
-```{r fig.cap="Histogram of losses for the scenarios considered between September 25 and 26, 2008: a histogram."}
+```{r}
+#| label: fig-holftscbs2a22ah
+#| fig-cap: "Histogram of losses for the scenarios considered between September 25 and 26, 2008: a histogram."
 hist(l, 15, xlab = "Portfolio losses (+) and gains (-)", main = NULL)
 points(l.tomorrow, 1, pch = 19, cex = 2)
 abline(v = 253.385, col = "red", lwd = 2)
@@ -236,7 +244,9 @@ legend("topleft", legend = c("Historic VaR: 253.385"), col = "red",
 
 The point refers to what really happened, and the red line is the VaR following a historic approach. Now, the same information but now using a density plot.
 
-```{r fig.cap="Histogram of losses for the scenarios considered between September 25 and 26, 2008: a density plot."}
+```{r}
+#| label: fig-holftscbs2a22adp
+#| fig-cap: "Histogram of losses for the scenarios considered between September 25 and 26, 2008: a density plot."
 densi <- density(l, na.rm = TRUE)
 plot(densi, main = "", xlab = "Portfolio losses (+) and gains (-)")
 polygon(densi, col = "grey", border = "black")
@@ -248,7 +258,9 @@ legend("topleft", legend = c("Historic VaR: 253.385"), col = "red",
 
 Here is a histogram that looks like the one in @Hull.
 
-```{r fig.cap="Figure 22.3. Histogram of losses for the scenarios considered between September 25 and 26, 2008."}
+```{r}
+#| label: fig-f2holftscbs2a22
+#| fig-cap: "Figure 22.3. Histogram of losses for the scenarios considered between September 25 and 26, 2008."
 hist(l, 15, axes = F, lty = "blank", col = "grey", main = "",
      xlab = "Portfolio losses (+) and gains (-)")
 axis(1, pos = 0)
@@ -281,7 +293,9 @@ Results
 
 We call sub-optimal weights because the allocation of 40% in the DJIA, 30% in the FTSE, 10% in the CAC, and 20% in the Nikkei is arbitrary. The VaR according to the historic approach is the highest 5th loss because the top 1% of 500 scenarios is the 5th scenario. We can view this in a barplot.
 
-```{r fig.cap="Extract of table 22.4 in a graph VaR historical approach 1 percent 253.385 What really happen in green."}
+```{r}
+#| label: fig-eot2iagvha1p2wrhig
+#| fig-cap: "Extract of table 22.4 in a graph VaR historical approach 1 percent 253.385 What really happen in green."
 barplot(l[order(l, decreasing = TRUE)], 
         names.arg = order(l, decreasing = TRUE), ylim = c(0, 500), 
         xlim = c(0, 20), las = 2, cex.names = 1, ylab = "Porfolio loss ($000s)",
@@ -316,7 +330,9 @@ quantile(l, 0.99)
 ```
 A graphical approach:
 
-```{r fig.cap="A quantile approach."}
+```{r}
+#| label: fig-aqa
+#| fig-cap: "A quantile approach."
 plot(seq(from = 0.902, to = 1, by = 0.002), 
      quantile(l, seq(from = 0.902, to = 1, by = 0.002)), cex = 1.5,
      xlab = "Confidence level (vertical line at 99%)", 
@@ -637,7 +653,9 @@ embed_url("https://youtu.be/DyjQbKm-NdE")
 
 Let's go back to the main @Hull example and see the results graphically.
 
-```{r fig.cap="Hull's allocation is sub-optimal, the red one is a better alternative, although with negative expected return."}
+```{r}
+#| label: fig-haistroiabaawner
+#| fig-cap: "Hull's allocation is sub-optimal, the red one is a better alternative, although with negative expected return."
 W_hull <- alpha / 10000
 R_hull <- c(t(W_hull) %*% E)
 S_hull <- c(t(W_hull) %*% sigma %*% W_hull)^0.5
@@ -671,7 +689,9 @@ The figure suggests that the (optimal) minimum variance alternative reduces the 
 
 This is interesting as it suggests that the sub-optimal allocation would lead to a realized return on Friday September 26, 2008 of -0.5583249%. On the other hand, following the optimal minimum variance allocation would lead to a portfolio gain of 0.2629549%. Hull's sub-optimal portfolio allocation turns out to be problematic.
 
-```{r fig.cap="Hull's allocation is sub-optimal, the red one is a better alternative, although with negative expected return."}
+```{r}
+#| label: fig-haistroiabaawner2
+#| fig-cap: "Hull's allocation is sub-optimal, the red one is a better alternative, although with negative expected return."
 W_hull <- alpha / 10000
 R_hull <- c(t(W_hull) %*% E)
 S_hull <- c(t(W_hull) %*% sigma %*% W_hull)^0.5
@@ -727,7 +747,9 @@ embed_url("https://youtu.be/P1Ky6-a8DE0")
 
 First, the minimum variance portfolio:
 
-```{r fig.cap="Minimum variance recommendation and realized outcome in blue."}
+```{r}
+#| label: fig-mvraroib
+#| fig-cap: "Minimum variance recommendation and realized outcome in blue."
 set.seed <- 1
 M <- rnorm(10000, R_min, S_min)
 hist(M, 100, xlim = c(-4, 4), ylim = c(0, 450), main = "")
@@ -737,7 +759,9 @@ abline(v = quantile(M, 0.975), lty = 2)
 ```
 Then, the sub-optimal allocation:
 
-```{r fig.cap="Hull sub-optimal recommendation and realized outcome."}
+```{r}
+#| label: fig-hsoraro
+#| fig-cap: "Hull sub-optimal recommendation and realized outcome."
 set.seed = 1
 H = rnorm(10000, R_hull, S_hull)
 hist(H, 100, xlim = c(-4, 4), ylim = c(0, 450), main = "")
@@ -747,7 +771,9 @@ abline(v = quantile(H, 0.975), lty = 2)
 ```
 And finally, the portfolio that targets the CAC 40 expected return:
 
-```{r fig.cap="CAC40 recommendation and realized outcome."}
+```{r}
+#| label: fig-craro
+#| fig-cap: "CAC40 recommendation and realized outcome."
 set.seed <- 1
 Ca <- rnorm(10000, R_cac40, S_cac40)
 hist(Ca, 100, xlim = c(-4, 4), ylim = c(0, 450), main = "")
@@ -758,7 +784,9 @@ abline(v = quantile(C, 0.975), lty = 2)
 
 Let's see the portfolio that targets the CAC 40 expected return in a mean-variance plot:
 
-```{r fig.cap="Estimation of a new optimal alpha: Replicate CAC40 ER."}
+```{r}
+#| label: fig-eoanoarce
+#| fig-cap: "Estimation of a new optimal alpha: Replicate CAC40 ER."
 plot(S, ER, type = "l", lwd = 3, xlim = c(0.7, 1.6),
      ylim = c(-0.022, 0.007), ylab = "Expected return",
      xlab = "Standard deviation")
@@ -893,7 +921,9 @@ l3.tomorrow <- df.Adj.S %>%
 
 As a reference, this is the @Hull original case.
 
-```{r fig.cap="Losses with Hull's suboptimal alpha DJ=0.4, FTSE=0.3, CAC=0.1, Nikkei=0.2."}
+```{r}
+#| label: fig-lwhsadfcn
+#| fig-cap: "Losses with Hull's suboptimal alpha DJ=0.4, FTSE=0.3, CAC=0.1, Nikkei=0.2."
 plot(l, type = "h", ylim = c(-600, 600), lwd = 2,
      xlab = "500 scenarios (sorted by historical date)",
 ylab = "Portfolio gains (-) and losses (+)", 
@@ -912,7 +942,9 @@ sort(l)[496]
 
 Now, let's see the historical approach but with minimum variance optimal weights.
 
-```{r fig.cap="Losses with optimal alpha DJ=0.56, FTSE=0.038, CAC=0.022, Nikkei=0.38."}
+```{r}
+#| label: fig-lwhsadfcn2
+#| fig-cap: "Losses with optimal alpha DJ=0.56, FTSE=0.038, CAC=0.022, Nikkei=0.38."
 plot(l2, type = "h", ylim = c(-600, 600), lwd = 2,
      xlab = "500 scenarios (sorted by historical date)",
      ylab = "Portfolio gains (-) and losses (+)", 
@@ -940,7 +972,9 @@ Results.updated
 
 And this is the optimal portfolio targeting the CAC 40 expected return.
 
-```{r fig.cap="Losses with CAC40 optimal alpha DJ=0.607, FTSE=-0.403, CAC=0.459, Nikkei=0.336."}
+```{r}
+#| label: fig-lwcoadfcn
+#| fig-cap: "Losses with CAC40 optimal alpha DJ=0.607, FTSE=-0.403, CAC=0.459, Nikkei=0.336."
 plot(l3, type = "h", ylim = c(-600, 600), lwd = 2,
      xlab = "500 scenarios (sorted by historical date)",
      ylab = "Portfolio gains (-) and losses (+)", 
@@ -968,7 +1002,9 @@ Results.updated
 
 Let's see the three historical approaches together.
 
-```{r fig.cap="Hull's suboptimal alpha (left); optimal alpha (center); optimal alpha CAC40 (right)."}
+```{r}
+#| label: fig-hsaoaoa
+#| fig-cap: "Hull's suboptimal alpha (left); optimal alpha (center); optimal alpha CAC40 (right)."
 par(mfrow=c(1, 3), oma = c(0, 0, 2, 0))
 par(pty = "s")
 plot(l, type = "h", ylim = c(-600, 600), lwd = 2, xlab = "",
@@ -1006,7 +1042,9 @@ ll <- data.frame(lq, lq2, lq3)
 colours <- c("red", "orange", "blue")
 ```
 
-```{r fig.cap="Quantile comparison of losses distribution."}
+```{r}
+#| label: fig-qcold
+#| fig-cap: "Quantile comparison of losses distribution."
 barplot(as.matrix(t(ll)), beside = TRUE, col = colours, 
         ylim = c(-60, 60), xlab = "Quantiles", 
         ylab = "Portfolio gains (-) and Losses (+)")

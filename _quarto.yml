@@ -1,0 +1,38 @@
+title: Options and VaR with {{< fa brands r-project >}} <span style="color:white">R</span>
+
+author: Dr. Martín Lozano.
+date-modified: now
+date-format: "MMMM D, YYYY, HH:mm:ss a."
+
+
+abstract: This material relies on @Hull. Some mathematical background is skipped to emphasize the data analysis, model logic, discussion, graphical approach and R coding [@Rref]. As in the philosophy of @knuth1984literate, the objective of this document is to explain to human beings what we want a computer to do as literate programming. This is a work in progress and it is under revision.
+bibliography: references.bib
+
+theme:
+  light: flatly
+  dark: darkly
+
+format:
+  html:
+    toc: true
+    toc-title: Contents
+    smooth-scroll: true
+    code-fold: true
+    code-tools:
+      source: false
+      toggle: true
+    code-block-bg: true
+    code-block-border-left: "#31BAE9"
+    code-line-numbers: true
+    number-sections: true
+    crossref:
+      chapters: true
+    toc-location: left
+    toc-depth: 2
+    page-layout: full
+    include-after-body: analytics_if.html
+    include-in-header:
+      - back-to-top.html
+      - progressbar.html
+  
+link-citations: true

@@ -1,16 +1,12 @@
----
-title: ''
-#output: bookdown::gitbook:
-  html_document:
-    df_print: paged
----
 
 ```{r echo=FALSE}
 # This removes all items in environment. 
 rm(list=ls())
 ```
 
-\newpage
+# Introduction. {.unnumbered}
+
+Option pricing and Value at Risk (VaR) play pivotal roles in risk management and quantitative finance, serving as indispensable tools for assessing and mitigating financial risks. Option pricing, exemplified by models like Black-Scholes, provides a systematic framework for valuing financial derivatives, enabling market participants to determine fair prices and make informed investment decisions. By understanding the potential future value of options, investors can hedge against adverse market movements and strategically allocate resources. On the other hand, VaR quantifies the potential loss that a portfolio may incur within a specified confidence interval and time horizon, offering a comprehensive measure of risk exposure. This metric assists financial institutions and investors in setting risk tolerance levels, optimizing portfolio diversification, and ensuring regulatory compliance. Together, option pricing and VaR contribute to the development of robust risk management strategies, enhancing the stability and resilience of financial markets in the face of uncertainties.
 
 # Payoff functions.
 

@@ -1,5 +1,5 @@
 ---
-title: Options and VaR with `r fontawesome::fa("r-project")` <span style="color:white">R</span>
+title:  `r fontawesome::fa("r-project")` <span style="color:white">R</span>
 
 subtitle: Dr. Martín Lozano.
 author:
@@ -18,7 +18,7 @@ output:
     theme: readable #darkly 
     includes:
       after_body: analytics_if.html
-abstract: This material relies on @Hull. Some mathematical background is skipped to emphasize the data analysis, model logic, discussion, graphical approach and R coding [@Rref]. As in the philosophy of @knuth1984literate, the objective of this document is to explain to human beings what we want a computer to do as literate programming. This is a work in progress and it is under revision.
+abstract: 
 bibliography: references.bib
 link-citations: yes
 ---
@@ -65,31 +65,12 @@ xfun::file_string('contact.html')
 
 # [`r fa("arrow-circle-up", fill = "black")`](https://mlozanoqf.github.io/tutorial_if/) [<span style="color: black">Back to top.</span>](https://mlozanoqf.github.io/tutorial_if/) {-}
 
-\newpage
 
-```{r strategies, child = 'strategies.Rmd'}
-```
 
-\newpage
-
-```{r valuation, child = 'valuation.Rmd'}
-```
-
-\newpage
-
-```{r wiener, child = 'wiener.Rmd'}
-```
-
-\newpage
-
-```{r VaR, child = 'VaR.Rmd'}
-```
 
 ```{r include=FALSE}
 a <- toc()
 ```
-
-This document took `r round(as.numeric((a$toc-a$tic)/60), 2)` minutes to compile in Rmarkdown, `r R.version.string`.
 
 # References.
 

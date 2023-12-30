@@ -1,0 +1,49 @@
+
+
+```{r include=FALSE}
+# This removes all items in environment. 
+# It is a good practice to start your code this way.
+rm(list=ls())
+library(fontawesome)
+library(tictoc)
+tic()
+```
+
+```{r global_options, include = FALSE}
+knitr::opts_chunk$set(warning = FALSE, message = FALSE)
+knitr::opts_chunk$set(fig.pos = "H", out.extra = "")
+```
+
+
+````{=html}
+```{r, echo=FALSE, results='asis'}
+xfun::file_string('contact.html')
+```
+````
+
+```{r strategies, child = 'strategies.Rmd'}
+```
+
+
+```{r valuation, child = 'valuation.Rmd'}
+```
+
+
+```{r wiener, child = 'wiener.Rmd'}
+```
+
+
+```{r VaR, child = 'VaR.Rmd'}
+```
+
+```{r include=FALSE}
+a <- toc()
+```
+
+
+This document took `r round(as.numeric((a$toc-a$tic)/60), 2)` minutes to compile in Quarto version `r quarto::quarto_version()`, and `r R.version.string`.
+
+
+#  References. {.unnumbered}
+::: {#refs}
+:::

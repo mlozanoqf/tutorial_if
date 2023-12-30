@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    #btn-back-to-top {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      width: 15px; /* Adjust the width */
+      height: 15px; /* Adjust the height */
+      box-sizing: content-box;
+      z-index: 1000;
+      background-color: rgba(0, 123, 255, 0.7);
+      border: none;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+  </style>
+</head>
+<body>
+
+<button type="button" class="btn btn-primary btn-lg bi bi-arrow-up" id="btn-back-to-top"></button>
+
+<script>
+  let backToTopButton = document.getElementById("btn-back-to-top");
+
+  backToTopButton.addEventListener("click", function () {
+    document.documentElement.scrollTop = 0;
+  });
+</script>
+
+</body>
+</html>

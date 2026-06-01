@@ -3,7 +3,7 @@ project:
   output-dir: _book
 
 book:
-  title: "Options and VaR with R"
+  title: "Option Pricing with R"
   subtitle: "Book"
   author: "Dr. Martin Lozano"
   page-navigation: true
@@ -14,15 +14,14 @@ book:
     style: docked
     collapse-level: 1
   page-footer:
-    left: "Options and VaR with R"
+    left: "Option Pricing with R"
     right: 'Dr. Martin Lozano &middot; <a href="mailto:mlozanoqf@gmail.com">mlozanoqf@gmail.com</a> &middot; <a href="https://mlozanoqf.github.io/">mlozanoqf.github.io</a>'
   chapters:
-    - text: "Options and VaR with R"
+    - text: "Option Pricing with R"
       href: index.qmd
     - 01-payoff-functions.qmd
     - 02-options-properties.qmd
     - 03-wiener-processes.qmd
-    - 04-value-at-risk.qmd
     - references.qmd
 
 bibliography: references.bib

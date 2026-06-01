@@ -23,11 +23,13 @@ write_book_dates()
 ## Preface {.unnumbered}
 
 ::: {.home-panel}
-Option pricing and Value at Risk (VaR) play pivotal roles in risk management and quantitative finance, serving as indispensable tools for assessing and mitigating financial risks. Option pricing, exemplified by models like Black-Scholes, provides a systematic framework for valuing financial derivatives, enabling market participants to determine fair prices and make informed investment decisions. By understanding the potential future value of options, investors can hedge against adverse market movements and strategically allocate resources. On the other hand, VaR quantifies the potential loss that a portfolio may incur within a specified confidence interval and time horizon, offering a comprehensive measure of risk exposure. This metric assists financial institutions and investors in setting risk tolerance levels, optimizing portfolio diversification, and ensuring regulatory compliance. Together, option pricing and VaR contribute to the development of robust risk management strategies, enhancing the stability and resilience of financial markets in the face of uncertainties.
+Option Pricing with R is written for readers who want to connect option pricing, payoffs, option properties, valuation logic, stochastic processes, and reproducible R code. The book focuses on the mechanics that make option pricing work: payoff diagrams, put-call parity, binomial valuation, risk-neutral reasoning, Black-Scholes intuition, and the Wiener-process foundations behind continuous-time models.
+
+The emphasis is applied and computational. Each chapter keeps the financial object visible while the code is built, so that option values, bounds, probabilities, paths, and valuation relationships can be inspected numerically and graphically. Future revisions will extend this foundation toward Greeks and richer option-pricing applications.
 :::
 
 ## What's new in this edition {.unnumbered}
 
-- **Book navigation:** The material is now organized as a Quarto book with chapter-level navigation instead of a single long document.
-- **Cleaner reading flow:** Payoff functions, option properties, Wiener processes, and Value at Risk now open as separate chapters with local section menus.
+- **Sharper book identity:** The book now focuses on option pricing, stochastic processes, and valuation mechanics.
+- **Cleaner reading flow:** Payoff functions, option properties, and Wiener processes open as separate chapters with local section menus.
 - **Publication workflow:** The site is prepared for GitHub Pages through GitHub Actions, with `_book` treated as generated output.

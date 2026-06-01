@@ -39,3 +39,13 @@ vignettes/*.pdf
 .Renviron
 
 /.quarto/
+/_book/
+
+# Legacy/generated HTML artifacts from the old root-level render.
+/index.html
+/index_files/
+/robotrader.html
+/robotrader_files/
+/libs/
+/site_libs/
+/*_files/

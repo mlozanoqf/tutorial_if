@@ -1,0 +1,258 @@
+<script>
+function initSidebarChapterSections() {
+  var sidebar = document.querySelector("#quarto-sidebar");
+
+  if (!sidebar) {
+    return;
+  }
+
+  var chapters = [
+    {
+      page: "01-payoff-functions.html",
+      sections: [
+        { id: "european-options", text: "1.1 European options" },
+        { id: "stocks", text: "1.2 Stocks" },
+        { id: "bonds", text: "1.3 Bonds" },
+        { id: "options-stocks-and-bonds", text: "1.4 Options, stocks and bonds" }
+      ]
+    },
+    {
+      page: "02-options-properties.html",
+      sections: [
+        { id: "determinants", text: "2.1 Determinants" },
+        { id: "option-bounds", text: "2.2 Option bounds" },
+        { id: "put-call-parity", text: "2.3 Put-call parity" },
+        { id: "binomial-trees", text: "2.4 Binomial trees" },
+        { id: "implementation", text: "2.5 Implementation" },
+        { id: "stock-price-paths", text: "2.6 Stock price paths" },
+        { id: "real-vs.-risk-neutral-world", text: "2.7 Real vs. risk-neutral world" },
+        { id: "parrondos-paradox", text: "2.8 Parrondo's paradox" }
+      ]
+    },
+    {
+      page: "03-wiener-processes.html",
+      sections: [
+        { id: "the-basic-process", text: "3.1 The basic process" },
+        { id: "the-generalized-wiener-process", text: "3.2 The generalized Wiener process" }
+      ]
+    },
+    {
+      page: "04-value-at-risk.html",
+      sections: [
+        { id: "prepare-the-data", text: "4.1 Prepare the data" },
+        { id: "historical-simulation", text: "4.2 Historical simulation" },
+        { id: "model-building-approach", text: "4.3 Model building approach" },
+        { id: "optimal-allocation", text: "4.4 Optimal allocation" },
+        { id: "model-building-approach-with-optimal-weights", text: "4.5 Model building approach with optimal weights" },
+        { id: "historic-approach-with-optimal-weights", text: "4.6 Historic approach with optimal weights" }
+      ]
+    }
+  ];
+
+  function pageNameFromUrl(value) {
+    var url = new URL(value, window.location.href);
+    var pageName = url.pathname.split("/").pop();
+
+    return pageName || "index.html";
+  }
+
+  function hashToId(hash) {
+    var id = hash.replace(/^#/, "");
+
+    try {
+      return decodeURIComponent(id);
+    } catch (error) {
+      return id;
+    }
+  }
+
+  function localNavOffset() {
+    var localNav = document.querySelector(".page-local-nav");
+
+    if (!localNav) {
+      return 0;
+    }
+
+    return Math.ceil(localNav.getBoundingClientRect().height + 16);
+  }
+
+  function scrollToSection(id, smooth) {
+    var target = document.getElementById(id);
+
+    if (!target) {
+      return false;
+    }
+
+    var top = target.getBoundingClientRect().top + window.pageYOffset - localNavOffset();
+    window.scrollTo({
+      top: Math.max(0, top),
+      behavior: smooth ? "smooth" : "auto"
+    });
+
+    return true;
+  }
+
+  function setOpen(list, toggle, isOpen) {
+    list.hidden = !isOpen;
+    list.classList.toggle("book-sidebar-subsections-open", isOpen);
+    toggle.classList.toggle("book-sidebar-subsection-toggle-open", isOpen);
+    toggle.setAttribute("aria-expanded", isOpen ? "true" : "false");
+  }
+
+  function currentSectionId(chapter) {
+    if (!chapter.sections.length) {
+      return "";
+    }
+
+    var current = chapter.sections[0].id;
+    var threshold = localNavOffset() + 24;
+
+    chapter.sections.forEach(function (section) {
+      var target = document.getElementById(section.id);
+
+      if (target && target.getBoundingClientRect().top <= threshold) {
+        current = section.id;
+      }
+    });
+
+    return current;
+  }
+
+  var lastActiveSubsection = "";
+
+  function keepActiveLinkVisible(link) {
+    var sidebarRect = sidebar.getBoundingClientRect();
+    var linkRect = link.getBoundingClientRect();
+    var padding = 16;
+
+    if (linkRect.top < sidebarRect.top + padding) {
+      sidebar.scrollTop += linkRect.top - sidebarRect.top - padding;
+    } else if (linkRect.bottom > sidebarRect.bottom - padding) {
+      sidebar.scrollTop += linkRect.bottom - sidebarRect.bottom + padding;
+    }
+  }
+
+  var currentPage = pageNameFromUrl(window.location.href);
+  var currentChapter = chapters.find(function (chapter) {
+    return chapter.page === currentPage;
+  });
+
+  chapters.forEach(function (chapter) {
+    var chapterLink = Array.prototype.slice.call(sidebar.querySelectorAll("a.sidebar-link[href]")).find(function (link) {
+      return pageNameFromUrl(link.getAttribute("href")) === chapter.page;
+    });
+
+    if (!chapterLink || chapterLink.dataset.bookSidebarSectionsReady === "true") {
+      return;
+    }
+
+    var item = chapterLink.closest("li.sidebar-item");
+    var container = chapterLink.closest(".sidebar-item-container");
+
+    if (!item || !container) {
+      return;
+    }
+
+    chapterLink.dataset.bookSidebarSectionsReady = "true";
+    item.classList.add("book-sidebar-chapter-item", "book-sidebar-chapter-has-sections");
+
+    var listId = "book-sidebar-subsections-" + chapter.page.replace(/[^a-z0-9]/gi, "-");
+    var toggle = document.createElement("button");
+    toggle.type = "button";
+    toggle.className = "book-sidebar-subsection-toggle";
+    toggle.setAttribute("aria-controls", listId);
+    toggle.setAttribute("aria-label", "Toggle chapter sections");
+    toggle.innerHTML = '<i class="bi bi-chevron-right" aria-hidden="true"></i>';
+
+    var list = document.createElement("ul");
+    list.id = listId;
+    list.className = "book-sidebar-subsections";
+
+    chapter.sections.forEach(function (section) {
+      var listItem = document.createElement("li");
+      var link = document.createElement("a");
+      link.className = "sidebar-link book-sidebar-subsection-link";
+      link.href = "./" + chapter.page + "#" + section.id;
+      link.textContent = section.text;
+
+      link.addEventListener("click", function (event) {
+        if (pageNameFromUrl(window.location.href) !== chapter.page) {
+          return;
+        }
+
+        event.preventDefault();
+        history.pushState(null, "", "#" + section.id);
+        scrollToSection(section.id, true);
+        syncActiveSubsection();
+      });
+
+      listItem.appendChild(link);
+      list.appendChild(listItem);
+    });
+
+    toggle.addEventListener("click", function (event) {
+      event.preventDefault();
+      event.stopPropagation();
+      setOpen(list, toggle, list.hidden);
+    });
+
+    container.appendChild(toggle);
+    item.appendChild(list);
+    setOpen(list, toggle, chapter.page === currentPage);
+  });
+
+  function syncActiveSubsection() {
+    var activeId = "";
+
+    if (currentChapter) {
+      activeId = currentSectionId(currentChapter) ||
+        (window.location.hash ? hashToId(window.location.hash) : "");
+    }
+
+    var activeLink = null;
+
+    sidebar.querySelectorAll(".book-sidebar-subsection-link").forEach(function (link) {
+      var url = new URL(link.getAttribute("href"), window.location.href);
+      var linkPage = pageNameFromUrl(url.href);
+      var linkId = hashToId(url.hash || "");
+      var isActive = currentChapter && linkPage === currentPage && linkId === activeId;
+
+      link.classList.toggle("book-subsection-active", isActive);
+      link.setAttribute("aria-current", isActive ? "location" : "false");
+
+      if (isActive) {
+        activeLink = link;
+      }
+    });
+
+    if (activeLink && activeId !== lastActiveSubsection) {
+      keepActiveLinkVisible(activeLink);
+    }
+
+    lastActiveSubsection = activeId;
+  }
+
+  var scrollFrame = null;
+
+  window.addEventListener("scroll", function () {
+    if (scrollFrame) {
+      return;
+    }
+
+    scrollFrame = window.requestAnimationFrame(function () {
+      scrollFrame = null;
+      syncActiveSubsection();
+    });
+  }, { passive: true });
+
+    window.addEventListener("hashchange", syncActiveSubsection);
+    syncActiveSubsection();
+    window.setTimeout(syncActiveSubsection, 250);
+  }
+
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", initSidebarChapterSections);
+} else {
+  initSidebarChapterSections();
+}
+</script>

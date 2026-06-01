@@ -1,0 +1,128 @@
+<script>
+function initSidebarAccordion() {
+  var sidebar = document.querySelector("#quarto-sidebar");
+
+  if (!sidebar) {
+    return;
+  }
+
+  var sections = Array.prototype.slice.call(
+    sidebar.querySelectorAll("ul.sidebar-section.depth1.collapse[id]")
+  );
+
+  function pageNameFromUrl(value) {
+    var url = new URL(value, window.location.href);
+    var pageName = url.pathname.split("/").pop();
+
+    return pageName || "index.html";
+  }
+
+  sidebar.querySelectorAll("a.sidebar-link[href]").forEach(function (link) {
+    if (pageNameFromUrl(link.getAttribute("href")) !== "index.html") {
+      return;
+    }
+
+    var item = link.closest("li.sidebar-item");
+
+    if (item) {
+      item.style.display = "none";
+    }
+  });
+
+  if (sections.length === 0) {
+    return;
+  }
+
+  function syncTriggers(section, isOpen) {
+    sidebar.querySelectorAll('[data-bs-target="#' + section.id + '"]').forEach(function (trigger) {
+      trigger.classList.toggle("collapsed", !isOpen);
+      trigger.setAttribute("aria-expanded", isOpen ? "true" : "false");
+    });
+  }
+
+  function closeSection(section) {
+    if (window.bootstrap && window.bootstrap.Collapse) {
+      window.bootstrap.Collapse.getOrCreateInstance(section, {
+        toggle: false
+      }).hide();
+    } else {
+      section.classList.remove("show");
+      syncTriggers(section, false);
+    }
+  }
+
+  function closeOtherSections(openSection) {
+    sections.forEach(function (section) {
+      if (section !== openSection && section.classList.contains("show")) {
+        closeSection(section);
+      }
+    });
+  }
+
+  function setCurrentSection(currentSection) {
+    sections.forEach(function (section) {
+      var sectionItem = section.closest("li.sidebar-item-section");
+
+      if (sectionItem) {
+        sectionItem.classList.toggle("sidebar-section-current", section === currentSection);
+      }
+    });
+  }
+
+  function markCurrentSection() {
+    var currentPage = pageNameFromUrl(window.location.href);
+
+    sections.forEach(function (section) {
+      var sectionItem = section.closest("li.sidebar-item-section");
+      var isCurrent = Array.prototype.slice.call(section.querySelectorAll("a.sidebar-link[href]")).some(function (link) {
+        return pageNameFromUrl(link.getAttribute("href")) === currentPage;
+      });
+
+      if (sectionItem) {
+        sectionItem.classList.toggle("sidebar-section-current", isCurrent);
+      }
+    });
+  }
+
+  markCurrentSection();
+  window.addEventListener("pageshow", markCurrentSection);
+  window.addEventListener("load", markCurrentSection);
+  window.setTimeout(markCurrentSection, 250);
+  window.setTimeout(markCurrentSection, 1000);
+
+  sidebar.querySelectorAll("[data-bs-target]").forEach(function (trigger) {
+    var target = trigger.getAttribute("data-bs-target");
+
+    if (!target || target.indexOf("#quarto-sidebar-section-") !== 0) {
+      return;
+    }
+
+    var section = sidebar.querySelector(target);
+
+    if (!section) {
+      return;
+    }
+
+    trigger.addEventListener("click", function () {
+      setCurrentSection(section);
+
+      if (!section.classList.contains("show")) {
+        closeOtherSections(section);
+      }
+    });
+  });
+
+  sections.forEach(function (section) {
+    section.addEventListener("show.bs.collapse", function () {
+      setCurrentSection(section);
+      closeOtherSections(section);
+    });
+  });
+}
+
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", initSidebarAccordion);
+} else {
+  initSidebarAccordion();
+}
+</script>

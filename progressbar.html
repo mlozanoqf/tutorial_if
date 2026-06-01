@@ -1,17 +1,23 @@
-<div id="progress-bar" style="width: 0%; height:2px; background-color: rgb(89 127 235);; position: fixed; top: 0px; z-index: 2000;"></div>
+<div id="progress-bar" style="width: 0%; height:1px; background-color: rgb(89 127 235); position: fixed; top: 0px; transform: scaleY(0.5); transform-origin: top left; z-index: 2000;"></div>
 
 <script id="progressbar" type="text/javascript">
+document.addEventListener("DOMContentLoaded", function () {
+  const bar = document.querySelector("#progress-bar");
+  const post = document.querySelector("#quarto-content");
+  const html = document.documentElement;
 
-document.addEventListener("DOMContentLoaded", function() {
+  if (!bar || !post) {
+    return;
+  }
 
-    const bar = document.querySelector('#progress-bar');
-    const post = document.querySelector('#quarto-content');
-    const html = document.documentElement;
-    
+  function updateProgress() {
     const height = post.scrollHeight + post.offsetTop;
-    
-    window.addEventListener('scroll', () => {
-        bar.style.width = (html.scrollTop / (height- html.clientHeight)) * 100 + '%';
-    });
+    const scrollable = height - html.clientHeight;
+    bar.style.width = (scrollable > 0 ? (html.scrollTop / scrollable) * 100 : 0) + "%";
+  }
+
+  updateProgress();
+  window.addEventListener("scroll", updateProgress, { passive: true });
+  window.addEventListener("resize", updateProgress);
 });
 </script>

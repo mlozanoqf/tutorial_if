@@ -1,0 +1,89 @@
+name: Publish Quarto book
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: windows-2022
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Install Quarto
+        shell: pwsh
+        run: |
+          choco install quarto -y --no-progress
+          "C:\Program Files\Quarto\bin" | Out-File -FilePath $env:GITHUB_PATH -Append
+
+      - name: Set up R
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = "Stop"
+          $rVersion = "4.5.2"
+          choco install r.project --version=$rVersion --allow-downgrade -y --no-progress
+          $rRoot = "C:\Program Files\R\R-$rVersion"
+          if (-not (Test-Path $rRoot)) {
+            throw "Expected R $rVersion at $rRoot"
+          }
+          "${rRoot}\bin\x64" | Out-File -FilePath $env:GITHUB_PATH -Append
+          "${rRoot}\bin" | Out-File -FilePath $env:GITHUB_PATH -Append
+
+      - name: Check tool versions
+        run: |
+          quarto --version
+          Rscript --version
+
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+
+      - name: Install R packages
+        shell: Rscript {0}
+        run: |
+          options(repos = c(CRAN = "https://cloud.r-project.org"))
+          # Keep only packages required to render the Options and VaR book.
+          if_packages <- c(
+            "dplyr",
+            "ggplot2",
+            "kableExtra",
+            "knitr",
+            "plotly",
+            "rmarkdown",
+            "tidyr",
+            "vembedr",
+            "xfun"
+          )
+          install.packages(setdiff(if_packages, rownames(installed.packages())))
+
+      - name: Render book
+        run: quarto render
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: _book
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

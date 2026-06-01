@@ -1,38 +1,69 @@
-title: Options and VaR with {{< fa brands r-project >}} <span style="color:white">R</span>
+project:
+  type: book
+  output-dir: _book
 
-author: Dr. Martín Lozano.
-date-modified: now
-date-format: "MMMM D, YYYY, HH:mm:ss a."
+book:
+  title: "Options and VaR with R"
+  subtitle: "Book"
+  author: "Dr. Martin Lozano"
+  page-navigation: true
+  search: true
+  date: today
+  date-format: "MMMM D, YYYY"
+  sidebar:
+    style: docked
+    collapse-level: 1
+  page-footer:
+    left: "Options and VaR with R"
+    right: 'Dr. Martin Lozano &middot; <a href="mailto:mlozanoqf@gmail.com">mlozanoqf@gmail.com</a> &middot; <a href="https://mlozanoqf.github.io/">mlozanoqf.github.io</a>'
+  chapters:
+    - text: "Options and VaR with R"
+      href: index.qmd
+    - 01-payoff-functions.qmd
+    - 02-options-properties.qmd
+    - 03-wiener-processes.qmd
+    - 04-value-at-risk.qmd
+    - references.qmd
 
-
-abstract: This material relies on @Hull. Some mathematical background is skipped to emphasize the data analysis, model logic, discussion, graphical approach and R coding [@Rref]. As in the philosophy of @knuth1984literate, the objective of this document is to explain to human beings what we want a computer to do as literate programming. This is a work in progress and it is under revision.
 bibliography: references.bib
+link-citations: true
 
-theme:
-  light: flatly
-  dark: darkly
+crossref:
+  chapters: true
+
+execute:
+  freeze: auto
+  warning: false
+  message: false
 
 format:
   html:
-    toc: true
-    toc-title: Contents
+    theme:
+      light: flatly
+      dark: darkly
+    toc: false
+    toc-title: "On this page"
+    toc-location: right
+    toc-depth: 2
     smooth-scroll: true
     code-fold: true
+    code-copy: true
     code-tools:
-      source: false
       toggle: true
+      source: false
     code-block-bg: true
     code-block-border-left: "#31BAE9"
     code-line-numbers: true
     number-sections: true
-    crossref:
-      chapters: true
-    toc-location: left
-    toc-depth: 2
+    number-depth: 3
     page-layout: full
-    include-after-body: analytics_if.html
-    include-in-header:
+    include-after-body:
+      - analytics_if.html
       - back-to-top.html
       - progressbar.html
-  
-link-citations: true
+      - sidebar-toggle.html
+      - local-navigation.html
+      - page-sections.html
+      - sidebar-accordion.html
+      - sidebar-chapter-sections.html
+    css: styles.css

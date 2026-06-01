@@ -1,0 +1,208 @@
+<script>
+function initPageSectionMenu() {
+  var topHeader = document.querySelector("#quarto-header .container-fluid");
+  var titleHeader = document.querySelector("#title-block-header");
+  var breadcrumbs = document.querySelector("#title-block-header .quarto-title-breadcrumbs") ||
+    document.querySelector("#quarto-header .quarto-page-breadcrumbs");
+  var main = document.querySelector("main.content, main#quarto-document-content, main");
+
+  if ((!titleHeader && !topHeader) || !main) {
+    return;
+  }
+
+  var pageName = window.location.pathname.split("/").pop();
+  var isHomePage = pageName === "" || pageName === "index.html";
+
+  if (isHomePage) {
+    if (titleHeader) {
+      var homeBreadcrumbs = titleHeader.querySelector(".quarto-title-breadcrumbs");
+      if (homeBreadcrumbs) {
+        homeBreadcrumbs.style.display = "none";
+      }
+    }
+
+    if (breadcrumbs) {
+      breadcrumbs.style.display = "none";
+    }
+
+    return;
+  }
+
+  function cleanText(element) {
+    return element.textContent.replace(/\s+/g, " ").trim();
+  }
+
+  function hashToId(hash) {
+    var id = hash.replace(/^#/, "");
+
+    try {
+      return decodeURIComponent(id);
+    } catch (error) {
+      return id;
+    }
+  }
+
+  function localNavOffset() {
+    var localNav = document.querySelector(".page-local-nav");
+
+    if (!localNav) {
+      return 0;
+    }
+
+    return Math.ceil(localNav.getBoundingClientRect().height + 16);
+  }
+
+  function scrollToSection(id, smooth) {
+    var target = document.getElementById(id);
+
+    if (!target) {
+      return false;
+    }
+
+    var top = target.getBoundingClientRect().top + window.pageYOffset - localNavOffset();
+    window.scrollTo({
+      top: Math.max(0, top),
+      behavior: smooth ? "smooth" : "auto"
+    });
+
+    return true;
+  }
+
+  var seen = {};
+  var generatedIndex = 0;
+  var headings = [];
+
+  Array.prototype.slice.call(main.querySelectorAll("h2, h3, a[id]")).forEach(function (element) {
+    var isHeading = element.matches("h2, h3");
+    var isAnchor = element.matches("a[id]");
+    var id = "";
+    var level = "h2";
+    var text = "";
+
+    if (isHeading) {
+      if (element.closest("#title-block-header, .cell, .sourceCode, pre, .callout")) {
+        return;
+      }
+
+      text = cleanText(element);
+      var section = element.closest("section[id]");
+      id = section ? section.id : element.id;
+      level = element.tagName.toLowerCase();
+
+      if (!id) {
+        id = "page-section-" + generatedIndex;
+        generatedIndex += 1;
+        element.id = id;
+      }
+    }
+
+    if (isAnchor && !isHeading) {
+      var block = element.parentElement ? element.parentElement.nextElementSibling : null;
+      var title = block ? block.querySelector(".callout-title-container") : null;
+
+      id = element.id;
+      text = title ? cleanText(title) : "";
+      level = "h2";
+    }
+
+    if (!id || !text || seen[id]) {
+      return;
+    }
+
+    seen[id] = true;
+    headings.push({
+      id: id,
+      level: level,
+      text: text
+    });
+  });
+
+  if (headings.length === 0 || document.querySelector(".page-section-menu")) {
+    return;
+  }
+
+  var menu = document.createElement("div");
+  menu.className = "page-section-menu dropdown";
+
+  var button = document.createElement("button");
+  button.className = "btn page-section-toggle dropdown-toggle";
+  button.type = "button";
+  button.setAttribute("data-bs-toggle", "dropdown");
+  button.setAttribute("aria-expanded", "false");
+  button.textContent = "On this page";
+
+  var list = document.createElement("ul");
+  list.className = "dropdown-menu dropdown-menu-end page-section-list";
+
+  headings.forEach(function (heading) {
+    var item = document.createElement("li");
+    var link = document.createElement("a");
+    link.className = "dropdown-item page-section-link page-section-link-" + heading.level;
+    link.href = "#" + heading.id;
+    link.textContent = heading.text;
+    link.addEventListener("click", function (event) {
+      var hash = link.getAttribute("href");
+      var id = hash ? hashToId(hash) : "";
+
+      if (!hash || !document.getElementById(id)) {
+        return;
+      }
+
+      event.preventDefault();
+      history.pushState(null, "", hash);
+
+      if (window.bootstrap && window.bootstrap.Dropdown) {
+        window.bootstrap.Dropdown.getOrCreateInstance(button).hide();
+      }
+
+      window.setTimeout(function () {
+        scrollToSection(id, true);
+      }, 0);
+
+      window.setTimeout(function () {
+        scrollToSection(id, false);
+      }, 650);
+    });
+    item.appendChild(link);
+    list.appendChild(item);
+  });
+
+  menu.appendChild(button);
+  menu.appendChild(list);
+
+  var localNav = document.createElement("div");
+  localNav.className = "page-local-nav";
+
+  if (breadcrumbs) {
+    var localBreadcrumbs = breadcrumbs.cloneNode(true);
+    localBreadcrumbs.classList.remove("d-none", "d-lg-block");
+    localBreadcrumbs.classList.add("page-local-breadcrumbs");
+    localNav.appendChild(localBreadcrumbs);
+  }
+
+  localNav.appendChild(menu);
+
+  if (titleHeader && titleHeader.parentElement) {
+    titleHeader.classList.add("has-page-local-nav");
+    titleHeader.parentElement.insertBefore(localNav, titleHeader);
+  } else if (main.firstChild) {
+    main.insertBefore(localNav, main.firstChild);
+  } else if (topHeader) {
+    topHeader.appendChild(localNav);
+  }
+
+  if (window.location.hash) {
+    [150, 450, 800].forEach(function (delay) {
+      window.setTimeout(function () {
+        scrollToSection(hashToId(window.location.hash), false);
+      }, delay);
+    });
+  }
+}
+
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", initPageSectionMenu);
+} else {
+  initPageSectionMenu();
+}
+</script>

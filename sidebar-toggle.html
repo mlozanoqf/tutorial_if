@@ -1,0 +1,92 @@
+<button
+  type="button"
+  id="book-menu-toggle"
+  class="book-menu-toggle book-menu-floating-toggle btn"
+  aria-controls="quarto-sidebar"
+  aria-label="Toggle sidebar navigation"
+>
+  <i class="bi bi-layout-sidebar-inset" aria-hidden="true"></i>
+  <span class="book-menu-toggle-text">Menu</span>
+</button>
+<script>
+function initBookSidebarToggle() {
+  var sidebar = document.querySelector("#quarto-sidebar");
+  var sidebarTools = document.querySelector("#quarto-sidebar .sidebar-tools-main");
+
+  if (!sidebar) {
+    return;
+  }
+
+  var nativeToggle = document.querySelector("#quarto-header .quarto-btn-toggle:not(#book-menu-toggle)");
+
+  if (nativeToggle) {
+    nativeToggle.classList.add("book-native-sidebar-toggle");
+    nativeToggle.setAttribute("aria-hidden", "true");
+    nativeToggle.setAttribute("tabindex", "-1");
+  }
+
+  var button = document.querySelector("#book-menu-toggle");
+
+  if (!button) {
+    button = document.createElement("button");
+    button.type = "button";
+    button.id = "book-menu-toggle";
+    button.className = "book-menu-toggle book-menu-floating-toggle btn";
+    button.setAttribute("aria-controls", "quarto-sidebar");
+    button.setAttribute("aria-label", "Toggle sidebar navigation");
+    button.innerHTML = '<i class="bi bi-layout-sidebar-inset" aria-hidden="true"></i><span class="book-menu-toggle-text">Menu</span>';
+    document.body.insertBefore(button, document.body.firstChild);
+  }
+
+  if (button.dataset.bookSidebarToggleReady === "true") {
+    return;
+  }
+
+  button.dataset.bookSidebarToggleReady = "true";
+
+  function sidebarIsVisible() {
+    return !document.body.classList.contains("book-sidebar-hidden");
+  }
+
+  function placeButton() {
+    if (sidebarIsVisible() && sidebarTools) {
+      button.classList.remove("book-menu-floating-toggle");
+      button.classList.add("book-menu-sidebar-toggle");
+      button.setAttribute("title", "Hide sidebar navigation");
+      sidebarTools.insertBefore(button, sidebarTools.firstChild);
+      return;
+    }
+
+    button.classList.remove("book-menu-sidebar-toggle");
+    button.classList.add("book-menu-floating-toggle");
+    button.setAttribute("title", "Show sidebar navigation");
+
+    if (button.parentElement !== document.body) {
+      document.body.insertBefore(button, document.body.firstChild);
+    }
+  }
+
+  function syncButton() {
+    button.setAttribute("aria-expanded", sidebarIsVisible() ? "true" : "false");
+    placeButton();
+  }
+
+  button.addEventListener("click", function (event) {
+    event.preventDefault();
+    event.stopImmediatePropagation();
+    document.body.classList.toggle("book-sidebar-hidden");
+    syncButton();
+  }, true);
+
+  sidebar.addEventListener("shown.bs.collapse", syncButton);
+  sidebar.addEventListener("hidden.bs.collapse", syncButton);
+  window.addEventListener("resize", syncButton);
+  syncButton();
+}
+
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", initBookSidebarToggle);
+} else {
+  initBookSidebarToggle();
+}
+</script>
